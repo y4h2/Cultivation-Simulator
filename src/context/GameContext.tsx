@@ -9,6 +9,7 @@ import type {
   ActivityType,
   CombatEnemy,
   CombatLogEntry,
+  SpiritBeast,
 } from '../types/game';
 import { createInitialTime, advanceTime, isNewDay } from '../utils/time';
 import { createInitialMarket, updateMarketPrices } from '../utils/market';
@@ -41,6 +42,14 @@ import {
   resetSkillTree,
   resetElementTree,
 } from '../utils/skillTree';
+import {
+  feedBeast,
+  trainBeast,
+  attemptBeastBreakthrough,
+  setActiveBeast,
+  updateBeastInCollection,
+  addBeastToCollection,
+} from '../utils/spiritBeast';
 import type { SkillTreeType, ElementTreeType } from '../types/game';
 
 // Action Types
@@ -71,7 +80,13 @@ type GameAction =
   // Skill Tree Actions
   | { type: 'LEARN_SKILL_NODE'; payload: { nodeId: string; treeType: 'main' | 'element' } }
   | { type: 'RESET_SKILL_TREE'; payload: { tree: SkillTreeType | ElementTreeType; treeType: 'main' | 'element' } }
-  | { type: 'AWARD_SKILL_POINTS'; payload: { amount: number } };
+  | { type: 'AWARD_SKILL_POINTS'; payload: { amount: number } }
+  // Spirit Beast Actions
+  | { type: 'CAPTURE_BEAST'; payload: { beast: SpiritBeast } }
+  | { type: 'FEED_BEAST'; payload: { beastId: string; feedItemId: string } }
+  | { type: 'TRAIN_BEAST'; payload: { beastId: string; intensity: number } }
+  | { type: 'SET_ACTIVE_BEAST'; payload: { beastId: string | null } }
+  | { type: 'BEAST_BREAKTHROUGH'; payload: { beastId: string } };
 
 // Initial State
 const createInitialState = (): GameState => ({
@@ -1065,6 +1080,194 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
       };
     }
 
+    // ========== Spirit Beast Actions ==========
+    case 'CAPTURE_BEAST': {
+      const { beast } = action.payload;
+      const updatedCollection = addBeastToCollection(state.character.spiritBeasts, beast);
+
+      if (!updatedCollection) {
+        // No space
+        return state;
+      }
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: `成功捕获了灵兽！`,
+        type: 'event',
+      };
+
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          spiritBeasts: updatedCollection,
+        },
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'FEED_BEAST': {
+      const { beastId, feedItemId } = action.payload;
+      const beast = state.character.spiritBeasts.beasts.find(b => b.id === beastId);
+
+      if (!beast) return state;
+
+      // Check if player has the feed item
+      const inventoryItem = state.character.inventory.items.find(i => i.itemId === feedItemId);
+      if (!inventoryItem || inventoryItem.quantity <= 0) return state;
+
+      const result = feedBeast(beast, feedItemId, state.time);
+      if (!result) return state;
+
+      // Update inventory
+      const newInventoryItems = state.character.inventory.items
+        .map(i => i.itemId === feedItemId ? { ...i, quantity: i.quantity - 1 } : i)
+        .filter(i => i.quantity > 0);
+
+      const updatedCollection = updateBeastInCollection(state.character.spiritBeasts, result.beast);
+
+      let logMessage = `喂养了灵兽，获得${result.expGained}经验，亲密度+${result.affinityGained}`;
+      if (result.leveledUp) {
+        logMessage += `，升级到${result.newLevel}级！`;
+      }
+      if (result.newSkills && result.newSkills.length > 0) {
+        logMessage += ` 学会了新技能：${result.newSkills.map(s => s.chineseName).join('、')}`;
+      }
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: logMessage,
+        type: 'event',
+      };
+
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          spiritBeasts: updatedCollection,
+          inventory: { ...state.character.inventory, items: newInventoryItems },
+        },
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'TRAIN_BEAST': {
+      const { beastId, intensity } = action.payload;
+      const beast = state.character.spiritBeasts.beasts.find(b => b.id === beastId);
+
+      if (!beast) return state;
+
+      const result = trainBeast(beast, intensity, state.time);
+      const updatedCollection = updateBeastInCollection(state.character.spiritBeasts, result.beast);
+
+      let logMessage = `训练了灵兽，获得${result.expGained}经验`;
+      if (result.leveledUp) {
+        logMessage += `，升级到${result.newLevel}级！`;
+      }
+      if (result.newSkills && result.newSkills.length > 0) {
+        logMessage += ` 学会了新技能：${result.newSkills.map(s => s.chineseName).join('、')}`;
+      }
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: logMessage,
+        type: 'event',
+      };
+
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          spiritBeasts: updatedCollection,
+        },
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'SET_ACTIVE_BEAST': {
+      const { beastId } = action.payload;
+      const updatedCollection = setActiveBeast(state.character.spiritBeasts, beastId);
+
+      const beast = beastId ? state.character.spiritBeasts.beasts.find(b => b.id === beastId) : null;
+      const logMessage = beast
+        ? `设置${beast.nickname || '灵兽'}为出战灵兽`
+        : `取消了出战灵兽`;
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: logMessage,
+        type: 'system',
+      };
+
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          spiritBeasts: updatedCollection,
+        },
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'BEAST_BREAKTHROUGH': {
+      const { beastId } = action.payload;
+      const beast = state.character.spiritBeasts.beasts.find(b => b.id === beastId);
+
+      if (!beast) return state;
+
+      const result = attemptBeastBreakthrough(beast, state.character);
+
+      if (!result.success) {
+        const log: GameLog = {
+          timestamp: state.time,
+          message: result.reasonChinese || '灵兽突破失败',
+          type: 'event',
+        };
+
+        if (result.beast) {
+          const updatedCollection = updateBeastInCollection(state.character.spiritBeasts, result.beast);
+          return {
+            ...state,
+            character: {
+              ...state.character,
+              spiritBeasts: updatedCollection,
+            },
+            logs: [...state.logs, log].slice(-100),
+          };
+        }
+
+        return {
+          ...state,
+          logs: [...state.logs, log].slice(-100),
+        };
+      }
+
+      if (!result.beast) return state;
+
+      const updatedCollection = updateBeastInCollection(state.character.spiritBeasts, result.beast);
+      const tierNames: Record<string, string> = {
+        mortal: '凡兽',
+        spirit: '灵兽',
+        mystic: '玄兽',
+        holy: '圣兽',
+      };
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: `灵兽突破成功！晋升为${tierNames[result.beast.tier]}`,
+        type: 'event',
+      };
+
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          spiritBeasts: updatedCollection,
+        },
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
     default:
       return state;
   }
@@ -1100,6 +1303,12 @@ interface GameContextType {
     learnSkillNode: (nodeId: string, treeType: 'main' | 'element') => void;
     resetSkillTreeAction: (tree: SkillTreeType | ElementTreeType, treeType: 'main' | 'element') => void;
     awardSkillPoints: (amount: number) => void;
+    // Spirit Beast actions
+    captureBeast: (beast: SpiritBeast) => void;
+    feedBeast: (beastId: string, feedItemId: string) => void;
+    trainBeast: (beastId: string, intensity: number) => void;
+    setActiveBeast: (beastId: string | null) => void;
+    beastBreakthrough: (beastId: string) => void;
   };
 }
 
@@ -1186,6 +1395,17 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dispatch({ type: 'RESET_SKILL_TREE', payload: { tree, treeType } }), []),
     awardSkillPoints: useCallback((amount: number) =>
       dispatch({ type: 'AWARD_SKILL_POINTS', payload: { amount } }), []),
+    // Spirit Beast actions
+    captureBeast: useCallback((beast: SpiritBeast) =>
+      dispatch({ type: 'CAPTURE_BEAST', payload: { beast } }), []),
+    feedBeast: useCallback((beastId: string, feedItemId: string) =>
+      dispatch({ type: 'FEED_BEAST', payload: { beastId, feedItemId } }), []),
+    trainBeast: useCallback((beastId: string, intensity: number) =>
+      dispatch({ type: 'TRAIN_BEAST', payload: { beastId, intensity } }), []),
+    setActiveBeast: useCallback((beastId: string | null) =>
+      dispatch({ type: 'SET_ACTIVE_BEAST', payload: { beastId } }), []),
+    beastBreakthrough: useCallback((beastId: string) =>
+      dispatch({ type: 'BEAST_BREAKTHROUGH', payload: { beastId } }), []),
   };
 
   return (

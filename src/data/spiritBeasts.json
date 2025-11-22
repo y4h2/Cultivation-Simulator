@@ -1,0 +1,523 @@
+{
+  "tierInfo": {
+    "mortal": {
+      "name": "Mortal Beast",
+      "chineseName": "凡兽",
+      "maxLevel": 20,
+      "statMultiplier": 1.0
+    },
+    "spirit": {
+      "name": "Spirit Beast",
+      "chineseName": "灵兽",
+      "maxLevel": 40,
+      "statMultiplier": 1.5
+    },
+    "mystic": {
+      "name": "Mystic Beast",
+      "chineseName": "玄兽",
+      "maxLevel": 60,
+      "statMultiplier": 2.0
+    },
+    "holy": {
+      "name": "Holy Beast",
+      "chineseName": "圣兽",
+      "maxLevel": 100,
+      "statMultiplier": 3.0
+    }
+  },
+  "personalityModifiers": {
+    "aggressive": {
+      "name": "Aggressive",
+      "chineseName": "暴躁",
+      "modifiers": { "atk": 1.15, "def": 0.9, "hp": 1.0, "spd": 1.0, "wis": 1.0, "sense": 1.0 }
+    },
+    "calm": {
+      "name": "Calm",
+      "chineseName": "稳重",
+      "modifiers": { "atk": 1.0, "def": 1.15, "hp": 1.0, "spd": 0.9, "wis": 1.0, "sense": 1.0 }
+    },
+    "agile": {
+      "name": "Agile",
+      "chineseName": "灵动",
+      "modifiers": { "atk": 1.0, "def": 1.0, "hp": 0.9, "spd": 1.15, "wis": 1.0, "sense": 1.0 }
+    },
+    "wise": {
+      "name": "Wise",
+      "chineseName": "睿智",
+      "modifiers": { "atk": 0.9, "def": 1.0, "hp": 1.0, "spd": 1.0, "wis": 1.15, "sense": 1.0 }
+    },
+    "lucky": {
+      "name": "Lucky",
+      "chineseName": "福缘",
+      "modifiers": { "atk": 1.0, "def": 0.9, "hp": 1.0, "spd": 1.0, "wis": 1.0, "sense": 1.15 }
+    }
+  },
+  "moodEffects": {
+    "happy": { "statBonus": 1.1, "canFight": true },
+    "calm": { "statBonus": 1.0, "canFight": true },
+    "anxious": { "statBonus": 0.9, "canFight": true },
+    "fearful": { "statBonus": 0.7, "canFight": true },
+    "sick": { "statBonus": 0.5, "canFight": false }
+  },
+  "rarityBaseCaptureRate": {
+    "N": 0.6,
+    "R": 0.4,
+    "SR": 0.2,
+    "SSR": 0.1,
+    "SSS": 0.05
+  },
+  "expRequirements": {
+    "baseExp": 100,
+    "growthRate": 1.15
+  },
+  "beasts": [
+    {
+      "id": "fire_fox",
+      "name": "Crimson Flame Fox",
+      "chineseName": "赤焰狐",
+      "rarity": "R",
+      "element": "fire",
+      "role": "attacker",
+      "baseStats": {
+        "hp": 80,
+        "atk": 25,
+        "def": 12,
+        "spd": 18,
+        "wis": 15,
+        "sense": 14
+      },
+      "growthRates": {
+        "hp": 8,
+        "atk": 3.5,
+        "def": 1.5,
+        "spd": 2.0,
+        "wis": 1.5,
+        "sense": 1.5
+      },
+      "skills": [
+        {
+          "id": "fire_fox_flame_bite",
+          "name": "Flame Bite",
+          "chineseName": "烈焰咬",
+          "description": "A fierce bite infused with flames",
+          "chineseDescription": "灼热的火焰附着于利齿之上",
+          "type": "attack",
+          "element": "fire",
+          "costMp": 10,
+          "cooldown": 0,
+          "powerMultiplier": 1.0,
+          "unlockLevel": 1
+        },
+        {
+          "id": "fire_fox_fireball",
+          "name": "Fox Fire",
+          "chineseName": "狐火",
+          "description": "Launches a ball of fox fire at the enemy",
+          "chineseDescription": "向敌人发射一团妖狐之火",
+          "type": "attack",
+          "element": "fire",
+          "costMp": 20,
+          "cooldown": 2,
+          "powerMultiplier": 1.5,
+          "unlockLevel": 10
+        },
+        {
+          "id": "fire_fox_inferno",
+          "name": "Inferno Dance",
+          "chineseName": "炎舞",
+          "description": "Surrounds the battlefield with scorching flames",
+          "chineseDescription": "以炎火环绕战场，灼烧一切敌人",
+          "type": "attack",
+          "element": "fire",
+          "costMp": 35,
+          "cooldown": 4,
+          "powerMultiplier": 2.0,
+          "unlockLevel": 25,
+          "unlockTier": "spirit"
+        }
+      ],
+      "traits": ["fire_affinity", "night_hunter"],
+      "description": "A cunning fox that has absorbed fire essence. Known for its fierce attacks.",
+      "chineseDescription": "吸收了火之精华的狡猾灵狐，以凶猛的攻击著称。"
+    },
+    {
+      "id": "cold_deer",
+      "name": "Cold Spring Deer",
+      "chineseName": "寒泉鹿",
+      "rarity": "R",
+      "element": "water",
+      "role": "supporter",
+      "baseStats": {
+        "hp": 100,
+        "atk": 12,
+        "def": 15,
+        "spd": 16,
+        "wis": 22,
+        "sense": 18
+      },
+      "growthRates": {
+        "hp": 10,
+        "atk": 1.5,
+        "def": 2.0,
+        "spd": 1.5,
+        "wis": 2.5,
+        "sense": 2.0
+      },
+      "skills": [
+        {
+          "id": "cold_deer_gentle_touch",
+          "name": "Gentle Touch",
+          "chineseName": "轻抚",
+          "description": "A soothing touch that heals wounds",
+          "chineseDescription": "温柔的触碰治愈伤口",
+          "type": "support",
+          "element": "water",
+          "costMp": 15,
+          "cooldown": 2,
+          "powerMultiplier": 0.3,
+          "unlockLevel": 1
+        },
+        {
+          "id": "cold_deer_spring_blessing",
+          "name": "Spring Blessing",
+          "chineseName": "泉之祝福",
+          "description": "Channels the power of cold springs to restore HP",
+          "chineseDescription": "引导寒泉之力恢复生命",
+          "type": "support",
+          "element": "water",
+          "costMp": 25,
+          "cooldown": 3,
+          "powerMultiplier": 0.5,
+          "unlockLevel": 12
+        },
+        {
+          "id": "cold_deer_frost_barrier",
+          "name": "Frost Barrier",
+          "chineseName": "霜之壁障",
+          "description": "Creates a protective barrier of frost",
+          "chineseDescription": "创造一道霜之屏障保护同伴",
+          "type": "defense",
+          "element": "water",
+          "costMp": 30,
+          "cooldown": 4,
+          "powerMultiplier": 0,
+          "unlockLevel": 20,
+          "unlockTier": "spirit"
+        }
+      ],
+      "traits": ["water_affinity", "spirit_field_friend"],
+      "description": "A graceful deer born near cold springs. Known for its healing abilities.",
+      "chineseDescription": "诞生于寒泉边的优雅灵鹿，以治愈能力著称。"
+    },
+    {
+      "id": "iron_turtle",
+      "name": "Iron Shell Turtle",
+      "chineseName": "铁甲龟",
+      "rarity": "N",
+      "element": "metal",
+      "role": "tank",
+      "baseStats": {
+        "hp": 150,
+        "atk": 10,
+        "def": 30,
+        "spd": 5,
+        "wis": 10,
+        "sense": 8
+      },
+      "growthRates": {
+        "hp": 15,
+        "atk": 1.0,
+        "def": 4.0,
+        "spd": 0.5,
+        "wis": 1.0,
+        "sense": 0.8
+      },
+      "skills": [
+        {
+          "id": "iron_turtle_shell_bash",
+          "name": "Shell Bash",
+          "chineseName": "铁壳冲撞",
+          "description": "Rams into the enemy with its iron shell",
+          "chineseDescription": "用铁壳撞击敌人",
+          "type": "attack",
+          "element": "metal",
+          "costMp": 10,
+          "cooldown": 0,
+          "powerMultiplier": 0.8,
+          "unlockLevel": 1
+        },
+        {
+          "id": "iron_turtle_iron_defense",
+          "name": "Iron Defense",
+          "chineseName": "铁壁",
+          "description": "Hardens its shell to block attacks",
+          "chineseDescription": "硬化龟壳抵御攻击",
+          "type": "defense",
+          "element": "metal",
+          "costMp": 15,
+          "cooldown": 3,
+          "powerMultiplier": 0,
+          "unlockLevel": 8
+        },
+        {
+          "id": "iron_turtle_provoke",
+          "name": "Provoke",
+          "chineseName": "嘲讽",
+          "description": "Draws enemy attention to itself",
+          "chineseDescription": "吸引敌人的注意力",
+          "type": "defense",
+          "element": "metal",
+          "costMp": 20,
+          "cooldown": 4,
+          "powerMultiplier": 0,
+          "unlockLevel": 15
+        }
+      ],
+      "traits": ["metal_affinity", "ore_devourer"],
+      "description": "A sturdy turtle with an iron-like shell. Extremely tough to break through.",
+      "chineseDescription": "拥有铁一般坚硬龟壳的灵龟，防御力极高。"
+    },
+    {
+      "id": "jade_sparrow",
+      "name": "Jade Spirit Sparrow",
+      "chineseName": "翠灵雀",
+      "rarity": "N",
+      "element": "wood",
+      "role": "gatherer",
+      "baseStats": {
+        "hp": 60,
+        "atk": 12,
+        "def": 8,
+        "spd": 25,
+        "wis": 18,
+        "sense": 25
+      },
+      "growthRates": {
+        "hp": 6,
+        "atk": 1.5,
+        "def": 1.0,
+        "spd": 3.0,
+        "wis": 2.0,
+        "sense": 3.0
+      },
+      "skills": [
+        {
+          "id": "jade_sparrow_peck",
+          "name": "Jade Peck",
+          "chineseName": "翠啄",
+          "description": "A quick pecking attack",
+          "chineseDescription": "快速的啄击攻击",
+          "type": "attack",
+          "element": "wood",
+          "costMp": 8,
+          "cooldown": 0,
+          "powerMultiplier": 0.7,
+          "unlockLevel": 1
+        },
+        {
+          "id": "jade_sparrow_treasure_sense",
+          "name": "Treasure Sense",
+          "chineseName": "探宝",
+          "description": "Senses nearby treasures and resources",
+          "chineseDescription": "感知附近的宝物和资源",
+          "type": "support",
+          "element": "wood",
+          "costMp": 20,
+          "cooldown": 5,
+          "powerMultiplier": 0,
+          "unlockLevel": 10
+        },
+        {
+          "id": "jade_sparrow_wind_dance",
+          "name": "Wind Dance",
+          "chineseName": "风之舞",
+          "description": "An evasive dance that increases speed",
+          "chineseDescription": "灵动的舞步提升速度",
+          "type": "support",
+          "element": "wood",
+          "costMp": 15,
+          "cooldown": 3,
+          "powerMultiplier": 0,
+          "unlockLevel": 15
+        }
+      ],
+      "traits": ["wood_affinity", "treasure_finder", "spirit_field_friend"],
+      "description": "A swift sparrow with jade-colored feathers. Excellent at finding treasures.",
+      "chineseDescription": "翠绿羽毛的灵雀，擅长发现宝物。"
+    },
+    {
+      "id": "earth_serpent",
+      "name": "Earth Serpent",
+      "chineseName": "玄土蛇",
+      "rarity": "R",
+      "element": "earth",
+      "role": "hybrid",
+      "baseStats": {
+        "hp": 90,
+        "atk": 18,
+        "def": 20,
+        "spd": 14,
+        "wis": 16,
+        "sense": 20
+      },
+      "growthRates": {
+        "hp": 9,
+        "atk": 2.5,
+        "def": 2.5,
+        "spd": 1.5,
+        "wis": 2.0,
+        "sense": 2.0
+      },
+      "skills": [
+        {
+          "id": "earth_serpent_constrict",
+          "name": "Constrict",
+          "chineseName": "缠绕",
+          "description": "Wraps around the enemy and squeezes",
+          "chineseDescription": "缠绕敌人并挤压",
+          "type": "attack",
+          "element": "earth",
+          "costMp": 12,
+          "cooldown": 0,
+          "powerMultiplier": 1.0,
+          "unlockLevel": 1
+        },
+        {
+          "id": "earth_serpent_burrow",
+          "name": "Burrow",
+          "chineseName": "遁地",
+          "description": "Burrows underground to avoid attacks",
+          "chineseDescription": "遁入地下躲避攻击",
+          "type": "defense",
+          "element": "earth",
+          "costMp": 18,
+          "cooldown": 3,
+          "powerMultiplier": 0,
+          "unlockLevel": 12
+        },
+        {
+          "id": "earth_serpent_earth_spike",
+          "name": "Earth Spike",
+          "chineseName": "地刺",
+          "description": "Summons spikes from the earth",
+          "chineseDescription": "从地面召唤尖刺攻击敌人",
+          "type": "attack",
+          "element": "earth",
+          "costMp": 25,
+          "cooldown": 3,
+          "powerMultiplier": 1.8,
+          "unlockLevel": 18
+        },
+        {
+          "id": "earth_serpent_earthquake",
+          "name": "Earthquake",
+          "chineseName": "地震",
+          "description": "Causes the earth to shake violently",
+          "chineseDescription": "引发剧烈的地震",
+          "type": "attack",
+          "element": "earth",
+          "costMp": 40,
+          "cooldown": 5,
+          "powerMultiplier": 2.2,
+          "unlockLevel": 30,
+          "unlockTier": "spirit"
+        }
+      ],
+      "traits": ["earth_affinity", "ore_devourer", "sense_underground"],
+      "description": "A mysterious serpent that dwells in the earth. Balanced in offense and defense.",
+      "chineseDescription": "栖息于大地之中的神秘蛇类，攻守兼备。"
+    }
+  ],
+  "traits": {
+    "fire_affinity": {
+      "name": "Fire Affinity",
+      "chineseName": "火系亲和",
+      "description": "+15% fire damage",
+      "chineseDescription": "火系伤害+15%"
+    },
+    "water_affinity": {
+      "name": "Water Affinity",
+      "chineseName": "水系亲和",
+      "description": "+15% water damage and healing",
+      "chineseDescription": "水系伤害和治疗+15%"
+    },
+    "wood_affinity": {
+      "name": "Wood Affinity",
+      "chineseName": "木系亲和",
+      "description": "+15% wood damage",
+      "chineseDescription": "木系伤害+15%"
+    },
+    "metal_affinity": {
+      "name": "Metal Affinity",
+      "chineseName": "金系亲和",
+      "description": "+15% metal damage",
+      "chineseDescription": "金系伤害+15%"
+    },
+    "earth_affinity": {
+      "name": "Earth Affinity",
+      "chineseName": "土系亲和",
+      "description": "+15% earth damage",
+      "chineseDescription": "土系伤害+15%"
+    },
+    "spirit_field_friend": {
+      "name": "Spirit Field Friend",
+      "chineseName": "灵田之友",
+      "description": "Increases spirit herb gathering rate",
+      "chineseDescription": "提高灵草采集效率"
+    },
+    "ore_devourer": {
+      "name": "Ore Devourer",
+      "chineseName": "矿脉啃噬",
+      "description": "Increases ore gathering rate",
+      "chineseDescription": "提高矿石采集效率"
+    },
+    "night_hunter": {
+      "name": "Night Hunter",
+      "chineseName": "夜行猎手",
+      "description": "Increased stats during night encounters",
+      "chineseDescription": "夜间战斗属性提升"
+    },
+    "treasure_finder": {
+      "name": "Treasure Finder",
+      "chineseName": "寻宝",
+      "description": "Chance to find extra loot",
+      "chineseDescription": "有几率发现额外战利品"
+    },
+    "sense_underground": {
+      "name": "Underground Sense",
+      "chineseName": "地底感知",
+      "description": "Can sense hidden items underground",
+      "chineseDescription": "能感知地下隐藏物品"
+    }
+  },
+  "feedItems": {
+    "normal_feed": {
+      "name": "Normal Feed",
+      "chineseName": "普通饲料",
+      "expBonus": 10,
+      "affinityBonus": 1,
+      "moodBonus": 5
+    },
+    "spirit_fruit": {
+      "name": "Spirit Fruit",
+      "chineseName": "灵果",
+      "expBonus": 50,
+      "affinityBonus": 5,
+      "moodBonus": 10
+    },
+    "spirit_grass": {
+      "name": "Spirit Grass",
+      "chineseName": "灵草",
+      "expBonus": 30,
+      "affinityBonus": 3,
+      "moodBonus": 8
+    },
+    "rare_material": {
+      "name": "Rare Material",
+      "chineseName": "珍稀材料",
+      "expBonus": 100,
+      "affinityBonus": 10,
+      "moodBonus": 15
+    }
+  }
+}

@@ -12,4 +12,5 @@ export { SkillTreeBackground } from './SkillTreeBackground';
 export { HelpModal } from './HelpModal';
 export { SettingsPanel } from './SettingsPanel';
 export { BottomNav } from './BottomNav';
+export { SpiritBeastPanel } from './SpiritBeastPanel';
 export type { TabType } from './TabNavigation';

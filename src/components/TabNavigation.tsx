@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../i18n';
 
-export type TabType = 'market' | 'inventory' | 'combat' | 'skills';
+export type TabType = 'market' | 'inventory' | 'combat' | 'skills' | 'spiritBeast';
 
 interface TabNavigationProps {
   activeTab: TabType;
@@ -14,11 +14,12 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
 }) => {
   const { t } = useLanguage();
 
-  const TABS: Array<{ id: TabType; labelKey: keyof typeof t.tabs }> = [
-    { id: 'market', labelKey: 'market' },
-    { id: 'inventory', labelKey: 'inventory' },
-    { id: 'combat', labelKey: 'combat' },
-    { id: 'skills', labelKey: 'skills' },
+  const TABS: Array<{ id: TabType; label: string }> = [
+    { id: 'market', label: t.tabs.market },
+    { id: 'inventory', label: t.tabs.inventory },
+    { id: 'combat', label: t.tabs.combat },
+    { id: 'skills', label: t.tabs.skills },
+    { id: 'spiritBeast', label: t.spiritBeast.title },
   ];
 
   return (
@@ -33,7 +34,7 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
               : 'text-gray-400 hover:text-white hover:bg-gray-800'
           }`}
         >
-          <span className="block whitespace-nowrap">{t.tabs[tab.labelKey]}</span>
+          <span className="block whitespace-nowrap">{tab.label}</span>
         </button>
       ))}
     </div>

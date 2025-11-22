@@ -3,6 +3,7 @@ import { ActivityType } from '../types/game';
 import { REALM_INFO, REALM_ORDER, getNextRealm, getRealmDisplayName } from '../constants/realms';
 import { ACTIVITY_INFO } from '../constants/activities';
 import { createInitialSkillPoints, createInitialLearnedSkills } from './skillTree';
+import { createInitialSpiritBeastCollection } from './spiritBeast';
 
 // Base cultivation value gained per ke
 const BASE_CULTIVATION_PER_KE = 1;
@@ -242,6 +243,8 @@ export const createInitialCharacter = (name: string): Character => {
     // Skill Tree System
     skillPoints: createInitialSkillPoints(),
     learnedSkills: createInitialLearnedSkills(),
+    // Spirit Beast System
+    spiritBeasts: createInitialSpiritBeastCollection(),
   };
 };
 

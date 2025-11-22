@@ -271,6 +271,8 @@ export interface Character {
   // Skill Tree System
   skillPoints: SkillPointsState;
   learnedSkills: LearnedSkillsState;
+  // Spirit Beast System
+  spiritBeasts: SpiritBeastCollection;
 }
 
 // Inventory System
@@ -672,4 +674,141 @@ export interface ComputedPassives {
     efficiencyBonus: number;        // Faster cultivation
     breakthroughBonus: number;      // Better breakthrough chance
   };
+}
+
+// ============================================
+// Spirit Beast System Types
+// ============================================
+
+export const SpiritBeastRarity = {
+  N: 'N',
+  R: 'R',
+  SR: 'SR',
+  SSR: 'SSR',
+  SSS: 'SSS',
+} as const;
+
+export type SpiritBeastRarity = typeof SpiritBeastRarity[keyof typeof SpiritBeastRarity];
+
+export const SpiritBeastRole = {
+  Attacker: 'attacker',
+  Supporter: 'supporter',
+  Tank: 'tank',
+  Gatherer: 'gatherer',
+  Hybrid: 'hybrid',
+} as const;
+
+export type SpiritBeastRole = typeof SpiritBeastRole[keyof typeof SpiritBeastRole];
+
+export const BeastPersonality = {
+  Aggressive: 'aggressive',    // 暴躁 - +ATK, -DEF
+  Calm: 'calm',               // 稳重 - +DEF, -SPD
+  Agile: 'agile',             // 灵动 - +SPD, -HP
+  Wise: 'wise',               // 睿智 - +WIS, -ATK
+  Lucky: 'lucky',             // 福缘 - +SENSE, -DEF
+} as const;
+
+export type BeastPersonality = typeof BeastPersonality[keyof typeof BeastPersonality];
+
+export const BeastMood = {
+  Happy: 'happy',           // 快乐 - stat bonus
+  Calm: 'calm',             // 平静 - normal
+  Anxious: 'anxious',       // 焦躁 - slight debuff
+  Fearful: 'fearful',       // 恐惧 - major debuff
+  Sick: 'sick',             // 生病 - cannot fight
+} as const;
+
+export type BeastMood = typeof BeastMood[keyof typeof BeastMood];
+
+export const BeastTier = {
+  Mortal: 'mortal',         // 凡兽
+  Spirit: 'spirit',         // 灵兽
+  Mystic: 'mystic',         // 玄兽
+  Holy: 'holy',             // 圣兽
+} as const;
+
+export type BeastTier = typeof BeastTier[keyof typeof BeastTier];
+
+export const BeastBattleMode = {
+  Accompanying: 'accompanying',  // 随行出战
+  Summoned: 'summoned',          // 召唤出战
+  Support: 'support',            // 辅助出战
+} as const;
+
+export type BeastBattleMode = typeof BeastBattleMode[keyof typeof BeastBattleMode];
+
+export interface SpiritBeastSkill {
+  id: string;
+  name: string;
+  chineseName: string;
+  description: string;
+  chineseDescription: string;
+  type: 'attack' | 'defense' | 'support' | 'combo';  // combo = 合击技
+  element?: Element;
+  costMp: number;
+  cooldown: number;
+  currentCooldown?: number;
+  powerMultiplier: number;
+  unlockLevel: number;         // Level required to unlock
+  unlockTier?: BeastTier;      // Tier required to unlock
+}
+
+export interface SpiritBeastBaseStats {
+  hp: number;
+  atk: number;
+  def: number;
+  spd: number;
+  wis: number;
+  sense: number;
+}
+
+export interface SpiritBeastGrowthRates {
+  hp: number;
+  atk: number;
+  def: number;
+  spd: number;
+  wis: number;
+  sense: number;
+}
+
+export interface SpiritBeastTemplate {
+  id: string;
+  name: string;
+  chineseName: string;
+  rarity: SpiritBeastRarity;
+  element: Element;
+  role: SpiritBeastRole;
+  baseStats: SpiritBeastBaseStats;
+  growthRates: SpiritBeastGrowthRates;
+  skills: SpiritBeastSkill[];
+  traits: string[];             // Passive traits like 灵田之友, 矿脉啃噬
+  description: string;
+  chineseDescription: string;
+}
+
+export interface SpiritBeast {
+  id: string;                   // Unique instance ID
+  templateId: string;           // Reference to template
+  nickname?: string;            // Custom nickname
+  level: number;
+  exp: number;
+  expToNextLevel: number;
+  tier: BeastTier;
+  personality: BeastPersonality;
+  mood: BeastMood;
+  affinity: number;             // 0-100, bond with player
+  currentStats: SpiritBeastBaseStats;
+  battleMode: BeastBattleMode;
+  skills: SpiritBeastSkill[];   // Unlocked skills
+  isActive: boolean;            // Is this the active beast?
+  capturedAt: GameTime;
+  lastFedAt?: GameTime;
+  lastTrainedAt?: GameTime;
+}
+
+// Add to Character interface
+export interface SpiritBeastCollection {
+  beasts: SpiritBeast[];
+  activeBeastId: string | null;
+  maxSlots: number;
 }

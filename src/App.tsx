@@ -10,6 +10,7 @@ import {
   CombatPanel,
   TabNavigation,
   SkillTreePanel,
+  SpiritBeastPanel,
 } from './components';
 import type { TabType } from './components';
 
@@ -35,6 +36,7 @@ function GameContent() {
             {activeTab === 'inventory' && <InventoryPanel />}
             {activeTab === 'combat' && <CombatPanel />}
             {activeTab === 'skills' && <SkillTreePanel />}
+            {activeTab === 'spiritBeast' && <SpiritBeastPanel />}
           </div>
         </div>
       </div>

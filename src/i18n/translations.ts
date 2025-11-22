@@ -193,6 +193,78 @@ export interface Translations {
       active: string;
     };
   };
+  // Spirit Beast System
+  spiritBeast: {
+    title: string;
+    collection: string;
+    empty: string;
+    details: string;
+    stats: string;
+    skills: string;
+    traits: string;
+    level: string;
+    exp: string;
+    tier: string;
+    rarity: string;
+    element: string;
+    role: string;
+    personality: string;
+    mood: string;
+    affinity: string;
+    feed: string;
+    train: string;
+    setActive: string;
+    removeActive: string;
+    breakthrough: string;
+    capture: string;
+    release: string;
+    battleMode: string;
+    tiers: {
+      mortal: string;
+      spirit: string;
+      mystic: string;
+      holy: string;
+    };
+    roles: {
+      attacker: string;
+      supporter: string;
+      tank: string;
+      gatherer: string;
+      hybrid: string;
+    };
+    personalities: {
+      aggressive: string;
+      calm: string;
+      agile: string;
+      wise: string;
+      lucky: string;
+    };
+    moods: {
+      happy: string;
+      calm: string;
+      anxious: string;
+      fearful: string;
+      sick: string;
+    };
+    battleModes: {
+      accompanying: string;
+      summoned: string;
+      support: string;
+    };
+    messages: {
+      fed: string;
+      trained: string;
+      levelUp: string;
+      breakthrough: string;
+      breakthroughFailed: string;
+      setActive: string;
+      removed: string;
+      noSpace: string;
+      captured: string;
+      captureFailed: string;
+      newSkill: string;
+    };
+  };
 }
 
 export const translations: Record<Language, Translations> = {
@@ -373,6 +445,77 @@ export const translations: Record<Language, Translations> = {
         active: '主动',
       },
     },
+    spiritBeast: {
+      title: '灵兽',
+      collection: '灵兽收藏',
+      empty: '暂无灵兽，去野外捕捉吧！',
+      details: '详细信息',
+      stats: '属性',
+      skills: '技能',
+      traits: '特性',
+      level: '等级',
+      exp: '经验',
+      tier: '品阶',
+      rarity: '稀有度',
+      element: '属性',
+      role: '定位',
+      personality: '性格',
+      mood: '心情',
+      affinity: '亲密度',
+      feed: '喂养',
+      train: '训练',
+      setActive: '设为出战',
+      removeActive: '取消出战',
+      breakthrough: '突破',
+      capture: '捕捉',
+      release: '放生',
+      battleMode: '出战模式',
+      tiers: {
+        mortal: '凡兽',
+        spirit: '灵兽',
+        mystic: '玄兽',
+        holy: '圣兽',
+      },
+      roles: {
+        attacker: '输出型',
+        supporter: '辅助型',
+        tank: '坦克型',
+        gatherer: '采集型',
+        hybrid: '混合型',
+      },
+      personalities: {
+        aggressive: '暴躁',
+        calm: '稳重',
+        agile: '灵动',
+        wise: '睿智',
+        lucky: '福缘',
+      },
+      moods: {
+        happy: '快乐',
+        calm: '平静',
+        anxious: '焦躁',
+        fearful: '恐惧',
+        sick: '生病',
+      },
+      battleModes: {
+        accompanying: '随行出战',
+        summoned: '召唤出战',
+        support: '辅助出战',
+      },
+      messages: {
+        fed: '喂养了{name}，获得{exp}经验，亲密度+{affinity}',
+        trained: '训练了{name}，获得{exp}经验',
+        levelUp: '{name}升级了！当前等级：{level}',
+        breakthrough: '{name}突破成功！晋升为{tier}',
+        breakthroughFailed: '突破失败，继续努力！',
+        setActive: '{name}已设为出战灵兽',
+        removed: '{name}已取消出战',
+        noSpace: '灵兽栏位已满',
+        captured: '成功捕获了{name}！',
+        captureFailed: '捕捉失败，{name}逃跑了',
+        newSkill: '{name}学会了新技能：{skill}',
+      },
+    },
   },
   en: {
     app: {
@@ -549,6 +692,77 @@ export const translations: Record<Language, Translations> = {
       nodeTypes: {
         passive: 'Passive',
         active: 'Active',
+      },
+    },
+    spiritBeast: {
+      title: 'Spirit Beast',
+      collection: 'Beast Collection',
+      empty: 'No spirit beasts yet. Go capture some!',
+      details: 'Details',
+      stats: 'Stats',
+      skills: 'Skills',
+      traits: 'Traits',
+      level: 'Level',
+      exp: 'EXP',
+      tier: 'Tier',
+      rarity: 'Rarity',
+      element: 'Element',
+      role: 'Role',
+      personality: 'Personality',
+      mood: 'Mood',
+      affinity: 'Affinity',
+      feed: 'Feed',
+      train: 'Train',
+      setActive: 'Set Active',
+      removeActive: 'Remove Active',
+      breakthrough: 'Breakthrough',
+      capture: 'Capture',
+      release: 'Release',
+      battleMode: 'Battle Mode',
+      tiers: {
+        mortal: 'Mortal Beast',
+        spirit: 'Spirit Beast',
+        mystic: 'Mystic Beast',
+        holy: 'Holy Beast',
+      },
+      roles: {
+        attacker: 'Attacker',
+        supporter: 'Supporter',
+        tank: 'Tank',
+        gatherer: 'Gatherer',
+        hybrid: 'Hybrid',
+      },
+      personalities: {
+        aggressive: 'Aggressive',
+        calm: 'Calm',
+        agile: 'Agile',
+        wise: 'Wise',
+        lucky: 'Lucky',
+      },
+      moods: {
+        happy: 'Happy',
+        calm: 'Calm',
+        anxious: 'Anxious',
+        fearful: 'Fearful',
+        sick: 'Sick',
+      },
+      battleModes: {
+        accompanying: 'Accompanying',
+        summoned: 'Summoned',
+        support: 'Support',
+      },
+      messages: {
+        fed: 'Fed {name}, gained {exp} EXP, affinity +{affinity}',
+        trained: 'Trained {name}, gained {exp} EXP',
+        levelUp: '{name} leveled up! Now level {level}',
+        breakthrough: '{name} breakthrough success! Advanced to {tier}',
+        breakthroughFailed: 'Breakthrough failed, keep trying!',
+        setActive: '{name} is now your active beast',
+        removed: '{name} is no longer active',
+        noSpace: 'Beast slots are full',
+        captured: 'Successfully captured {name}!',
+        captureFailed: 'Capture failed, {name} escaped',
+        newSkill: '{name} learned a new skill: {skill}',
       },
     },
   },
