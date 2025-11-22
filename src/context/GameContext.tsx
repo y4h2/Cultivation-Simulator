@@ -7,6 +7,8 @@ import type {
   Market,
   CombatState,
   ActivityType,
+  CombatEnemy,
+  CombatLogEntry,
 } from '../types/game';
 import { createInitialTime, advanceTime, isNewDay } from '../utils/time';
 import { createInitialMarket, updateMarketPrices } from '../utils/market';
@@ -17,6 +19,22 @@ import {
   changeActivity,
 } from '../utils/cultivation';
 import { TIME_CONSTANTS } from '../constants/time';
+import {
+  createPlayerCombatUnit,
+  createEnemyCombatUnit,
+  calculateTurnOrder,
+  getRandomEnemy,
+  executeSkill,
+  executeObserve,
+  executeDefend,
+  processTurnEnd,
+  processBuffTicks,
+  generateLoot,
+  executeAI,
+  hasEnoughQi,
+  consumeQi,
+} from '../utils/combat';
+import { COMBAT_ITEMS } from '../constants/combat';
 
 // Action Types
 type GameAction =
@@ -31,7 +49,18 @@ type GameAction =
   | { type: 'UPDATE_CHARACTER'; payload: Partial<Character> }
   | { type: 'UPDATE_MARKET'; payload: Market }
   | { type: 'LOAD_GAME'; payload: GameState }
-  | { type: 'RESET_GAME' };
+  | { type: 'RESET_GAME' }
+  // Combat Actions
+  | { type: 'START_COMBAT'; payload: { enemy: CombatEnemy } }
+  | { type: 'PLAYER_ATTACK'; payload: { skillId: string } }
+  | { type: 'PLAYER_DEFEND' }
+  | { type: 'PLAYER_OBSERVE' }
+  | { type: 'PLAYER_USE_ITEM'; payload: { itemId: string } }
+  | { type: 'PLAYER_FLEE' }
+  | { type: 'ENEMY_ACTION' }
+  | { type: 'END_COMBAT'; payload: { victory: boolean } }
+  | { type: 'COLLECT_REWARDS' }
+  | { type: 'TRIGGER_RANDOM_ENCOUNTER' };
 
 // Initial State
 const createInitialState = (): GameState => ({
@@ -40,9 +69,10 @@ const createInitialState = (): GameState => ({
   market: createInitialMarket(),
   combat: {
     inCombat: false,
+    phase: 'idle',
+    round: 0,
     turnOrder: [],
-    currentTurn: 0,
-    playerInsight: 0,
+    currentTurnIndex: 0,
     combatLog: [],
   },
   logs: [
@@ -92,6 +122,63 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
 
       // Keep only last 100 logs
       const trimmedLogs = newLogs.slice(-100);
+
+      // Check for random encounter while traveling (5% chance per tick)
+      if (updatedCharacter.currentActivity === 'travel' && Math.random() < 0.05) {
+        const enemy = getRandomEnemy(updatedCharacter.realm);
+        if (enemy) {
+          const playerUnit = createPlayerCombatUnit(updatedCharacter);
+          const enemyUnit = createEnemyCombatUnit(enemy);
+          const turnOrder = calculateTurnOrder(playerUnit, enemyUnit);
+
+          const encounterLog: GameLog = {
+            timestamp: newTime,
+            message: `Travel encounter: ${enemy.chineseName}!`,
+            type: 'combat',
+          };
+
+          const startLog: CombatLogEntry = {
+            message: `Combat started! ${enemy.name} appears!`,
+            chineseMessage: `Battle begins! ${enemy.chineseName} appears!`,
+            type: 'system',
+            timestamp: Date.now(),
+          };
+
+          const firstTurn = turnOrder[0];
+          let readyPlayerUnit = playerUnit;
+          let readyEnemyUnit = enemyUnit;
+          const combatLogs: CombatLogEntry[] = [startLog];
+
+          if (firstTurn === 'player') {
+            const { unit, logs } = processBuffTicks(playerUnit, 'turnStart');
+            readyPlayerUnit = unit;
+            combatLogs.push(...logs);
+          } else {
+            const { unit, logs } = processBuffTicks(enemyUnit, 'turnStart');
+            readyEnemyUnit = unit;
+            combatLogs.push(...logs);
+          }
+
+          return {
+            ...state,
+            time: newTime,
+            character: updatedCharacter,
+            market: updatedMarket,
+            combat: {
+              inCombat: true,
+              phase: firstTurn === 'player' ? 'player_turn' : 'enemy_turn',
+              round: 1,
+              playerUnit: readyPlayerUnit,
+              enemyUnit: readyEnemyUnit,
+              enemy,
+              turnOrder,
+              currentTurnIndex: 0,
+              combatLog: combatLogs,
+            },
+            logs: [...trimmedLogs, encounterLog].slice(-100),
+          };
+        }
+      }
 
       return {
         ...state,
@@ -283,6 +370,571 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
     case 'RESET_GAME':
       return createInitialState();
 
+    // ========== Combat Actions ==========
+    case 'START_COMBAT': {
+      const { enemy } = action.payload;
+      const playerUnit = createPlayerCombatUnit(state.character);
+      const enemyUnit = createEnemyCombatUnit(enemy);
+      const turnOrder = calculateTurnOrder(playerUnit, enemyUnit);
+
+      const startLog: CombatLogEntry = {
+        message: `Combat started! ${enemy.name} appears!`,
+        chineseMessage: `战斗开始！${enemy.chineseName}出现了！`,
+        type: 'system',
+        timestamp: Date.now(),
+      };
+
+      // Process turn start buffs for the first unit
+      const firstTurn = turnOrder[0];
+      let updatedPlayerUnit = playerUnit;
+      let updatedEnemyUnit = enemyUnit;
+      const combatLogs: CombatLogEntry[] = [startLog];
+
+      if (firstTurn === 'player') {
+        const { unit, logs } = processBuffTicks(playerUnit, 'turnStart');
+        updatedPlayerUnit = unit;
+        combatLogs.push(...logs);
+      } else {
+        const { unit, logs } = processBuffTicks(enemyUnit, 'turnStart');
+        updatedEnemyUnit = unit;
+        combatLogs.push(...logs);
+      }
+
+      return {
+        ...state,
+        combat: {
+          inCombat: true,
+          phase: firstTurn === 'player' ? 'player_turn' : 'enemy_turn',
+          round: 1,
+          playerUnit: updatedPlayerUnit,
+          enemyUnit: updatedEnemyUnit,
+          enemy,
+          turnOrder,
+          currentTurnIndex: 0,
+          combatLog: combatLogs,
+        },
+      };
+    }
+
+    case 'PLAYER_ATTACK': {
+      if (!state.combat.playerUnit || !state.combat.enemyUnit || !state.combat.enemy) {
+        return state;
+      }
+
+      const skill = state.combat.playerUnit.skills.find(s => s.id === action.payload.skillId);
+      if (!skill) return state;
+
+      // Check if skill is available
+      if (skill.currentCooldown && skill.currentCooldown > 0) return state;
+      if (state.combat.playerUnit.combatStats.mp < skill.costMp) return state;
+
+      // Check Qi requirements for ultimate skills
+      if (skill.type === 'ultimate' && skill.costQi) {
+        if (!hasEnoughQi(state.combat.playerUnit.qiGauge, skill.qiElement, skill.costQi)) {
+          return state;
+        }
+      }
+
+      // Execute skill
+      const result = executeSkill(
+        state.combat.playerUnit,
+        state.combat.enemyUnit,
+        skill,
+        state.combat.enemy.element
+      );
+
+      // Consume Qi for ultimate
+      let updatedAttacker = result.attacker;
+      if (skill.type === 'ultimate' && skill.costQi) {
+        const newQiGauge = consumeQi(updatedAttacker.qiGauge, skill.qiElement, skill.costQi);
+        if (newQiGauge) {
+          updatedAttacker = { ...updatedAttacker, qiGauge: newQiGauge };
+        }
+      }
+
+      // Check for victory
+      if (result.target.combatStats.hp <= 0) {
+        const loot = generateLoot(state.combat.enemy);
+        const victoryLog: CombatLogEntry = {
+          message: `Victory! ${state.combat.enemy.name} defeated!`,
+          chineseMessage: `胜利！${state.combat.enemy.chineseName}被击败了！`,
+          type: 'system',
+          timestamp: Date.now(),
+        };
+
+        return {
+          ...state,
+          combat: {
+            ...state.combat,
+            phase: 'victory',
+            playerUnit: updatedAttacker,
+            enemyUnit: result.target,
+            combatLog: [...state.combat.combatLog, ...result.logs, victoryLog],
+            rewards: {
+              spiritStones: loot.spiritStones,
+              items: loot.items,
+              cultivationExp: Math.floor(state.combat.enemy.combatStats.maxHp / 5),
+            },
+          },
+        };
+      }
+
+      // Process turn end for player
+      const { unit: turnEndPlayer, logs: turnEndLogs } = processTurnEnd(updatedAttacker);
+
+      // Move to enemy turn
+      const nextTurnIndex = (state.combat.currentTurnIndex + 1) % state.combat.turnOrder.length;
+      const isNewRound = nextTurnIndex === 0;
+
+      // Process turn start buffs for enemy
+      const { unit: turnStartEnemy, logs: enemyStartLogs } = processBuffTicks(result.target, 'turnStart');
+
+      return {
+        ...state,
+        combat: {
+          ...state.combat,
+          phase: 'enemy_turn',
+          round: isNewRound ? state.combat.round + 1 : state.combat.round,
+          playerUnit: turnEndPlayer,
+          enemyUnit: turnStartEnemy,
+          currentTurnIndex: nextTurnIndex,
+          combatLog: [...state.combat.combatLog, ...result.logs, ...turnEndLogs, ...enemyStartLogs],
+        },
+      };
+    }
+
+    case 'PLAYER_DEFEND': {
+      if (!state.combat.playerUnit || !state.combat.enemyUnit) {
+        return state;
+      }
+
+      const { unit: defendingPlayer, log: defendLog } = executeDefend(state.combat.playerUnit);
+
+      // Process turn end
+      const { unit: turnEndPlayer, logs: turnEndLogs } = processTurnEnd(defendingPlayer);
+
+      // Move to enemy turn
+      const nextTurnIndex = (state.combat.currentTurnIndex + 1) % state.combat.turnOrder.length;
+      const isNewRound = nextTurnIndex === 0;
+
+      // Process turn start buffs for enemy
+      const { unit: turnStartEnemy, logs: enemyStartLogs } = processBuffTicks(state.combat.enemyUnit, 'turnStart');
+
+      return {
+        ...state,
+        combat: {
+          ...state.combat,
+          phase: 'enemy_turn',
+          round: isNewRound ? state.combat.round + 1 : state.combat.round,
+          playerUnit: turnEndPlayer,
+          enemyUnit: turnStartEnemy,
+          currentTurnIndex: nextTurnIndex,
+          combatLog: [...state.combat.combatLog, defendLog, ...turnEndLogs, ...enemyStartLogs],
+        },
+      };
+    }
+
+    case 'PLAYER_OBSERVE': {
+      if (!state.combat.playerUnit || !state.combat.enemyUnit) {
+        return state;
+      }
+
+      const { unit: observingPlayer, log: observeLog } = executeObserve(state.combat.playerUnit);
+
+      // Process turn end
+      const { unit: turnEndPlayer, logs: turnEndLogs } = processTurnEnd(observingPlayer);
+
+      // Move to enemy turn
+      const nextTurnIndex = (state.combat.currentTurnIndex + 1) % state.combat.turnOrder.length;
+      const isNewRound = nextTurnIndex === 0;
+
+      // Process turn start buffs for enemy
+      const { unit: turnStartEnemy, logs: enemyStartLogs } = processBuffTicks(state.combat.enemyUnit, 'turnStart');
+
+      return {
+        ...state,
+        combat: {
+          ...state.combat,
+          phase: 'enemy_turn',
+          round: isNewRound ? state.combat.round + 1 : state.combat.round,
+          playerUnit: turnEndPlayer,
+          enemyUnit: turnStartEnemy,
+          currentTurnIndex: nextTurnIndex,
+          combatLog: [...state.combat.combatLog, observeLog, ...turnEndLogs, ...enemyStartLogs],
+        },
+      };
+    }
+
+    case 'PLAYER_USE_ITEM': {
+      if (!state.combat.playerUnit || !state.combat.enemyUnit) {
+        return state;
+      }
+
+      const { itemId } = action.payload;
+      const inventoryItem = state.character.inventory.items.find(i => i.itemId === itemId);
+      if (!inventoryItem || inventoryItem.quantity <= 0) return state;
+
+      const combatItem = COMBAT_ITEMS[itemId];
+      if (!combatItem) return state;
+
+      const logs: CombatLogEntry[] = [];
+      let updatedPlayer = state.combat.playerUnit;
+      let updatedEnemy = state.combat.enemyUnit;
+
+      // Apply item effect
+      if (combatItem.type === 'heal') {
+        const healBase = combatItem.isPercentage
+          ? updatedPlayer.combatStats.maxHp
+          : 0;
+        const healAmount = combatItem.isPercentage
+          ? Math.floor(healBase * combatItem.value / 100)
+          : combatItem.value;
+        const newHp = Math.min(updatedPlayer.combatStats.maxHp, updatedPlayer.combatStats.hp + healAmount);
+
+        updatedPlayer = {
+          ...updatedPlayer,
+          combatStats: { ...updatedPlayer.combatStats, hp: newHp },
+        };
+
+        logs.push({
+          message: `${updatedPlayer.name} uses ${combatItem.name} and heals ${healAmount} HP`,
+          chineseMessage: `${updatedPlayer.chineseName}使用${combatItem.chineseName}，恢复了${healAmount}点生命`,
+          type: 'heal',
+          timestamp: Date.now(),
+        });
+      } else if (combatItem.type === 'damage') {
+        const damage = combatItem.value;
+        updatedEnemy = {
+          ...updatedEnemy,
+          combatStats: { ...updatedEnemy.combatStats, hp: Math.max(0, updatedEnemy.combatStats.hp - damage) },
+        };
+
+        logs.push({
+          message: `${updatedPlayer.name} uses ${combatItem.name} and deals ${damage} damage`,
+          chineseMessage: `${updatedPlayer.chineseName}使用${combatItem.chineseName}，造成了${damage}点伤害`,
+          type: 'damage',
+          timestamp: Date.now(),
+        });
+      }
+
+      // Remove item from inventory
+      const newInventoryItems = state.character.inventory.items
+        .map(i => i.itemId === itemId ? { ...i, quantity: i.quantity - 1 } : i)
+        .filter(i => i.quantity > 0);
+
+      // Check for victory
+      if (updatedEnemy.combatStats.hp <= 0 && state.combat.enemy) {
+        const loot = generateLoot(state.combat.enemy);
+        logs.push({
+          message: `Victory! ${state.combat.enemy.name} defeated!`,
+          chineseMessage: `胜利！${state.combat.enemy.chineseName}被击败了！`,
+          type: 'system',
+          timestamp: Date.now(),
+        });
+
+        return {
+          ...state,
+          character: {
+            ...state.character,
+            inventory: { ...state.character.inventory, items: newInventoryItems },
+          },
+          combat: {
+            ...state.combat,
+            phase: 'victory',
+            playerUnit: updatedPlayer,
+            enemyUnit: updatedEnemy,
+            combatLog: [...state.combat.combatLog, ...logs],
+            rewards: {
+              spiritStones: loot.spiritStones,
+              items: loot.items,
+              cultivationExp: Math.floor(state.combat.enemy.combatStats.maxHp / 5),
+            },
+          },
+        };
+      }
+
+      // Process turn end for player
+      const { unit: turnEndPlayer, logs: turnEndLogs } = processTurnEnd(updatedPlayer);
+
+      // Move to enemy turn
+      const nextTurnIndex = (state.combat.currentTurnIndex + 1) % state.combat.turnOrder.length;
+      const isNewRound = nextTurnIndex === 0;
+
+      // Process turn start buffs for enemy
+      const { unit: turnStartEnemy, logs: enemyStartLogs } = processBuffTicks(updatedEnemy, 'turnStart');
+
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          inventory: { ...state.character.inventory, items: newInventoryItems },
+        },
+        combat: {
+          ...state.combat,
+          phase: 'enemy_turn',
+          round: isNewRound ? state.combat.round + 1 : state.combat.round,
+          playerUnit: turnEndPlayer,
+          enemyUnit: turnStartEnemy,
+          currentTurnIndex: nextTurnIndex,
+          combatLog: [...state.combat.combatLog, ...logs, ...turnEndLogs, ...enemyStartLogs],
+        },
+      };
+    }
+
+    case 'PLAYER_FLEE': {
+      // 30% base flee chance, modified by speed difference
+      const playerSpd = state.combat.playerUnit?.combatStats.spd || 10;
+      const enemySpd = state.combat.enemyUnit?.combatStats.spd || 10;
+      const speedRatio = playerSpd / enemySpd;
+      const fleeChance = Math.min(0.8, 0.3 * speedRatio);
+
+      if (Math.random() < fleeChance) {
+        const fleeLog: CombatLogEntry = {
+          message: 'You successfully fled from combat!',
+          chineseMessage: '你成功逃离了战斗！',
+          type: 'system',
+          timestamp: Date.now(),
+        };
+
+        return {
+          ...state,
+          combat: {
+            ...state.combat,
+            phase: 'fled',
+            combatLog: [...state.combat.combatLog, fleeLog],
+          },
+        };
+      }
+
+      // Failed to flee, enemy gets a turn
+      const failLog: CombatLogEntry = {
+        message: 'Failed to flee!',
+        chineseMessage: '逃跑失败！',
+        type: 'system',
+        timestamp: Date.now(),
+      };
+
+      return {
+        ...state,
+        combat: {
+          ...state.combat,
+          phase: 'enemy_turn',
+          combatLog: [...state.combat.combatLog, failLog],
+        },
+      };
+    }
+
+    case 'ENEMY_ACTION': {
+      if (!state.combat.playerUnit || !state.combat.enemyUnit || !state.combat.enemy) {
+        return state;
+      }
+
+      // Execute AI to determine action
+      const aiDecision = executeAI(
+        state.combat.enemyUnit,
+        state.combat.playerUnit,
+        state.combat.enemy.aiRules
+      );
+
+      const logs: CombatLogEntry[] = [];
+      let updatedEnemy = state.combat.enemyUnit;
+      let updatedPlayer = state.combat.playerUnit;
+
+      if (aiDecision.action === 'use_skill' && aiDecision.skillId) {
+        const skill = updatedEnemy.skills.find(s => s.id === aiDecision.skillId);
+        if (skill) {
+          const result = executeSkill(updatedEnemy, updatedPlayer, skill);
+          updatedEnemy = result.attacker;
+          updatedPlayer = result.target;
+          logs.push(...result.logs);
+        }
+      } else if (aiDecision.action === 'defend') {
+        const { unit, log } = executeDefend(updatedEnemy);
+        updatedEnemy = unit;
+        logs.push(log);
+      }
+
+      // Check for defeat
+      if (updatedPlayer.combatStats.hp <= 0) {
+        const defeatLog: CombatLogEntry = {
+          message: 'You have been defeated...',
+          chineseMessage: '你被击败了...',
+          type: 'system',
+          timestamp: Date.now(),
+        };
+
+        return {
+          ...state,
+          combat: {
+            ...state.combat,
+            phase: 'defeat',
+            playerUnit: updatedPlayer,
+            enemyUnit: updatedEnemy,
+            combatLog: [...state.combat.combatLog, ...logs, defeatLog],
+          },
+        };
+      }
+
+      // Process turn end for enemy
+      const { unit: turnEndEnemy, logs: turnEndLogs } = processTurnEnd(updatedEnemy);
+
+      // Move to player turn
+      const nextTurnIndex = (state.combat.currentTurnIndex + 1) % state.combat.turnOrder.length;
+      const isNewRound = nextTurnIndex === 0;
+
+      // Process turn start buffs for player
+      const { unit: turnStartPlayer, logs: playerStartLogs } = processBuffTicks(updatedPlayer, 'turnStart');
+
+      return {
+        ...state,
+        combat: {
+          ...state.combat,
+          phase: 'player_turn',
+          round: isNewRound ? state.combat.round + 1 : state.combat.round,
+          playerUnit: turnStartPlayer,
+          enemyUnit: turnEndEnemy,
+          currentTurnIndex: nextTurnIndex,
+          combatLog: [...state.combat.combatLog, ...logs, ...turnEndLogs, ...playerStartLogs],
+        },
+      };
+    }
+
+    case 'END_COMBAT': {
+      // Reset combat state
+      return {
+        ...state,
+        combat: {
+          inCombat: false,
+          phase: 'idle',
+          round: 0,
+          turnOrder: [],
+          currentTurnIndex: 0,
+          combatLog: [],
+        },
+      };
+    }
+
+    case 'COLLECT_REWARDS': {
+      if (!state.combat.rewards) return state;
+
+      const { spiritStones, items, cultivationExp } = state.combat.rewards;
+
+      // Add spirit stones
+      let updatedCharacter = {
+        ...state.character,
+        spiritStones: state.character.spiritStones + spiritStones,
+        cultivationValue: state.character.cultivationValue + cultivationExp,
+      };
+
+      // Add items to inventory
+      const newInventoryItems = [...updatedCharacter.inventory.items];
+      for (const item of items) {
+        const existingItem = newInventoryItems.find(i => i.itemId === item.itemId);
+        if (existingItem) {
+          existingItem.quantity += item.quantity;
+        } else {
+          newInventoryItems.push({ ...item });
+        }
+      }
+
+      updatedCharacter = {
+        ...updatedCharacter,
+        inventory: { ...updatedCharacter.inventory, items: newInventoryItems },
+      };
+
+      // Sync HP and SP from combat
+      if (state.combat.playerUnit) {
+        updatedCharacter = {
+          ...updatedCharacter,
+          stats: {
+            ...updatedCharacter.stats,
+            hp: state.combat.playerUnit.combatStats.hp,
+            spiritualPower: state.combat.playerUnit.combatStats.mp,
+          },
+        };
+      }
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: `战斗胜利！获得 ${spiritStones} 灵石，${cultivationExp} 修为`,
+        type: 'combat',
+      };
+
+      return {
+        ...state,
+        character: updatedCharacter,
+        combat: {
+          inCombat: false,
+          phase: 'idle',
+          round: 0,
+          turnOrder: [],
+          currentTurnIndex: 0,
+          combatLog: [],
+        },
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'TRIGGER_RANDOM_ENCOUNTER': {
+      // Only trigger if traveling
+      if (state.character.currentActivity !== 'travel') return state;
+
+      // Random encounter chance (10% per trigger)
+      if (Math.random() > 0.1) return state;
+
+      const enemy = getRandomEnemy(state.character.realm);
+      if (!enemy) return state;
+
+      // Start combat with random enemy
+      const playerUnit = createPlayerCombatUnit(state.character);
+      const enemyUnit = createEnemyCombatUnit(enemy);
+      const turnOrder = calculateTurnOrder(playerUnit, enemyUnit);
+
+      const encounterLog: GameLog = {
+        timestamp: state.time,
+        message: `游历中遇到了${enemy.chineseName}！`,
+        type: 'combat',
+      };
+
+      const startLog: CombatLogEntry = {
+        message: `Combat started! ${enemy.name} appears!`,
+        chineseMessage: `战斗开始！${enemy.chineseName}出现了！`,
+        type: 'system',
+        timestamp: Date.now(),
+      };
+
+      const firstTurn = turnOrder[0];
+      let updatedPlayerUnit = playerUnit;
+      let updatedEnemyUnit = enemyUnit;
+      const combatLogs: CombatLogEntry[] = [startLog];
+
+      if (firstTurn === 'player') {
+        const { unit, logs } = processBuffTicks(playerUnit, 'turnStart');
+        updatedPlayerUnit = unit;
+        combatLogs.push(...logs);
+      } else {
+        const { unit, logs } = processBuffTicks(enemyUnit, 'turnStart');
+        updatedEnemyUnit = unit;
+        combatLogs.push(...logs);
+      }
+
+      return {
+        ...state,
+        combat: {
+          inCombat: true,
+          phase: firstTurn === 'player' ? 'player_turn' : 'enemy_turn',
+          round: 1,
+          playerUnit: updatedPlayerUnit,
+          enemyUnit: updatedEnemyUnit,
+          enemy,
+          turnOrder,
+          currentTurnIndex: 0,
+          combatLog: combatLogs,
+        },
+        logs: [...state.logs, encounterLog].slice(-100),
+      };
+    }
+
     default:
       return state;
   }
@@ -303,6 +955,17 @@ interface GameContextType {
     saveGame: () => void;
     loadGame: () => void;
     resetGame: () => void;
+    // Combat actions
+    startCombat: (enemy: CombatEnemy) => void;
+    playerAttack: (skillId: string) => void;
+    playerDefend: () => void;
+    playerObserve: () => void;
+    playerUseItem: (itemId: string) => void;
+    playerFlee: () => void;
+    enemyAction: () => void;
+    endCombat: (victory: boolean) => void;
+    collectRewards: () => void;
+    triggerRandomEncounter: () => void;
   };
 }
 
@@ -371,6 +1034,17 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.removeItem('xiuxian_save');
       dispatch({ type: 'RESET_GAME' });
     }, []),
+    // Combat actions
+    startCombat: useCallback((enemy: CombatEnemy) => dispatch({ type: 'START_COMBAT', payload: { enemy } }), []),
+    playerAttack: useCallback((skillId: string) => dispatch({ type: 'PLAYER_ATTACK', payload: { skillId } }), []),
+    playerDefend: useCallback(() => dispatch({ type: 'PLAYER_DEFEND' }), []),
+    playerObserve: useCallback(() => dispatch({ type: 'PLAYER_OBSERVE' }), []),
+    playerUseItem: useCallback((itemId: string) => dispatch({ type: 'PLAYER_USE_ITEM', payload: { itemId } }), []),
+    playerFlee: useCallback(() => dispatch({ type: 'PLAYER_FLEE' }), []),
+    enemyAction: useCallback(() => dispatch({ type: 'ENEMY_ACTION' }), []),
+    endCombat: useCallback((victory: boolean) => dispatch({ type: 'END_COMBAT', payload: { victory } }), []),
+    collectRewards: useCallback(() => dispatch({ type: 'COLLECT_REWARDS' }), []),
+    triggerRandomEncounter: useCallback(() => dispatch({ type: 'TRIGGER_RANDOM_ENCOUNTER' }), []),
   };
 
   return (

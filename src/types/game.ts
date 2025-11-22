@@ -2,6 +2,213 @@
 // Core Game Types for Xiuxian (Cultivation) Game
 // ============================================
 
+// ============================================
+// Element System Types
+// ============================================
+
+export const Element = {
+  Fire: 'fire',
+  Water: 'water',
+  Wood: 'wood',
+  Metal: 'metal',
+  Earth: 'earth',
+  Wind: 'wind',
+} as const;
+
+export type Element = typeof Element[keyof typeof Element];
+
+// ============================================
+// Combat Unit Types
+// ============================================
+
+export interface CombatStats {
+  hp: number;
+  maxHp: number;
+  mp: number;           // 灵力 (Spiritual Power for combat)
+  maxMp: number;
+  atk: number;          // Attack
+  def: number;          // Defense
+  spd: number;          // Speed (turn order)
+  acc: number;          // Accuracy
+  eva: number;          // Evasion
+  crit: number;         // Critical Rate (0-100)
+  critDmg: number;      // Critical Damage Multiplier (default 1.5)
+  wis: number;          // 悟性 (Comprehension)
+  sense: number;        // 神识 (Divine Sense)
+  // Element Resistances (0-100, percentage reduction)
+  resfire: number;
+  reswater: number;
+  reswood: number;
+  resmetal: number;
+  researth: number;
+  reswind: number;
+}
+
+export interface QiGauge {
+  fire: number;
+  water: number;
+  wood: number;
+  metal: number;
+  earth: number;
+  wind: number;
+  neutral: number;      // For non-elemental skills
+}
+
+// ============================================
+// Skill System Types
+// ============================================
+
+export const SkillType = {
+  Basic: 'basic',
+  Attack: 'attack',
+  Defense: 'defense',
+  Support: 'support',
+  Ultimate: 'ultimate',
+} as const;
+
+export type SkillType = typeof SkillType[keyof typeof SkillType];
+
+export const SkillTarget = {
+  SingleEnemy: 'single_enemy',
+  AllEnemies: 'all_enemies',
+  Self: 'self',
+  SingleAlly: 'single_ally',
+  AllAllies: 'all_allies',
+} as const;
+
+export type SkillTarget = typeof SkillTarget[keyof typeof SkillTarget];
+
+export interface SkillEffect {
+  type: 'damage' | 'heal' | 'buff' | 'debuff' | 'shield' | 'dot' | 'hot';
+  value: number;                    // Base value or percentage
+  isPercentage?: boolean;          // If true, value is percentage of stat
+  stat?: keyof CombatStats;        // Which stat to base on
+  buffId?: string;                 // For buff/debuff effects
+  duration?: number;               // Duration in turns
+}
+
+export interface Skill {
+  id: string;
+  name: string;
+  chineseName: string;
+  description: string;
+  chineseDescription: string;
+  type: SkillType;
+  element?: Element;
+  costMp: number;
+  costQi?: number;                 // Qi threshold required (for ultimates)
+  qiElement?: Element;             // Which element Qi to consume
+  cooldown: number;                // Turns until can use again
+  currentCooldown?: number;        // Current cooldown counter
+  target: SkillTarget;
+  powerMultiplier: number;         // Damage = ATK * powerMultiplier
+  hitBonus?: number;               // Bonus to hit rate
+  critBonus?: number;              // Bonus to crit rate
+  effects: SkillEffect[];
+}
+
+// ============================================
+// Buff/Debuff System Types
+// ============================================
+
+export interface StatModifier {
+  stat: keyof CombatStats;
+  value: number;
+  isPercentage: boolean;           // If true, value is percentage modifier
+}
+
+export interface BuffEffect {
+  type: 'damage' | 'heal' | 'stat_change' | 'shield' | 'cleanse';
+  value: number;
+  isPercentage?: boolean;
+  stat?: keyof CombatStats;
+}
+
+export interface Buff {
+  id: string;
+  name: string;
+  chineseName: string;
+  description: string;
+  chineseDescription: string;
+  duration: number;                // Total duration in turns
+  remainingDuration: number;       // Current remaining duration
+  stackable: boolean;
+  maxStacks?: number;
+  currentStacks?: number;
+  isDebuff: boolean;               // true = debuff, false = buff
+  onApply?: BuffEffect[];          // Effects when buff is first applied
+  onTurnStart?: BuffEffect[];      // Effects at start of unit's turn
+  onTurnEnd?: BuffEffect[];        // Effects at end of unit's turn
+  onRemove?: BuffEffect[];         // Effects when buff expires/removed
+  modifiers?: StatModifier[];      // Passive stat modifications
+}
+
+// ============================================
+// Combat Unit Types (Player & Enemy)
+// ============================================
+
+export interface CombatUnit {
+  id: string;
+  name: string;
+  chineseName: string;
+  isPlayer: boolean;
+  combatStats: CombatStats;
+  skills: Skill[];
+  buffs: Buff[];
+  qiGauge: QiGauge;
+  insightStacks: number;           // From Observe action, max 5
+  shield: number;                  // Damage absorption
+  isStunned: boolean;
+  isDefending: boolean;            // From Defend action
+}
+
+// ============================================
+// Enemy AI Types
+// ============================================
+
+export type AIConditionType =
+  | 'hp_below'           // self.hpRatio < value
+  | 'hp_above'           // self.hpRatio > value
+  | 'mp_below'           // self.mpRatio < value
+  | 'mp_above'           // self.mpRatio > value
+  | 'target_hp_below'    // target.hpRatio < value
+  | 'target_hp_above'    // target.hpRatio > value
+  | 'has_buff'           // self has buff with id
+  | 'target_has_debuff'  // target has debuff with id
+  | 'random'             // random chance
+  | 'always';            // always true
+
+export interface AICondition {
+  type: AIConditionType;
+  value?: number;        // Threshold value (0-1 for ratios, 0-100 for random)
+  buffId?: string;       // For buff-related conditions
+}
+
+export interface AIRule {
+  condition: AICondition;
+  action: 'use_skill' | 'use_item' | 'defend' | 'flee';
+  skillId?: string;
+  itemId?: string;
+  priority: number;      // Higher = evaluated first
+}
+
+// ============================================
+// Enhanced Enemy Type
+// ============================================
+
+export interface CombatEnemy {
+  id: string;
+  name: string;
+  chineseName: string;
+  realm: Realm;
+  combatStats: CombatStats;
+  skills: Skill[];
+  aiRules: AIRule[];
+  loot: LootTable;
+  element?: Element;     // Enemy's primary element
+  isBoss?: boolean;
+}
+
 // Time System Types
 export interface GameTime {
   ke: number;      // 刻 - smallest unit (1 ke = 15 minutes game time)
@@ -206,13 +413,42 @@ export interface LootTable {
   };
 }
 
+// ============================================
+// Combat State Types
+// ============================================
+
+export type CombatPhase =
+  | 'idle'              // Not in combat
+  | 'starting'          // Combat initialization
+  | 'player_turn'       // Player's turn to act
+  | 'enemy_turn'        // Enemy's turn to act
+  | 'animating'         // Action animation playing
+  | 'victory'           // Player won
+  | 'defeat'            // Player lost
+  | 'fled';             // Player fled
+
+export interface CombatLogEntry {
+  message: string;
+  chineseMessage: string;
+  type: 'action' | 'damage' | 'heal' | 'buff' | 'system' | 'critical' | 'miss';
+  timestamp: number;
+}
+
 export interface CombatState {
   inCombat: boolean;
-  enemy?: Enemy;
+  phase: CombatPhase;
+  round: number;                   // Current round number
+  playerUnit?: CombatUnit;         // Player's combat unit
+  enemyUnit?: CombatUnit;          // Enemy's combat unit (single enemy for now)
+  enemy?: CombatEnemy;             // Enemy template data
   turnOrder: ('player' | 'enemy')[];
-  currentTurn: number;
-  playerInsight: number;  // Stacks from Observe action
-  combatLog: string[];
+  currentTurnIndex: number;
+  combatLog: CombatLogEntry[];
+  rewards?: {
+    spiritStones: number;
+    items: { itemId: string; quantity: number }[];
+    cultivationExp: number;
+  };
 }
 
 // Event Log

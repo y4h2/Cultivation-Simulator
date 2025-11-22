@@ -87,6 +87,20 @@ export interface Translations {
     title: string;
     comingSoon: string;
     description: string;
+    round: string;
+    yourTurn: string;
+    enemyTurn: string;
+    victory: string;
+    defeat: string;
+    fled: string;
+    attack: string;
+    defend: string;
+    observe: string;
+    flee: string;
+    skills: string;
+    items: string;
+    collectRewards: string;
+    rewards: string;
   };
   // Log
   log: {
@@ -211,6 +225,20 @@ export const translations: Record<Language, Translations> = {
       title: '战斗',
       comingSoon: '即将开放',
       description: '战斗系统正在开发中，敬请期待秘境探险、宗门大比等精彩内容！',
+      round: '回合',
+      yourTurn: '你的回合',
+      enemyTurn: '敌人回合',
+      victory: '胜利!',
+      defeat: '战败...',
+      fled: '逃跑成功',
+      attack: '攻击',
+      defend: '防御',
+      observe: '观察',
+      flee: '逃跑',
+      skills: '技能',
+      items: '物品',
+      collectRewards: '收取奖励',
+      rewards: '获得奖励',
     },
     log: {
       title: '修炼日志',
@@ -328,6 +356,20 @@ export const translations: Record<Language, Translations> = {
       title: 'Combat',
       comingSoon: 'Coming Soon',
       description: 'Combat system is under development. Look forward to secret realm exploration, sect competitions, and more!',
+      round: 'Round',
+      yourTurn: 'Your Turn',
+      enemyTurn: 'Enemy Turn',
+      victory: 'Victory!',
+      defeat: 'Defeat...',
+      fled: 'Escaped',
+      attack: 'Attack',
+      defend: 'Defend',
+      observe: 'Observe',
+      flee: 'Flee',
+      skills: 'Skills',
+      items: 'Items',
+      collectRewards: 'Collect Rewards',
+      rewards: 'Rewards',
     },
     log: {
       title: 'Cultivation Log',

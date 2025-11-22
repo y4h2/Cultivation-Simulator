@@ -55,20 +55,20 @@ function CultivationInfo() {
     realms: {
       title: '境界体系',
       items: [
-        '炼气期 - Qi Refining (9层)',
-        '筑基期 - Foundation (4阶段)',
-        '结丹期 - Core Formation (4阶段)',
-        '元婴期 - Nascent Soul (4阶段)',
-        '化神期 - Spirit Transformation',
-        '...',
+        '炼气期（9层）',
+        '筑基期（4阶段）',
+        '结丹期（4阶段）',
+        '元婴期（4阶段）',
+        '化神期',
+        '……',
       ],
     },
     tips: {
       title: '修炼技巧',
       items: [
-        '闭关修炼 - 最快提升修为',
-        '驻守坊市 - 可以交易物品',
-        '游历 - 可能遇到机缘或危险',
+        '闭关修炼：最快提升修为',
+        '驻守坊市：可以交易物品',
+        '游历：可能遇到机缘或危险',
         '修为满时可尝试突破',
       ],
     },
@@ -84,10 +84,10 @@ function CultivationInfo() {
     attributes: {
       title: '属性说明',
       items: [
-        '悟性 - 影响修炼速度',
-        '气运 - 影响突破成功率',
-        '神识 - 影响战斗准确度',
-        '速度 - 影响战斗顺序',
+        '悟性：影响修炼速度',
+        '气运：影响突破成功率',
+        '神识：影响战斗准确度',
+        '速度：影响战斗顺序',
       ],
     },
   } : {
@@ -106,9 +106,9 @@ function CultivationInfo() {
     tips: {
       title: 'Cultivation Tips',
       items: [
-        'Closed-door - Fastest cultivation',
-        'Market Station - Trade items',
-        'Travel - May find opportunities or danger',
+        'Closed-door: Fastest cultivation',
+        'Market Station: Trade items',
+        'Travel: May find opportunities or danger',
         'Attempt breakthrough when cultivation is full',
       ],
     },
@@ -124,10 +124,10 @@ function CultivationInfo() {
     attributes: {
       title: 'Attribute Guide',
       items: [
-        'Comprehension - Affects cultivation speed',
-        'Luck - Affects breakthrough success',
-        'Divine Sense - Affects combat accuracy',
-        'Speed - Affects turn order in combat',
+        'Comprehension: Affects cultivation speed',
+        'Luck: Affects breakthrough success',
+        'Divine Sense: Affects combat accuracy',
+        'Speed: Affects turn order in combat',
       ],
     },
   };
