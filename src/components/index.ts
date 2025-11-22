@@ -10,4 +10,6 @@ export { TabNavigation } from './TabNavigation';
 export { SkillTreePanel } from './SkillTreePanel';
 export { SkillTreeBackground } from './SkillTreeBackground';
 export { HelpModal } from './HelpModal';
+export { SettingsPanel } from './SettingsPanel';
+export { BottomNav } from './BottomNav';
 export type { TabType } from './TabNavigation';

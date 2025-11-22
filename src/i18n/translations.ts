@@ -15,6 +15,16 @@ export interface Translations {
     load: string;
     language: string;
   };
+  // Settings
+  settings: {
+    title: string;
+    gameSpeed: string;
+    language: string;
+    help: string;
+    saveGame: string;
+    loadGame: string;
+    close: string;
+  };
   // Tabs
   tabs: {
     cultivation: string;
@@ -199,6 +209,15 @@ export const translations: Record<Language, Translations> = {
       load: '读档',
       language: '语言',
     },
+    settings: {
+      title: '设置',
+      gameSpeed: '游戏速度',
+      language: '语言切换',
+      help: '帮助',
+      saveGame: '保存游戏',
+      loadGame: '读取存档',
+      close: '关闭',
+    },
     tabs: {
       cultivation: '修炼',
       market: '坊市',
@@ -367,6 +386,15 @@ export const translations: Record<Language, Translations> = {
       save: 'Save',
       load: 'Load',
       language: 'Language',
+    },
+    settings: {
+      title: 'Settings',
+      gameSpeed: 'Game Speed',
+      language: 'Language',
+      help: 'Help',
+      saveGame: 'Save Game',
+      loadGame: 'Load Game',
+      close: 'Close',
     },
     tabs: {
       cultivation: 'Cultivation',

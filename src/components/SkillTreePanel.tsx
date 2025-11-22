@@ -47,6 +47,7 @@ export const SkillTreePanel: React.FC = () => {
   const [selectedElementTree, setSelectedElementTree] = useState<ElementTreeType>('fire');
   const [selectedNode, setSelectedNode] = useState<SkillTreeNode | ElementTreeNode | null>(null);
   const [containerWidth, setContainerWidth] = useState(600);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const isZh = language === 'zh';
@@ -611,27 +612,107 @@ export const SkillTreePanel: React.FC = () => {
     );
   };
 
+  // Calculate total spent points for current tree
+  const currentTreeSpentPoints = useMemo(() => {
+    const nodeIds = treeCategory === 'main'
+      ? character.learnedSkills.mainTree[selectedMainTree]
+      : character.learnedSkills.elementTree[selectedElementTree];
+
+    return currentNodes
+      .filter(node => nodeIds.includes(node.id))
+      .reduce((sum, node) => sum + node.cost, 0);
+  }, [treeCategory, selectedMainTree, selectedElementTree, character.learnedSkills, currentNodes]);
+
+  // Handle reset skill tree
+  const handleResetTree = useCallback(() => {
+    if (treeCategory === 'main') {
+      dispatch({
+        type: 'RESET_SKILL_TREE',
+        payload: { tree: selectedMainTree, treeType: 'main' },
+      });
+    } else {
+      dispatch({
+        type: 'RESET_SKILL_TREE',
+        payload: { tree: selectedElementTree, treeType: 'element' },
+      });
+    }
+    setShowResetConfirm(false);
+    setSelectedNode(null);
+  }, [treeCategory, selectedMainTree, selectedElementTree, dispatch]);
+
+  // Check if current tree has any learned skills
+  const canResetCurrentTree = useMemo(() => {
+    const nodeIds = treeCategory === 'main'
+      ? character.learnedSkills.mainTree[selectedMainTree]
+      : character.learnedSkills.elementTree[selectedElementTree];
+    return nodeIds.length > 0;
+  }, [treeCategory, selectedMainTree, selectedElementTree, character.learnedSkills]);
+
   return (
-    <div className="bg-gray-900/70 rounded-xl border border-amber-900/30 p-4 space-y-4">
+    <div className="bg-gray-900/70 rounded-xl border border-amber-900/30 p-2 sm:p-3 md:p-4 space-y-3 sm:space-y-4">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-amber-400">{t.skillTree.title}</h2>
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+        <h2 className="text-lg sm:text-xl font-bold text-amber-400">{t.skillTree.title}</h2>
+        <div className="flex items-center gap-3 sm:gap-4">
           <div className="text-sm">
             <span className="text-gray-400">{t.skillTree.wudaoPoints}: </span>
             <span className="text-amber-400 font-bold">{character.skillPoints.wudaoPoints}</span>
+            <span className="text-gray-500"> / </span>
+            <span className="text-gray-400">{character.skillPoints.totalPointsEarned}</span>
           </div>
+          <button
+            onClick={() => setShowResetConfirm(true)}
+            disabled={!canResetCurrentTree}
+            className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+              canResetCurrentTree
+                ? 'bg-red-600/80 hover:bg-red-500 text-white'
+                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+            }`}
+          >
+            {t.skillTree.reset}
+          </button>
         </div>
       </div>
 
+      {/* Reset Confirmation Modal */}
+      {showResetConfirm && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => setShowResetConfirm(false)}>
+          <div className="bg-gray-800 rounded-xl p-4 sm:p-6 max-w-sm mx-4 border border-gray-600" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-amber-400 mb-3">
+              {isZh ? '重置技能树' : 'Reset Skill Tree'}
+            </h3>
+            <p className="text-gray-300 text-sm mb-2">
+              {t.skillTree.resetConfirm}
+            </p>
+            <p className="text-amber-400 text-sm mb-4">
+              {t.skillTree.refund}: <span className="font-bold">{Math.floor(currentTreeSpentPoints * 0.8)}</span> {t.skillTree.wudaoPoints}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowResetConfirm(false)}
+                className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+              >
+                {isZh ? '取消' : 'Cancel'}
+              </button>
+              <button
+                onClick={handleResetTree}
+                className="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg transition-colors"
+              >
+                {isZh ? '确定重置' : 'Confirm Reset'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Category toggle */}
-      <div className="flex gap-2">
+      <div className="flex gap-1.5 sm:gap-2">
         <button
           onClick={() => {
             setTreeCategory('main');
             setSelectedNode(null);
           }}
-          className={`px-4 py-2 rounded-lg font-medium transition-all ${
+          className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-sm sm:text-base min-h-[44px] ${
             treeCategory === 'main'
               ? 'bg-amber-600 text-white'
               : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
@@ -644,7 +725,7 @@ export const SkillTreePanel: React.FC = () => {
             setTreeCategory('element');
             setSelectedNode(null);
           }}
-          className={`px-4 py-2 rounded-lg font-medium transition-all ${
+          className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-sm sm:text-base min-h-[44px] ${
             treeCategory === 'element'
               ? 'bg-cyan-600 text-white'
               : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
@@ -658,12 +739,14 @@ export const SkillTreePanel: React.FC = () => {
       {renderTreeTabs()}
 
       {/* Tree info */}
-      <div className="text-sm text-gray-400">
+      <div className="text-xs sm:text-sm text-gray-400">
         <span className="font-medium" style={{ color: currentTreeInfo.color }}>
           {isZh ? currentTreeInfo.chineseName : currentTreeInfo.name}
         </span>
-        {' - '}
-        {isZh ? currentTreeInfo.chineseDescription : currentTreeInfo.description}
+        <span className="hidden sm:inline">
+          {' - '}
+          {isZh ? currentTreeInfo.chineseDescription : currentTreeInfo.description}
+        </span>
         {' | '}
         <span className="text-amber-400">
           {treeProgress.learned}/{treeProgress.total} ({treeProgress.percentage}%)
@@ -671,14 +754,14 @@ export const SkillTreePanel: React.FC = () => {
       </div>
 
       {/* Main content: Tree + Details */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
         {/* Tree visualization */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 order-2 lg:order-1">
           {renderTree()}
         </div>
 
         {/* Node details */}
-        <div>
+        <div className="order-1 lg:order-2">
           {renderNodeDetails()}
         </div>
       </div>

@@ -32,15 +32,15 @@ export const MarketPanel: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-900/70 rounded-xl border border-amber-900/30 p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-amber-400">{t.market.title}</h2>
+    <div className="bg-gray-900/70 rounded-xl border border-amber-900/30 p-3 sm:p-4 md:p-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-3 sm:mb-4">
+        <h2 className="text-lg sm:text-xl font-bold text-amber-400">{t.market.title}</h2>
         {market.activeEvents.length > 0 && (
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-1 sm:gap-2">
             {market.activeEvents.map((event) => (
               <span
                 key={event.id}
-                className="px-2 py-1 bg-amber-900/50 text-amber-300 text-xs rounded"
+                className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-amber-900/50 text-amber-300 text-[10px] sm:text-xs rounded"
               >
                 {language === 'zh' ? event.chineseName : event.name}
               </span>
@@ -50,14 +50,14 @@ export const MarketPanel: React.FC = () => {
       </div>
 
       {/* Quantity Selector */}
-      <div className="flex items-center gap-4 mb-4 p-3 bg-gray-800/50 rounded-lg">
-        <span className="text-gray-400">{t.market.quantity}:</span>
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-3 sm:mb-4 p-2 sm:p-3 bg-gray-800/50 rounded-lg">
+        <span className="text-gray-400 text-sm">{t.market.quantity}:</span>
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
           {[1, 5, 10, 50].map((q) => (
             <button
               key={q}
               onClick={() => setQuantity(q)}
-              className={`px-3 py-1 rounded text-sm ${
+              className={`px-2.5 sm:px-3 py-1.5 sm:py-1 rounded text-xs sm:text-sm min-w-[40px] min-h-[36px] ${
                 quantity === q
                   ? 'bg-amber-600 text-white'
                   : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
@@ -71,13 +71,13 @@ export const MarketPanel: React.FC = () => {
             min="1"
             value={quantity}
             onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-            className="w-20 px-2 py-1 bg-gray-700 rounded text-center text-gray-200"
+            className="w-16 sm:w-20 px-2 py-1.5 sm:py-1 bg-gray-700 rounded text-center text-gray-200 text-sm min-h-[36px]"
           />
         </div>
       </div>
 
       {/* Market Items */}
-      <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
+      <div className="space-y-2 max-h-[280px] sm:max-h-96 overflow-y-auto pr-1 sm:pr-2">
         {market.items.map((marketItem) => (
           <MarketItemRow
             key={marketItem.itemId}
@@ -131,41 +131,41 @@ const MarketItemRow: React.FC<MarketItemRowProps> = ({
 
   return (
     <div
-      className={`p-3 rounded-lg transition-all cursor-pointer ${
+      className={`p-2 sm:p-3 rounded-lg transition-all cursor-pointer ${
         isSelected ? 'bg-gray-800 border border-amber-500/50' : 'bg-gray-800/50 hover:bg-gray-800'
       }`}
       onClick={onSelect}
     >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           {/* Item Info */}
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-2">
               <span
-                className="font-medium"
+                className="font-medium text-sm sm:text-base truncate"
                 style={{ color: getRarityColor(item.rarity) }}
               >
                 {language === 'zh' ? item.chineseName : item.name}
               </span>
-              <span className="text-gray-500 text-sm">
+              <span className="text-gray-500 text-xs sm:text-sm hidden sm:inline">
                 {language === 'zh' ? item.name : item.chineseName}
               </span>
             </div>
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">
               {t.market.inventory}: {inventoryQuantity} | {t.market.marketStock}: {marketItem.liquidity}
             </div>
           </div>
         </div>
 
         {/* Price Info */}
-        <div className="text-right">
-          <div className="flex items-center gap-2">
-            <span className="text-yellow-400 font-medium">
+        <div className="text-left sm:text-right flex-shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+            <span className="text-yellow-400 font-medium text-sm sm:text-base">
               {marketItem.currentPrice.toFixed(1)}
             </span>
-            <span className="text-gray-500 text-sm">{t.header.spiritStones}</span>
+            <span className="text-gray-500 text-xs sm:text-sm hidden sm:inline">{t.header.spiritStones}</span>
             <span
-              className={`text-xs ${
+              className={`text-[10px] sm:text-xs ${
                 trend === 'up'
                   ? 'text-green-400'
                   : trend === 'down'
@@ -178,7 +178,7 @@ const MarketItemRow: React.FC<MarketItemRowProps> = ({
               {priceChange !== 0 && `${priceChange > 0 ? '+' : ''}${priceChange.toFixed(1)}%`}
             </span>
           </div>
-          <div className="text-xs text-gray-500">
+          <div className="text-[10px] sm:text-xs text-gray-500">
             {t.market.basePrice}: {marketItem.basePrice}
           </div>
         </div>
@@ -186,8 +186,8 @@ const MarketItemRow: React.FC<MarketItemRowProps> = ({
 
       {/* Expanded Actions */}
       {isSelected && (
-        <div className="mt-3 pt-3 border-t border-gray-700 flex items-center justify-between">
-          <div className="text-sm text-gray-400">
+        <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="text-xs sm:text-sm text-gray-400">
             {quantity} x = {totalCost} {t.header.spiritStones}
           </div>
           <div className="flex gap-2">
@@ -197,7 +197,7 @@ const MarketItemRow: React.FC<MarketItemRowProps> = ({
                 onBuy();
               }}
               disabled={!canAfford}
-              className={`px-4 py-1.5 rounded text-sm font-medium transition-colors ${
+              className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-1.5 rounded text-xs sm:text-sm font-medium transition-colors min-h-[40px] sm:min-h-0 ${
                 canAfford
                   ? 'bg-green-600 hover:bg-green-500 text-white'
                   : 'bg-gray-700 text-gray-500 cursor-not-allowed'
@@ -211,7 +211,7 @@ const MarketItemRow: React.FC<MarketItemRowProps> = ({
                 onSell();
               }}
               disabled={!canSell}
-              className={`px-4 py-1.5 rounded text-sm font-medium transition-colors ${
+              className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-1.5 rounded text-xs sm:text-sm font-medium transition-colors min-h-[40px] sm:min-h-0 ${
                 canSell
                   ? 'bg-red-600 hover:bg-red-500 text-white'
                   : 'bg-gray-700 text-gray-500 cursor-not-allowed'

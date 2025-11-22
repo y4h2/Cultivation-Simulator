@@ -18,19 +18,19 @@ function GameContent() {
 
   return (
     <Layout>
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-6">
         {/* Left Column - Character Info (always visible) */}
-        <div className="lg:col-span-4">
+        <div className="lg:col-span-4 xl:col-span-4">
           <CharacterPanel />
         </div>
 
         {/* Right Column - Main Content Area */}
-        <div className="lg:col-span-8 space-y-6">
+        <div className="lg:col-span-8 xl:col-span-8 space-y-3 sm:space-y-4 lg:space-y-6">
           {/* Tab Navigation */}
           <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
           {/* Tab Content */}
-          <div className="min-h-[400px]">
+          <div className="min-h-[300px] sm:min-h-[400px]">
             {activeTab === 'market' && <MarketPanel />}
             {activeTab === 'inventory' && <InventoryPanel />}
             {activeTab === 'combat' && <CombatPanel />}

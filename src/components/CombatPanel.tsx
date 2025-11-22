@@ -452,27 +452,27 @@ export const CombatPanel: React.FC = () => {
   // Not in combat - show guide and test button
   if (!combat.inCombat) {
     return (
-      <div className="bg-gray-900/70 rounded-xl border border-amber-900/30 p-6">
-        <h2 className="text-xl font-bold text-amber-400 mb-4">{texts.title}</h2>
+      <div className="bg-gray-900/70 rounded-xl border border-amber-900/30 p-3 sm:p-4 md:p-6">
+        <h2 className="text-lg sm:text-xl font-bold text-amber-400 mb-3 sm:mb-4">{texts.title}</h2>
 
-        <div className="text-center py-8">
-          <div className="text-6xl mb-4">&#9876;</div>
-          <p className="text-gray-400 mb-6">{texts.comingSoon}</p>
+        <div className="text-center py-4 sm:py-8">
+          <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">&#9876;</div>
+          <p className="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">{texts.comingSoon}</p>
 
           {/* Test Battle Button */}
-          <div className="flex gap-4 justify-center mb-8">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center mb-6 sm:mb-8">
             <button
               onClick={() => {
                 const enemy = ENEMY_TEMPLATES['forest_wolf'];
                 if (enemy) actions.startCombat(enemy);
               }}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+              className="px-3 sm:px-4 py-2.5 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm sm:text-base min-h-[44px]"
             >
               {texts.testBattle} (Forest Wolf)
             </button>
             <button
               onClick={() => actions.triggerRandomEncounter()}
-              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-colors"
+              className="px-3 sm:px-4 py-2.5 sm:py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-colors text-sm sm:text-base min-h-[44px]"
             >
               {texts.startEncounter}
             </button>
@@ -480,9 +480,9 @@ export const CombatPanel: React.FC = () => {
         </div>
 
         {/* Combat Guide */}
-        <div className="p-4 bg-gray-800/50 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-200 mb-3">{texts.combatGuide.title}</h3>
-          <ul className="space-y-2 text-sm text-gray-400">
+        <div className="p-3 sm:p-4 bg-gray-800/50 rounded-lg">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-200 mb-2 sm:mb-3">{texts.combatGuide.title}</h3>
+          <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-400">
             {texts.combatGuide.items.map((item, idx) => (
               <li key={idx}>- {item}</li>
             ))}
@@ -495,8 +495,8 @@ export const CombatPanel: React.FC = () => {
   // Victory or Defeat screen
   if (combat.phase === 'victory' || combat.phase === 'defeat' || combat.phase === 'fled') {
     return (
-      <div className="bg-gray-900/70 rounded-xl border border-amber-900/30 p-6">
-        <h2 className="text-xl font-bold text-amber-400 mb-4">{texts.title}</h2>
+      <div className="bg-gray-900/70 rounded-xl border border-amber-900/30 p-3 sm:p-4 md:p-6">
+        <h2 className="text-lg sm:text-xl font-bold text-amber-400 mb-3 sm:mb-4">{texts.title}</h2>
         <CombatEndScreen
           victory={combat.phase === 'victory'}
           rewards={combat.rewards}
@@ -518,15 +518,15 @@ export const CombatPanel: React.FC = () => {
   const isDisabled = !isPlayerTurn;
 
   return (
-    <div className="bg-gray-900/70 rounded-xl border border-amber-900/30 p-6">
+    <div className="bg-gray-900/70 rounded-xl border border-amber-900/30 p-3 sm:p-4 md:p-6">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-amber-400">{texts.title}</h2>
-        <div className="flex items-center gap-4">
-          <span className="text-gray-400">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-3 sm:mb-4">
+        <h2 className="text-lg sm:text-xl font-bold text-amber-400">{texts.title}</h2>
+        <div className="flex items-center gap-2 sm:gap-4">
+          <span className="text-gray-400 text-sm">
             {texts.round} {combat.round}
           </span>
-          <span className={`px-3 py-1 rounded-full text-sm ${
+          <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm ${
             isPlayerTurn ? 'bg-blue-600 text-white' : 'bg-red-600 text-white'
           }`}>
             {isPlayerTurn ? texts.yourTurn : texts.enemyTurn}
@@ -535,7 +535,7 @@ export const CombatPanel: React.FC = () => {
       </div>
 
       {/* Battle Area */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-3 sm:mb-4">
         {/* Player Status */}
         <UnitStatus unit={playerUnit} language={language} />
 
@@ -544,8 +544,8 @@ export const CombatPanel: React.FC = () => {
       </div>
 
       {/* Combat Log */}
-      <div className="mb-4">
-        <h4 className="text-sm text-gray-400 mb-2">
+      <div className="mb-3 sm:mb-4">
+        <h4 className="text-xs sm:text-sm text-gray-400 mb-1.5 sm:mb-2">
           {language === 'zh' ? '战斗记录' : 'Combat Log'}
         </h4>
         <CombatLog logs={combat.combatLog} language={language} />
@@ -553,36 +553,36 @@ export const CombatPanel: React.FC = () => {
 
       {/* Action Buttons */}
       {isPlayerTurn && (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {/* Quick Actions */}
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
             <button
               onClick={() => actions.playerAttack('basic_attack')}
-              className="p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+              className="p-2 sm:p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors min-h-[52px]"
             >
-              <div className="text-gray-200">{texts.attack}</div>
-              <div className="text-xs text-gray-500">Basic Attack</div>
+              <div className="text-gray-200 text-sm sm:text-base">{texts.attack}</div>
+              <div className="text-[10px] sm:text-xs text-gray-500">Basic Attack</div>
             </button>
             <button
               onClick={actions.playerDefend}
-              className="p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+              className="p-2 sm:p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors min-h-[52px]"
             >
-              <div className="text-gray-200">{texts.defend}</div>
-              <div className="text-xs text-gray-500">-50% DMG</div>
+              <div className="text-gray-200 text-sm sm:text-base">{texts.defend}</div>
+              <div className="text-[10px] sm:text-xs text-gray-500">-50% DMG</div>
             </button>
             <button
               onClick={actions.playerObserve}
-              className="p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+              className="p-2 sm:p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors min-h-[52px]"
             >
-              <div className="text-gray-200">{texts.observe}</div>
-              <div className="text-xs text-gray-500">+Insight</div>
+              <div className="text-gray-200 text-sm sm:text-base">{texts.observe}</div>
+              <div className="text-[10px] sm:text-xs text-gray-500">+Insight</div>
             </button>
             <button
               onClick={actions.playerFlee}
-              className="p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+              className="p-2 sm:p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors min-h-[52px]"
             >
-              <div className="text-gray-200">{texts.flee}</div>
-              <div className="text-xs text-gray-500">Escape</div>
+              <div className="text-gray-200 text-sm sm:text-base">{texts.flee}</div>
+              <div className="text-[10px] sm:text-xs text-gray-500">Escape</div>
             </button>
           </div>
 
@@ -590,7 +590,7 @@ export const CombatPanel: React.FC = () => {
           <div className="flex border-b border-gray-700">
             <button
               onClick={() => setActiveTab('skills')}
-              className={`px-4 py-2 ${
+              className={`px-3 sm:px-4 py-2 text-sm sm:text-base min-h-[44px] ${
                 activeTab === 'skills'
                   ? 'text-amber-400 border-b-2 border-amber-400'
                   : 'text-gray-400 hover:text-gray-300'
@@ -600,7 +600,7 @@ export const CombatPanel: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab('items')}
-              className={`px-4 py-2 ${
+              className={`px-3 sm:px-4 py-2 text-sm sm:text-base min-h-[44px] ${
                 activeTab === 'items'
                   ? 'text-amber-400 border-b-2 border-amber-400'
                   : 'text-gray-400 hover:text-gray-300'
@@ -612,7 +612,7 @@ export const CombatPanel: React.FC = () => {
 
           {/* Skills Panel */}
           {activeTab === 'skills' && (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-60 overflow-y-auto">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5 sm:gap-2 max-h-48 sm:max-h-60 overflow-y-auto">
               {playerUnit.skills
                 .filter(skill => skill.id !== 'basic_attack')
                 .map(skill => (
@@ -642,8 +642,8 @@ export const CombatPanel: React.FC = () => {
 
       {/* Enemy Turn Indicator */}
       {!isPlayerTurn && (
-        <div className="text-center py-8">
-          <div className="text-2xl text-red-400 animate-pulse">
+        <div className="text-center py-6 sm:py-8">
+          <div className="text-xl sm:text-2xl text-red-400 animate-pulse">
             {language === 'zh' ? '敌人行动中...' : 'Enemy is acting...'}
           </div>
         </div>
