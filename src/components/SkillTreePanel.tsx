@@ -98,7 +98,17 @@ export const SkillTreePanel: React.FC = () => {
     });
 
     const positions: Map<string, NodePosition> = new Map();
-    const availableWidth = containerWidth - TREE_PADDING_LEFT * 2;
+    const NODE_WIDTH = 64; // w-16 = 64px
+    const MIN_NODE_SPACING = 8; // Minimum space between nodes
+    
+    // Calculate available width, ensuring it's never negative
+    // If container is too small, reduce padding dynamically
+    const minRequiredWidth = NODE_WIDTH + MIN_NODE_SPACING;
+    const effectivePadding = Math.max(
+      TREE_PADDING_LEFT,
+      Math.min(TREE_PADDING_LEFT, (containerWidth - minRequiredWidth) / 2)
+    );
+    const availableWidth = Math.max(0, containerWidth - effectivePadding * 2);
 
     // Calculate positions for each tier
     [1, 2, 3, 4, 5].forEach(tier => {
@@ -108,10 +118,35 @@ export const SkillTreePanel: React.FC = () => {
       if (nodeCount === 0) return;
 
       // Calculate horizontal spacing
-      const spacing = availableWidth / (nodeCount + 1);
+      // If we have enough space, distribute evenly; otherwise use minimum spacing
+      const totalNodeWidth = nodeCount * NODE_WIDTH;
+      const totalSpacingNeeded = (nodeCount - 1) * MIN_NODE_SPACING;
+      const minRequiredSpace = totalNodeWidth + totalSpacingNeeded;
+      
+      let spacing: number;
+      if (availableWidth >= minRequiredSpace && nodeCount > 1) {
+        // Enough space: distribute evenly
+        spacing = availableWidth / (nodeCount + 1);
+      } else if (nodeCount === 1) {
+        // Single node: center it
+        spacing = availableWidth / 2;
+      } else {
+        // Not enough space: use minimum spacing
+        spacing = MIN_NODE_SPACING;
+      }
 
       tierNodes.forEach((node, index) => {
-        const x = TREE_PADDING_LEFT + spacing * (index + 1);
+        let x: number;
+        if (nodeCount === 1) {
+          // Center single node
+          x = effectivePadding + spacing;
+        } else if (availableWidth >= minRequiredSpace) {
+          // Even distribution
+          x = effectivePadding + spacing * (index + 1);
+        } else {
+          // Minimum spacing layout
+          x = effectivePadding + index * (NODE_WIDTH + spacing);
+        }
         const y = TREE_PADDING_TOP + (tier - 1) * TIER_HEIGHT + NODE_HEIGHT / 2;
 
         positions.set(node.id, { x, y, node });
