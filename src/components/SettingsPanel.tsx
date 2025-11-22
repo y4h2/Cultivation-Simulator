@@ -16,7 +16,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
 }) => {
   const { state, actions } = useGame();
   const { gameSpeed } = state;
-  const { t, language, toggleLanguage } = useLanguage();
+  const { t, toggleLanguage } = useLanguage();
 
   // Handle escape key to close panel
   const handleKeyDown = useCallback(
@@ -99,8 +99,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             onClick={toggleLanguage}
             className="w-full px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors flex items-center justify-between"
           >
-            <span className="text-white">{language === 'zh' ? '中文' : 'English'}</span>
-            <span className="text-gray-400">{language === 'zh' ? 'EN' : '中'}</span>
+            <span className="text-white">{t.common.currentLanguage}</span>
+            <span className="text-gray-400">{t.common.otherLanguage}</span>
           </button>
         </div>
 
@@ -197,9 +197,9 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               onClick={toggleLanguage}
               className="w-full px-5 py-4 bg-gray-800 hover:bg-gray-700 rounded-xl transition-colors flex items-center justify-between"
             >
-              <span className="text-white text-base">{language === 'zh' ? '中文' : 'English'}</span>
+              <span className="text-white text-base">{t.common.currentLanguage}</span>
               <div className="flex items-center gap-2">
-                <span className="text-gray-400">{language === 'zh' ? 'Switch to EN' : '切换到中文'}</span>
+                <span className="text-gray-400">{t.common.switchTo} {t.common.otherLanguage}</span>
                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>

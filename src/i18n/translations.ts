@@ -192,6 +192,12 @@ export interface Translations {
       passive: string;
       active: string;
     };
+    available: string;
+    clickNodeToView: string;
+    statBonuses: string;
+    unlocksSkill: string;
+    resetTitle: string;
+    confirmReset: string;
   };
   // Spirit Beast System
   spiritBeast: {
@@ -264,6 +270,55 @@ export interface Translations {
       captureFailed: string;
       newSkill: string;
     };
+  };
+  // Help Modal
+  help: {
+    title: string;
+    realms: {
+      title: string;
+      items: string[];
+    };
+    tips: {
+      title: string;
+      items: string[];
+    };
+    market: {
+      title: string;
+      items: string[];
+    };
+    attributes: {
+      title: string;
+      items: string[];
+    };
+  };
+  // Log Types
+  logTypes: {
+    cultivation: string;
+    market: string;
+    combat: string;
+    event: string;
+    system: string;
+    all: string;
+  };
+  // Common UI
+  common: {
+    minimize: string;
+    global: string;
+    switchTo: string;
+    currentLanguage: string;
+    otherLanguage: string;
+    otherStats: string;
+    cancel: string;
+    confirm: string;
+    noItems: string;
+    clickToView: string;
+    defending: string;
+    insight: string;
+    rewards: string;
+    return: string;
+    enemyActing: string;
+    noCombatItems: string;
+    noFeedItems: string;
   };
 }
 
@@ -391,7 +446,7 @@ export const translations: Record<Language, Translations> = {
       mid: '中期',
       late: '后期',
       peak: '巅峰',
-      layer: '第{n}层',
+      layer: '{realm}第{n}层',
     },
     time: {
       year: '年',
@@ -444,6 +499,12 @@ export const translations: Record<Language, Translations> = {
         passive: '被动',
         active: '主动',
       },
+      available: '可学习',
+      clickNodeToView: '点击节点查看详情',
+      statBonuses: '属性加成',
+      unlocksSkill: '解锁技能',
+      resetTitle: '重置技能树',
+      confirmReset: '确定重置',
     },
     spiritBeast: {
       title: '灵兽',
@@ -515,6 +576,74 @@ export const translations: Record<Language, Translations> = {
         captureFailed: '捕捉失败，{name}逃跑了',
         newSkill: '{name}学会了新技能：{skill}',
       },
+    },
+    help: {
+      title: '修炼指南',
+      realms: {
+        title: '境界体系',
+        items: [
+          '炼气期（9层）',
+          '筑基期（4阶段）',
+          '结丹期（4阶段）',
+          '元婴期（4阶段）',
+          '化神期',
+          '……',
+        ],
+      },
+      tips: {
+        title: '修炼技巧',
+        items: [
+          '闭关修炼：最快提升修为',
+          '驻守坊市：可以交易物品',
+          '游历：可能遇到机缘或危险',
+          '修为满时可尝试突破',
+        ],
+      },
+      market: {
+        title: '市场交易',
+        items: [
+          '价格随时间波动',
+          '大量买入会推高价格',
+          '大量卖出会压低价格',
+          '关注世界事件影响',
+        ],
+      },
+      attributes: {
+        title: '属性说明',
+        items: [
+          '悟性：影响修炼速度',
+          '气运：影响突破成功率',
+          '神识：影响战斗准确度',
+          '速度：影响战斗顺序',
+        ],
+      },
+    },
+    logTypes: {
+      cultivation: '修炼',
+      market: '交易',
+      combat: '战斗',
+      event: '事件',
+      system: '系统',
+      all: '全部',
+    },
+    common: {
+      minimize: '最小化',
+      global: '全局',
+      switchTo: '切换到',
+      currentLanguage: '中文',
+      otherLanguage: 'EN',
+      otherStats: '其他属性',
+      cancel: '取消',
+      confirm: '确定',
+      noItems: '没有可用物品',
+      clickToView: '点击查看详情',
+      defending: '防御中',
+      insight: '洞察',
+      rewards: '获得奖励',
+      return: '返回',
+      enemyActing: '敌人行动中...',
+      noCombatItems: '没有可用的战斗物品',
+      noFeedItems: '没有可用的喂养物品',
     },
   },
   en: {
@@ -640,7 +769,7 @@ export const translations: Record<Language, Translations> = {
       mid: 'Mid',
       late: 'Late',
       peak: 'Peak',
-      layer: 'Layer {n}',
+      layer: '{realm} Layer {n}',
     },
     time: {
       year: 'Year',
@@ -693,6 +822,12 @@ export const translations: Record<Language, Translations> = {
         passive: 'Passive',
         active: 'Active',
       },
+      available: 'Available',
+      clickNodeToView: 'Click a node to view details',
+      statBonuses: 'Stat Bonuses',
+      unlocksSkill: 'Unlocks Skill',
+      resetTitle: 'Reset Skill Tree',
+      confirmReset: 'Confirm Reset',
     },
     spiritBeast: {
       title: 'Spirit Beast',
@@ -764,6 +899,74 @@ export const translations: Record<Language, Translations> = {
         captureFailed: 'Capture failed, {name} escaped',
         newSkill: '{name} learned a new skill: {skill}',
       },
+    },
+    help: {
+      title: 'Cultivation Guide',
+      realms: {
+        title: 'Realm System',
+        items: [
+          'Qi Refining (9 layers)',
+          'Foundation (4 stages)',
+          'Core Formation (4 stages)',
+          'Nascent Soul (4 stages)',
+          'Spirit Transformation',
+          '...',
+        ],
+      },
+      tips: {
+        title: 'Cultivation Tips',
+        items: [
+          'Closed-door: Fastest cultivation',
+          'Market Station: Trade items',
+          'Travel: May find opportunities or danger',
+          'Attempt breakthrough when cultivation is full',
+        ],
+      },
+      market: {
+        title: 'Market Trading',
+        items: [
+          'Prices fluctuate over time',
+          'Bulk buying raises prices',
+          'Bulk selling lowers prices',
+          'Watch for world events',
+        ],
+      },
+      attributes: {
+        title: 'Attribute Guide',
+        items: [
+          'Comprehension: Affects cultivation speed',
+          'Luck: Affects breakthrough success',
+          'Divine Sense: Affects combat accuracy',
+          'Speed: Affects turn order in combat',
+        ],
+      },
+    },
+    logTypes: {
+      cultivation: 'Cult',
+      market: 'Trade',
+      combat: 'Combat',
+      event: 'Event',
+      system: 'Sys',
+      all: 'ALL',
+    },
+    common: {
+      minimize: 'Minimize',
+      global: 'Global',
+      switchTo: 'Switch to',
+      currentLanguage: 'English',
+      otherLanguage: '中',
+      otherStats: 'Other Stats',
+      cancel: 'Cancel',
+      confirm: 'Confirm',
+      noItems: 'No items available',
+      clickToView: 'Click to view details',
+      defending: 'Defending',
+      insight: 'Insight',
+      rewards: 'Rewards',
+      return: 'Return',
+      enemyActing: 'Enemy is acting...',
+      noCombatItems: 'No combat items available',
+      noFeedItems: 'No feed items available',
     },
   },
 };

@@ -476,15 +476,15 @@ export const SkillTreePanel: React.FC = () => {
         <div className="absolute bottom-2 right-2 flex gap-3 text-xs text-gray-400 bg-gray-900/90 px-3 py-2 rounded z-20 border border-gray-700/50">
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 rounded bg-green-600 border border-green-400"></div>
-            <span>{isZh ? '已学习' : 'Learned'}</span>
+            <span>{t.skillTree.learned}</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 rounded bg-amber-600 border border-amber-400"></div>
-            <span>{isZh ? '可学习' : 'Available'}</span>
+            <span>{t.skillTree.available}</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 rounded bg-gray-700 border border-gray-500 opacity-60"></div>
-            <span>{isZh ? '锁定' : 'Locked'}</span>
+            <span>{t.skillTree.locked}</span>
           </div>
         </div>
       </div>
@@ -496,7 +496,7 @@ export const SkillTreePanel: React.FC = () => {
     if (!selectedNode) {
       return (
         <div className="bg-gray-800/50 rounded-lg p-4 text-gray-400 text-center">
-          {isZh ? '点击节点查看详情' : 'Click a node to view details'}
+          {t.skillTree.clickNodeToView}
         </div>
       );
     }
@@ -557,7 +557,7 @@ export const SkillTreePanel: React.FC = () => {
         {/* Modifiers */}
         {selectedNode.modifiers && selectedNode.modifiers.length > 0 && (
           <div className="text-sm">
-            <span className="text-gray-500">{isZh ? '属性加成:' : 'Stat Bonuses:'}</span>
+            <span className="text-gray-500">{t.skillTree.statBonuses}:</span>
             <ul className="text-green-400 text-xs mt-1">
               {selectedNode.modifiers.map((mod, idx) => (
                 <li key={idx}>
@@ -571,7 +571,7 @@ export const SkillTreePanel: React.FC = () => {
         {/* Skill granted */}
         {selectedNode.skill && (
           <div className="text-sm bg-purple-900/30 rounded p-2">
-            <span className="text-purple-400">{isZh ? '解锁技能:' : 'Unlocks Skill:'}</span>
+            <span className="text-purple-400">{t.skillTree.unlocksSkill}:</span>
             <div className="text-white font-medium">
               {isZh ? selectedNode.skill.chineseName : selectedNode.skill.name}
             </div>
@@ -679,7 +679,7 @@ export const SkillTreePanel: React.FC = () => {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => setShowResetConfirm(false)}>
           <div className="bg-gray-800 rounded-xl p-4 sm:p-6 max-w-sm mx-4 border border-gray-600" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-bold text-amber-400 mb-3">
-              {isZh ? '重置技能树' : 'Reset Skill Tree'}
+              {t.skillTree.resetTitle}
             </h3>
             <p className="text-gray-300 text-sm mb-2">
               {t.skillTree.resetConfirm}
@@ -692,13 +692,13 @@ export const SkillTreePanel: React.FC = () => {
                 onClick={() => setShowResetConfirm(false)}
                 className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
               >
-                {isZh ? '取消' : 'Cancel'}
+                {t.common.cancel}
               </button>
               <button
                 onClick={handleResetTree}
                 className="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg transition-colors"
               >
-                {isZh ? '确定重置' : 'Confirm Reset'}
+                {t.skillTree.confirmReset}
               </button>
             </div>
           </div>

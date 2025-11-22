@@ -6,7 +6,7 @@ import type { GameLog } from '../types/game';
 export const ChatLog: React.FC = () => {
   const { state } = useGame();
   const { logs } = state;
-  const { language } = useLanguage();
+  const { t } = useLanguage();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false); // Start collapsed on mobile
   const [filter, setFilter] = useState<GameLog['type'] | 'all'>('all');
@@ -19,21 +19,15 @@ export const ChatLog: React.FC = () => {
     system: 'text-gray-400',
   };
 
-  const LOG_TYPE_LABELS: Record<GameLog['type'], { zh: string; en: string }> = {
-    cultivation: { zh: '修炼', en: 'Cult' },
-    market: { zh: '交易', en: 'Trade' },
-    combat: { zh: '战斗', en: 'Combat' },
-    event: { zh: '事件', en: 'Event' },
-    system: { zh: '系统', en: 'Sys' },
-  };
+  type LogTypeKey = keyof typeof t.logTypes;
 
-  const FILTER_OPTIONS: Array<{ value: GameLog['type'] | 'all'; label: { zh: string; en: string } }> = [
-    { value: 'all', label: { zh: '全部', en: 'ALL' } },
-    { value: 'cultivation', label: { zh: '修炼', en: 'Cult' } },
-    { value: 'market', label: { zh: '交易', en: 'Trade' } },
-    { value: 'combat', label: { zh: '战斗', en: 'Combat' } },
-    { value: 'event', label: { zh: '事件', en: 'Event' } },
-    { value: 'system', label: { zh: '系统', en: 'Sys' } },
+  const FILTER_OPTIONS: Array<{ value: GameLog['type'] | 'all'; labelKey: LogTypeKey }> = [
+    { value: 'all', labelKey: 'all' },
+    { value: 'cultivation', labelKey: 'cultivation' },
+    { value: 'market', labelKey: 'market' },
+    { value: 'combat', labelKey: 'combat' },
+    { value: 'event', labelKey: 'event' },
+    { value: 'system', labelKey: 'system' },
   ];
 
   const filteredLogs = filter === 'all'
@@ -56,7 +50,7 @@ export const ChatLog: React.FC = () => {
           className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-black/80 backdrop-blur-sm border border-amber-900/50 rounded-lg hover:bg-black/90 transition-colors group min-h-[44px]"
         >
           <span className="text-amber-400 font-medium text-sm sm:text-base">
-            {language === 'zh' ? '日志' : 'Log'}
+            {t.log.title}
           </span>
           <span className="text-gray-500 text-xs sm:text-sm">
             ({logs.length})
@@ -90,7 +84,7 @@ export const ChatLog: React.FC = () => {
             >
               {FILTER_OPTIONS.map(opt => (
                 <option key={opt.value} value={opt.value} className="bg-gray-900">
-                  {opt.label[language]}
+                  {t.logTypes[opt.labelKey]}
                 </option>
               ))}
             </select>
@@ -101,7 +95,7 @@ export const ChatLog: React.FC = () => {
             <button
               onClick={() => setIsExpanded(false)}
               className="text-gray-400 hover:text-amber-400 transition-colors p-2 min-w-[36px] min-h-[36px] flex items-center justify-center"
-              title={language === 'zh' ? '最小化' : 'Minimize'}
+              title={t.common.minimize}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -117,13 +111,13 @@ export const ChatLog: React.FC = () => {
         >
           {filteredLogs.length === 0 ? (
             <div className="text-center py-6 sm:py-8 text-gray-500 text-sm">
-              {language === 'zh' ? '暂无日志...' : 'No logs...'}
+              {t.log.empty}
             </div>
           ) : (
             filteredLogs.map((log, index) => (
               <div key={index} className="text-xs sm:text-sm leading-relaxed">
                 <span className={`${LOG_TYPE_COLORS[log.type]}`}>
-                  {LOG_TYPE_LABELS[log.type][language]}:
+                  {t.logTypes[log.type as LogTypeKey]}:
                 </span>
                 {' '}
                 <span className="text-gray-300">{log.message}</span>
@@ -135,7 +129,7 @@ export const ChatLog: React.FC = () => {
         {/* Footer - Global label */}
         <div className="flex items-center px-2 sm:px-3 py-1.5 border-t border-amber-900/30 bg-black/50">
           <span className="text-gray-500 text-xs">
-            {language === 'zh' ? '全局' : 'Global'}
+            {t.common.global}
           </span>
           <svg className="w-3 h-3 text-gray-500 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />

@@ -7,7 +7,7 @@ import type { Realm } from '../types/game';
 export const CharacterPanel: React.FC = () => {
   const { state, actions } = useGame();
   const { character } = state;
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [showSecondaryStats, setShowSecondaryStats] = useState(false);
 
   const cultivationProgress = (character.cultivationValue / character.cultivationMax) * 100;
@@ -32,9 +32,7 @@ export const CharacterPanel: React.FC = () => {
 
   const getStageDisplay = (realm: Realm, stage: number): string => {
     if (realm === 'qi_refining') {
-      return language === 'zh'
-        ? `${getRealmName(realm)}第${stage}层`
-        : `${getRealmName(realm)} Layer ${stage}`;
+      return t.stages.layer.replace('{realm}', getRealmName(realm)).replace('{n}', String(stage));
     }
     const stageNames = [t.stages.early, t.stages.mid, t.stages.late, t.stages.peak];
     return `${getRealmName(realm)} ${stageNames[stage - 1] || ''}`;
@@ -103,7 +101,7 @@ export const CharacterPanel: React.FC = () => {
                 ? 'bg-amber-600/50 text-amber-300'
                 : 'bg-gray-800/50 text-gray-400 hover:bg-gray-700/50 hover:text-gray-300'
             }`}
-            title={language === 'zh' ? '其他属性' : 'Other Stats'}
+            title={t.common.otherStats}
           >
             <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
