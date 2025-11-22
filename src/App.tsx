@@ -14,6 +14,7 @@ import {
   TalentPanel,
   TalentSelectionModal,
   BreakthroughTalentModal,
+  WorldEventPanel,
 } from './components';
 import type { TabType } from './components';
 
@@ -42,6 +43,7 @@ function GameContent() {
             {activeTab === 'skills' && <SkillTreePanel />}
             {activeTab === 'spiritBeast' && <SpiritBeastPanel />}
             {activeTab === 'talents' && <TalentPanel />}
+            {activeTab === 'worldEvents' && <WorldEventPanel />}
           </div>
         </div>
       </div>

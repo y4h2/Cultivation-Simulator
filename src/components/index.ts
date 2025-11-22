@@ -15,4 +15,6 @@ export { BottomNav } from './BottomNav';
 export { SpiritBeastPanel } from './SpiritBeastPanel';
 export { TalentPanel } from './TalentPanel';
 export { TalentSelectionModal, BreakthroughTalentModal, FateChangeModal } from './TalentSelectionModal';
+export { WorldEventPanel } from './WorldEventPanel';
+export { EventNewsModal } from './EventNewsModal';
 export type { TabType } from './TabNavigation';

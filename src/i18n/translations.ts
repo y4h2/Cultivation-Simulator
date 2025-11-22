@@ -333,6 +333,61 @@ export interface Translations {
       newSkill: string;
     };
   };
+  // World Events
+  worldEvent: {
+    title: string;
+    activeEvents: string;
+    noEvents: string;
+    noEventsDescription: string;
+    intel: string;
+    remaining: string;
+    phase: string;
+    effects: string;
+    progress: string;
+    currentPhase: string;
+    detailsUnknown: string;
+    effectsOverview: string;
+    noActiveEffects: string;
+    clickToViewDetails: string;
+    priceChanges: string;
+    encounterRates: string;
+    dropRates: string;
+    elementDamage: string;
+    otherEffects: string;
+    cultivation: string;
+    captureRate: string;
+    unlockedAreas: string;
+    scopes: {
+      minor: string;
+      regional: string;
+      global: string;
+    };
+    categories: {
+      market: string;
+      war: string;
+      natural: string;
+      resource: string;
+      policy: string;
+      beast: string;
+      personal: string;
+    };
+    sources: {
+      rumor: string;
+      sect_notice: string;
+      tianji: string;
+      black_market: string;
+    };
+    newsModal: {
+      title: string;
+      all: string;
+      unread: string;
+      noIntel: string;
+      new: string;
+      reliable: string;
+      related: string;
+      footer: string;
+    };
+  };
   // Help Modal
   help: {
     title: string;
@@ -698,6 +753,60 @@ export const translations: Record<Language, Translations> = {
         captured: '成功捕获了{name}！',
         captureFailed: '捕捉失败，{name}逃跑了',
         newSkill: '{name}学会了新技能：{skill}',
+      },
+    },
+    worldEvent: {
+      title: '天下大势',
+      activeEvents: '进行中的事件',
+      noEvents: '天下太平，暂无大事',
+      noEventsDescription: '继续修炼，等待风云变幻...',
+      intel: '情报',
+      remaining: '剩余',
+      phase: '阶段',
+      effects: '效果',
+      progress: '事件进程',
+      currentPhase: '当前阶段进度',
+      detailsUnknown: '尚未发现详情',
+      effectsOverview: '世界效果总览',
+      noActiveEffects: '当前无活动效果',
+      clickToViewDetails: '点击事件查看详情',
+      priceChanges: '价格变动',
+      encounterRates: '遭遇率',
+      dropRates: '掉落率',
+      elementDamage: '元素伤害',
+      otherEffects: '其他效果',
+      cultivation: '修炼效率',
+      captureRate: '捕获率',
+      unlockedAreas: '开放区域',
+      scopes: {
+        minor: '局部',
+        regional: '区域',
+        global: '全局',
+      },
+      categories: {
+        market: '市场',
+        war: '战争',
+        natural: '自然',
+        resource: '资源',
+        policy: '政策',
+        beast: '灵兽',
+        personal: '个人',
+      },
+      sources: {
+        rumor: '市井传闻',
+        sect_notice: '宗门公告',
+        tianji: '天机阁',
+        black_market: '黑市情报',
+      },
+      newsModal: {
+        title: '天下情报',
+        all: '全部',
+        unread: '未读',
+        noIntel: '暂无情报',
+        new: '新',
+        reliable: '可信',
+        related: '相关事件',
+        footer: '情报来源不同，可靠性也各异。天机阁情报最为准确，但需付费。',
       },
     },
     help: {
@@ -1082,6 +1191,60 @@ export const translations: Record<Language, Translations> = {
         captured: 'Successfully captured {name}!',
         captureFailed: 'Capture failed, {name} escaped',
         newSkill: '{name} learned a new skill: {skill}',
+      },
+    },
+    worldEvent: {
+      title: 'World Events',
+      activeEvents: 'Active Events',
+      noEvents: 'The world is at peace. No major events.',
+      noEventsDescription: 'Continue cultivating, await changes...',
+      intel: 'Intel',
+      remaining: 'Left',
+      phase: 'Phase',
+      effects: 'Effects',
+      progress: 'Event Progress',
+      currentPhase: 'Current Phase Progress',
+      detailsUnknown: 'Details unknown',
+      effectsOverview: 'World Effects Overview',
+      noActiveEffects: 'No active effects',
+      clickToViewDetails: 'Click an event to view details',
+      priceChanges: 'Price Changes',
+      encounterRates: 'Encounter Rates',
+      dropRates: 'Drop Rates',
+      elementDamage: 'Element Damage',
+      otherEffects: 'Other Effects',
+      cultivation: 'Cultivation',
+      captureRate: 'Capture Rate',
+      unlockedAreas: 'Unlocked Areas',
+      scopes: {
+        minor: 'Local',
+        regional: 'Regional',
+        global: 'Global',
+      },
+      categories: {
+        market: 'Market',
+        war: 'War',
+        natural: 'Natural',
+        resource: 'Resource',
+        policy: 'Policy',
+        beast: 'Beast',
+        personal: 'Personal',
+      },
+      sources: {
+        rumor: 'Rumors',
+        sect_notice: 'Sect Notice',
+        tianji: 'Tianji Oracle',
+        black_market: 'Black Market',
+      },
+      newsModal: {
+        title: 'World Intel',
+        all: 'All',
+        unread: 'Unread',
+        noIntel: 'No intel available',
+        new: 'NEW',
+        reliable: 'reliable',
+        related: 'Related Event',
+        footer: 'Intel reliability varies by source. Tianji Oracle is most accurate but requires payment.',
       },
     },
     help: {

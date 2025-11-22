@@ -1,0 +1,473 @@
+{
+  "events": [
+    {
+      "id": "evt_north_beast_riot",
+      "name": "Northern Beast Riot",
+      "chineseName": "北域妖兽暴乱",
+      "description": "Beasts in the northern mountains have become agitated. Beast materials become rare but encounters increase.",
+      "chineseDescription": "北域山脉的妖兽变得躁动不安。妖兽材料变得稀少，但遭遇战增加。",
+      "scope": "regional",
+      "category": "beast",
+      "region": "north_mountains",
+      "triggerType": "random",
+      "triggerConditions": [
+        { "type": "random_chance", "value": 5 },
+        { "type": "player_realm", "minValue": 1 }
+      ],
+      "durationDays": 30,
+      "phases": [
+        {
+          "id": "omen",
+          "name": "Omen",
+          "chineseName": "预兆",
+          "durationDays": 5,
+          "effects": [
+            { "hook": "encounter", "effectType": "encounter_rate", "target": "beasts", "value": 10, "isPercentage": true }
+          ],
+          "newsKey": "rumor"
+        },
+        {
+          "id": "riot",
+          "name": "Riot",
+          "chineseName": "暴乱",
+          "durationDays": 20,
+          "effects": [
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "beast_materials", "value": 30, "isPercentage": true },
+            { "hook": "battle_init", "effectType": "encounter_rate", "target": "beasts", "value": 50, "isPercentage": true },
+            { "hook": "item_drop", "effectType": "drop_rate_bonus", "target": "beast_materials", "value": 20, "isPercentage": true }
+          ],
+          "newsKey": "official"
+        },
+        {
+          "id": "aftermath",
+          "name": "Aftermath",
+          "chineseName": "余波",
+          "durationDays": 5,
+          "effects": [
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "beast_materials", "value": -10, "isPercentage": true }
+          ],
+          "newsKey": "aftermath"
+        }
+      ],
+      "baseEffects": [],
+      "newsTemplates": {
+        "rumor": "北域山脉似有妖气浮动，猎人报告妖兽活动异常...",
+        "rumorEn": "Strange beast activity reported in the northern mountains. Hunters speak of unusual movements...",
+        "official": "北域妖兽暴乱！宗门发布讨伐任务，妖兽材料价格飞涨！",
+        "officialEn": "Northern Beast Riot! Sects issue hunting missions. Beast material prices skyrocket!",
+        "aftermath": "北域山脉重归寂静，妖兽材料价格逐渐回落。",
+        "aftermathEn": "The northern mountains return to calm. Beast material prices gradually normalize."
+      },
+      "weight": 15,
+      "isRepeatable": true,
+      "cooldownDays": 60
+    },
+    {
+      "id": "evt_alchemy_competition",
+      "name": "Grand Alchemy Competition",
+      "chineseName": "炼丹大会",
+      "description": "The annual alchemy competition draws cultivators from all regions. Herb and pill prices surge.",
+      "chineseDescription": "一年一度的炼丹大会吸引了各地修士。草药和丹药价格飙升。",
+      "scope": "global",
+      "category": "market",
+      "region": "all",
+      "triggerType": "time",
+      "triggerConditions": [
+        { "type": "time_range", "minValue": 3, "maxValue": 3 }
+      ],
+      "durationDays": 15,
+      "phases": [
+        {
+          "id": "preparation",
+          "name": "Preparation",
+          "chineseName": "筹备期",
+          "durationDays": 5,
+          "effects": [
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "herbs", "value": 15, "isPercentage": true }
+          ],
+          "newsKey": "warning"
+        },
+        {
+          "id": "competition",
+          "name": "Competition",
+          "chineseName": "大会期",
+          "durationDays": 7,
+          "effects": [
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "herbs", "value": 30, "isPercentage": true },
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "pills", "value": 20, "isPercentage": true }
+          ],
+          "newsKey": "official"
+        },
+        {
+          "id": "conclusion",
+          "name": "Conclusion",
+          "chineseName": "落幕",
+          "durationDays": 3,
+          "effects": [
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "herbs", "value": -5, "isPercentage": true }
+          ],
+          "newsKey": "aftermath"
+        }
+      ],
+      "baseEffects": [],
+      "newsTemplates": {
+        "warning": "炼丹大会即将开幕，各地炼丹师纷纷采购材料...",
+        "warningEn": "The Grand Alchemy Competition approaches. Alchemists everywhere stock up on materials...",
+        "rumor": "听说今年的炼丹大会规模空前，丹药需求激增。",
+        "rumorEn": "Rumors say this year's alchemy competition will be unprecedented. Pill demand surges.",
+        "official": "炼丹大会盛大开幕！各路炼丹高手齐聚，草药丹药供不应求！",
+        "officialEn": "The Grand Alchemy Competition begins! Master alchemists gather. Herbs and pills in high demand!",
+        "aftermath": "炼丹大会圆满落幕，市场逐渐恢复正常。",
+        "aftermathEn": "The Alchemy Competition concludes successfully. Markets gradually return to normal."
+      },
+      "weight": 20,
+      "isRepeatable": true,
+      "cooldownDays": 365
+    },
+    {
+      "id": "evt_fire_vein_eruption",
+      "name": "Fire Vein Eruption",
+      "chineseName": "火脉喷发",
+      "description": "Underground fire veins erupt, boosting fire element power and producing rare fire materials.",
+      "chineseDescription": "地下火脉喷发，火系力量增强，产出稀有火属性材料。",
+      "scope": "regional",
+      "category": "natural",
+      "region": "south_plains",
+      "triggerType": "random",
+      "triggerConditions": [
+        { "type": "random_chance", "value": 3 }
+      ],
+      "durationDays": 20,
+      "phases": [
+        {
+          "id": "tremors",
+          "name": "Tremors",
+          "chineseName": "震颤",
+          "durationDays": 3,
+          "effects": [],
+          "newsKey": "rumor"
+        },
+        {
+          "id": "eruption",
+          "name": "Eruption",
+          "chineseName": "喷发",
+          "durationDays": 12,
+          "effects": [
+            { "hook": "battle_init", "effectType": "element_damage_bonus", "target": "fire", "value": 15, "isPercentage": true, "element": "fire" },
+            { "hook": "item_drop", "effectType": "drop_rate_bonus", "target": "fire_materials", "value": 40, "isPercentage": true },
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "fire_materials", "value": -20, "isPercentage": true }
+          ],
+          "newsKey": "official"
+        },
+        {
+          "id": "cooling",
+          "name": "Cooling",
+          "chineseName": "冷却",
+          "durationDays": 5,
+          "effects": [
+            { "hook": "item_drop", "effectType": "drop_rate_bonus", "target": "fire_materials", "value": 10, "isPercentage": true }
+          ],
+          "newsKey": "aftermath"
+        }
+      ],
+      "baseEffects": [],
+      "newsTemplates": {
+        "rumor": "南域平原地下传来隆隆声响，似有火脉异动...",
+        "rumorEn": "Rumbling sounds from beneath the southern plains. Fire veins may be stirring...",
+        "official": "火脉喷发！南域平原火属性灵气浓郁，火系修士实力大增！",
+        "officialEn": "Fire Vein Eruption! Fire spiritual energy surges in the southern plains. Fire cultivators grow stronger!",
+        "aftermath": "火脉渐渐平息，但地表仍留有大量火属性材料。",
+        "aftermathEn": "The fire veins gradually calm. Abundant fire materials remain on the surface."
+      },
+      "weight": 10,
+      "isRepeatable": true,
+      "cooldownDays": 90
+    },
+    {
+      "id": "evt_secret_realm_opening",
+      "name": "Secret Realm Opening",
+      "chineseName": "秘境开启",
+      "description": "An ancient secret realm opens its gates. Rare treasures and powerful enemies await within.",
+      "chineseDescription": "古老秘境开启大门。珍稀宝物和强敌在内等待。",
+      "scope": "global",
+      "category": "resource",
+      "region": "all",
+      "triggerType": "conditional",
+      "triggerConditions": [
+        { "type": "random_chance", "value": 2 },
+        { "type": "player_realm", "minValue": 2 }
+      ],
+      "durationDays": 30,
+      "phases": [
+        {
+          "id": "manifestation",
+          "name": "Manifestation",
+          "chineseName": "显现",
+          "durationDays": 5,
+          "effects": [],
+          "newsKey": "rumor"
+        },
+        {
+          "id": "open",
+          "name": "Open",
+          "chineseName": "开放",
+          "durationDays": 20,
+          "effects": [
+            { "hook": "item_drop", "effectType": "drop_rate_bonus", "target": "rare_materials", "value": 50, "isPercentage": true },
+            { "hook": "battle_init", "effectType": "encounter_rate", "target": "bosses", "value": 30, "isPercentage": true },
+            { "hook": "encounter", "effectType": "unlock_area", "target": "secret_realm", "value": 1 }
+          ],
+          "newsKey": "official"
+        },
+        {
+          "id": "closing",
+          "name": "Closing",
+          "chineseName": "关闭",
+          "durationDays": 5,
+          "effects": [
+            { "hook": "item_drop", "effectType": "drop_rate_bonus", "target": "rare_materials", "value": 20, "isPercentage": true }
+          ],
+          "newsKey": "aftermath"
+        }
+      ],
+      "baseEffects": [],
+      "newsTemplates": {
+        "rumor": "天机变化，似有上古秘境即将显现...",
+        "rumorEn": "The heavens shift. An ancient secret realm may soon manifest...",
+        "official": "秘境开启！上古遗迹重现人间，各路高手蜂拥而至！",
+        "officialEn": "Secret Realm Opens! Ancient ruins emerge. Masters from all regions rush to explore!",
+        "aftermath": "秘境入口渐渐消失，下次开启不知何年何月。",
+        "aftermathEn": "The realm's entrance fades away. When it will open again, none can say."
+      },
+      "chainEvents": ["evt_boss_escape"],
+      "weight": 5,
+      "isRepeatable": true,
+      "cooldownDays": 180
+    },
+    {
+      "id": "evt_spirit_field_harvest",
+      "name": "Spirit Field Harvest",
+      "chineseName": "灵田丰收",
+      "description": "Abundant spiritual energy leads to bountiful harvests in spirit fields across the region.",
+      "chineseDescription": "灵气充沛导致灵田大丰收。",
+      "scope": "minor",
+      "category": "resource",
+      "region": "central_lands",
+      "triggerType": "random",
+      "triggerConditions": [
+        { "type": "random_chance", "value": 10 }
+      ],
+      "durationDays": 5,
+      "phases": [
+        {
+          "id": "harvest",
+          "name": "Harvest",
+          "chineseName": "丰收",
+          "durationDays": 5,
+          "effects": [
+            { "hook": "item_drop", "effectType": "drop_rate_bonus", "target": "herbs", "value": 50, "isPercentage": true },
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "herbs", "value": -25, "isPercentage": true }
+          ],
+          "newsKey": "official"
+        }
+      ],
+      "baseEffects": [],
+      "newsTemplates": {
+        "rumor": "今年灵气充足，灵田似有丰收之兆。",
+        "rumorEn": "Spiritual energy flows abundantly this year. Spirit fields show signs of bountiful harvest.",
+        "official": "灵田大丰收！草药价格大跌，正是囤货良机！",
+        "officialEn": "Spirit Field Harvest! Herb prices plummet. A perfect time to stock up!"
+      },
+      "weight": 25,
+      "isRepeatable": true,
+      "cooldownDays": 20
+    },
+    {
+      "id": "evt_merchant_caravan",
+      "name": "Merchant Caravan",
+      "chineseName": "商队途经",
+      "description": "A traveling merchant caravan passes through, offering special items and better prices.",
+      "chineseDescription": "行商队伍途经此地，提供特殊商品和更优惠的价格。",
+      "scope": "minor",
+      "category": "market",
+      "region": "central_lands",
+      "triggerType": "random",
+      "triggerConditions": [
+        { "type": "random_chance", "value": 8 }
+      ],
+      "durationDays": 3,
+      "phases": [
+        {
+          "id": "arrival",
+          "name": "Arrival",
+          "chineseName": "到达",
+          "durationDays": 1,
+          "effects": [],
+          "newsKey": "rumor"
+        },
+        {
+          "id": "trading",
+          "name": "Trading",
+          "chineseName": "交易",
+          "durationDays": 2,
+          "effects": [
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "all", "value": -10, "isPercentage": true }
+          ],
+          "newsKey": "official"
+        }
+      ],
+      "baseEffects": [],
+      "newsTemplates": {
+        "rumor": "听说有商队即将途经此地...",
+        "rumorEn": "Word is a merchant caravan will pass through soon...",
+        "official": "商队到达！各类物品价格优惠，机不可失！",
+        "officialEn": "Caravan arrives! Special prices on all goods. Don't miss out!"
+      },
+      "weight": 30,
+      "isRepeatable": true,
+      "cooldownDays": 10
+    },
+    {
+      "id": "evt_sect_competition",
+      "name": "Annual Sect Competition",
+      "chineseName": "宗门大比",
+      "description": "Sects from across the land gather for the annual martial arts competition.",
+      "chineseDescription": "各大宗门齐聚一堂，举行一年一度的武道大比。",
+      "scope": "global",
+      "category": "war",
+      "region": "all",
+      "triggerType": "time",
+      "triggerConditions": [
+        { "type": "time_range", "minValue": 9, "maxValue": 9 }
+      ],
+      "durationDays": 10,
+      "phases": [
+        {
+          "id": "gathering",
+          "name": "Gathering",
+          "chineseName": "集结",
+          "durationDays": 2,
+          "effects": [],
+          "newsKey": "warning"
+        },
+        {
+          "id": "competition",
+          "name": "Competition",
+          "chineseName": "大比",
+          "durationDays": 6,
+          "effects": [
+            { "hook": "cultivation_tick", "effectType": "cultivation_bonus", "target": "combat", "value": 20, "isPercentage": true },
+            { "hook": "battle_init", "effectType": "encounter_rate", "target": "cultivators", "value": 30, "isPercentage": true }
+          ],
+          "newsKey": "official"
+        },
+        {
+          "id": "celebration",
+          "name": "Celebration",
+          "chineseName": "庆功",
+          "durationDays": 2,
+          "effects": [
+            { "hook": "cultivation_tick", "effectType": "cultivation_bonus", "target": "all", "value": 10, "isPercentage": true }
+          ],
+          "newsKey": "aftermath"
+        }
+      ],
+      "baseEffects": [],
+      "newsTemplates": {
+        "warning": "宗门大比在即，各派弟子厉兵秣马...",
+        "warningEn": "The Sect Competition approaches. Disciples everywhere prepare for battle...",
+        "rumor": "今年的宗门大比据说竞争异常激烈。",
+        "rumorEn": "This year's sect competition is rumored to be exceptionally fierce.",
+        "official": "宗门大比正式开始！各路英豪齐聚，一决高下！",
+        "officialEn": "The Sect Competition begins! Heroes gather to prove their worth!",
+        "aftermath": "宗门大比圆满落幕，英雄榜上又添新名。",
+        "aftermathEn": "The Sect Competition concludes. New names grace the hero rankings."
+      },
+      "weight": 25,
+      "isRepeatable": true,
+      "cooldownDays": 365
+    },
+    {
+      "id": "evt_beast_tide",
+      "name": "Beast Tide",
+      "chineseName": "万兽潮",
+      "description": "A massive tide of spirit beasts sweeps across the land. Danger and opportunity abound.",
+      "chineseDescription": "大规模灵兽潮席卷大地。危机与机遇并存。",
+      "scope": "regional",
+      "category": "beast",
+      "region": "east_coast",
+      "triggerType": "conditional",
+      "triggerConditions": [
+        { "type": "random_chance", "value": 2 },
+        { "type": "event_completed", "eventId": "evt_north_beast_riot" }
+      ],
+      "durationDays": 15,
+      "phases": [
+        {
+          "id": "warning_signs",
+          "name": "Warning Signs",
+          "chineseName": "征兆",
+          "durationDays": 2,
+          "effects": [
+            { "hook": "encounter", "effectType": "encounter_rate", "target": "beasts", "value": 20, "isPercentage": true }
+          ],
+          "newsKey": "warning"
+        },
+        {
+          "id": "tide",
+          "name": "Beast Tide",
+          "chineseName": "兽潮",
+          "durationDays": 10,
+          "effects": [
+            { "hook": "battle_init", "effectType": "encounter_rate", "target": "beasts", "value": 100, "isPercentage": true },
+            { "hook": "beast_capture", "effectType": "capture_rate_bonus", "target": "all", "value": -30, "isPercentage": true },
+            { "hook": "item_drop", "effectType": "drop_rate_bonus", "target": "beast_materials", "value": 60, "isPercentage": true },
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "beast_materials", "value": 50, "isPercentage": true }
+          ],
+          "newsKey": "official"
+        },
+        {
+          "id": "retreat",
+          "name": "Retreat",
+          "chineseName": "退潮",
+          "durationDays": 3,
+          "effects": [
+            { "hook": "beast_capture", "effectType": "capture_rate_bonus", "target": "all", "value": 20, "isPercentage": true },
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "beast_materials", "value": -15, "isPercentage": true }
+          ],
+          "newsKey": "aftermath"
+        }
+      ],
+      "baseEffects": [],
+      "newsTemplates": {
+        "warning": "东海之滨灵兽异动频繁，恐有大事发生...",
+        "warningEn": "Spirit beasts stir restlessly along the eastern coast. Something major approaches...",
+        "rumor": "有渔民见到海中灵兽成群结队向岸边游来...",
+        "rumorEn": "Fishermen report seeing swarms of spirit beasts swimming towards shore...",
+        "official": "万兽潮来袭！东海沿岸全面戒备，修士当心！",
+        "officialEn": "Beast Tide arrives! Eastern coast on full alert. Cultivators beware!",
+        "aftermath": "兽潮渐退，沿海地区留下大量灵兽遗骸，正是收集材料的好时机。",
+        "aftermathEn": "The tide recedes. Beast remains scatter the coast - a perfect time for material gathering."
+      },
+      "requiredTalents": ["nature_spirit", "beast_resonance"],
+      "weight": 8,
+      "isRepeatable": true,
+      "cooldownDays": 120
+    }
+  ],
+  "intelConfig": {
+    "rumorReliability": 60,
+    "sectNoticeReliability": 90,
+    "tianjiReliability": 98,
+    "blackMarketReliability": 85,
+    "tianjiBaseCost": 500,
+    "blackMarketBaseCost": 200,
+    "newsRetentionDays": 30
+  },
+  "eventConfig": {
+    "minEventInterval": 3,
+    "maxActiveEvents": 5,
+    "randomEventCheckInterval": 1,
+    "baseRandomEventChance": 10
+  }
+}

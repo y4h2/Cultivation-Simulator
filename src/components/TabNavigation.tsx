@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../i18n';
 
-export type TabType = 'market' | 'inventory' | 'combat' | 'skills' | 'spiritBeast' | 'talents';
+export type TabType = 'market' | 'inventory' | 'combat' | 'skills' | 'spiritBeast' | 'talents' | 'worldEvents';
 
 interface TabNavigationProps {
   activeTab: TabType;
@@ -21,6 +21,7 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
     { id: 'skills', label: t.tabs.skills },
     { id: 'spiritBeast', label: t.spiritBeast.title },
     { id: 'talents', label: t.talent.title },
+    { id: 'worldEvents', label: t.worldEvent.title },
   ];
 
   return (

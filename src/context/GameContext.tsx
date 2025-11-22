@@ -58,7 +58,119 @@ import {
   generateStartingOptions,
   generateBreakthroughOptions,
 } from '../constants/talents';
+import {
+  createInitialWorldEventState,
+  getTriggeredRandomEvents,
+  getTimedEvents,
+  startEvent,
+  tickEvent,
+  endEvent,
+  getEventById,
+  generateEventNews,
+  EVENT_CONFIG,
+} from '../constants/worldEvents';
+import type { IntelSourceType, WorldEventState } from '../types/worldEvent';
 import type { SkillTreeType, ElementTreeType } from '../types/game';
+
+// Helper function to process world event tick (called on new day)
+function processWorldEventTick(
+  worldEvents: WorldEventState,
+  gameTime: GameTime,
+  character: Character
+): WorldEventState {
+  const updatedWorldEvents = { ...worldEvents };
+
+  // Decrease random event cooldown
+  if (updatedWorldEvents.randomEventCooldown > 0) {
+    updatedWorldEvents.randomEventCooldown -= 1;
+  }
+
+  // Tick all active events
+  const updatedActiveEvents = updatedWorldEvents.activeEvents.map(activeEvent => {
+    const eventDef = getEventById(activeEvent.definitionId);
+    if (!eventDef) return activeEvent;
+
+    const result = tickEvent(activeEvent, eventDef);
+    if (result.completed) {
+      // Record to history
+      updatedWorldEvents.eventHistory = [
+        ...updatedWorldEvents.eventHistory,
+        endEvent(activeEvent, gameTime),
+      ];
+      // Set cooldown
+      if (eventDef.cooldownDays) {
+        updatedWorldEvents.eventCooldowns = {
+          ...updatedWorldEvents.eventCooldowns,
+          [eventDef.id]: eventDef.cooldownDays,
+        };
+      }
+      return null;
+    }
+
+    if (result.phaseChanged && result.event && result.event.isDiscovered) {
+      const news = generateEventNews(eventDef, result.event, 'sect_notice', gameTime, true);
+      updatedWorldEvents.eventNews = [...updatedWorldEvents.eventNews, news];
+    }
+
+    return result.event;
+  }).filter((e): e is NonNullable<typeof e> => e !== null);
+
+  updatedWorldEvents.activeEvents = updatedActiveEvents;
+
+  // Decrease event cooldowns
+  const newCooldowns: Record<string, number> = {};
+  for (const eventId of Object.keys(updatedWorldEvents.eventCooldowns)) {
+    const cooldown = updatedWorldEvents.eventCooldowns[eventId];
+    if (cooldown > 1) {
+      newCooldowns[eventId] = cooldown - 1;
+    }
+  }
+  updatedWorldEvents.eventCooldowns = newCooldowns;
+
+  // Check for new random events (only if cooldown is 0)
+  if (updatedWorldEvents.randomEventCooldown <= 0) {
+    const talentIds = character.talents.majorTalents.map(t => t.talentId)
+      .concat(character.talents.minorTalents.map(t => t.talentId));
+    const realmIndex = ['qi_refining', 'foundation', 'core_formation', 'nascent_soul',
+      'spirit_transformation', 'void_refining', 'body_integration', 'mahayana', 'tribulation']
+      .indexOf(character.realm);
+
+    const triggeredEvents = getTriggeredRandomEvents(updatedWorldEvents, gameTime, realmIndex, talentIds);
+    for (const eventDef of triggeredEvents) {
+      const newEvent = startEvent(eventDef, gameTime);
+      updatedWorldEvents.activeEvents = [...updatedWorldEvents.activeEvents, newEvent];
+      updatedWorldEvents.randomEventCooldown = EVENT_CONFIG.minEventInterval;
+
+      // Generate initial rumor
+      const news = generateEventNews(eventDef, newEvent, 'rumor', gameTime, true);
+      updatedWorldEvents.eventNews = [...updatedWorldEvents.eventNews, news];
+    }
+
+    // Check for timed events
+    const timedEvents = getTimedEvents(updatedWorldEvents, gameTime, realmIndex);
+    for (const eventDef of timedEvents) {
+      const newEvent = startEvent(eventDef, gameTime);
+      newEvent.isDiscovered = true; // Timed events are always discovered
+      updatedWorldEvents.activeEvents = [...updatedWorldEvents.activeEvents, newEvent];
+
+      const news = generateEventNews(eventDef, newEvent, 'sect_notice', gameTime, true);
+      updatedWorldEvents.eventNews = [...updatedWorldEvents.eventNews, news];
+    }
+  }
+
+  // Clean up old news
+  const maxNewsAge = EVENT_CONFIG.newsRetentionDays;
+  updatedWorldEvents.eventNews = updatedWorldEvents.eventNews.filter(news => {
+    const daysSinceNews = (gameTime.year - news.timestamp.year) * 365 +
+      (gameTime.month - news.timestamp.month) * 30 +
+      (gameTime.day - news.timestamp.day);
+    return daysSinceNews < maxNewsAge;
+  });
+
+  updatedWorldEvents.lastEventCheck = { ...gameTime };
+
+  return updatedWorldEvents;
+}
 
 // Action Types
 type GameAction =
@@ -101,7 +213,12 @@ type GameAction =
   | { type: 'PERFORM_FATE_CHANGE'; payload: { removeId: string; addId: string; cost: number } }
   | { type: 'GENERATE_BREAKTHROUGH_OPTIONS'; payload: { realmName: string } }
   | { type: 'CLEAR_TALENT_OPTIONS' }
-  | { type: 'SET_SHOW_TALENT_SELECTION'; payload: boolean };
+  | { type: 'SET_SHOW_TALENT_SELECTION'; payload: boolean }
+  // World Event Actions
+  | { type: 'TICK_WORLD_EVENTS' }
+  | { type: 'TRIGGER_WORLD_EVENT'; payload: { eventId: string } }
+  | { type: 'DISCOVER_EVENT'; payload: { eventId: string; source: IntelSourceType } }
+  | { type: 'MARK_NEWS_READ'; payload: { newsId: string } };
 
 // Initial State
 const createInitialState = (): GameState => ({
@@ -136,6 +253,8 @@ const createInitialState = (): GameState => ({
   startingTalentOptions: generateStartingOptions(3),
   breakthroughTalentOptions: [],
   breakthroughRealmName: '',
+  // World Event System
+  worldEvents: createInitialWorldEventState(),
 });
 
 // Reducer
@@ -157,8 +276,11 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
 
       // Update market on new day
       let updatedMarket = state.market;
+      let updatedWorldEvents = state.worldEvents;
       if (isNewDay(oldTime, newTime)) {
         updatedMarket = updateMarketPrices(state.market, newTime);
+        // Process world events on new day - inline to avoid dispatch during reducer
+        updatedWorldEvents = processWorldEventTick(state.worldEvents, newTime, state.character);
       }
 
       // Add logs
@@ -232,6 +354,7 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         time: newTime,
         character: updatedCharacter,
         market: updatedMarket,
+        worldEvents: updatedWorldEvents,
         logs: trimmedLogs,
       };
     }
@@ -1431,6 +1554,213 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
       };
     }
 
+    // ========== World Event Actions ==========
+    case 'TICK_WORLD_EVENTS': {
+      const worldEvents = { ...state.worldEvents };
+      const newLogs: GameLog[] = [];
+      const completedEvents: string[] = [];
+
+      // Decrease random event cooldown
+      if (worldEvents.randomEventCooldown > 0) {
+        worldEvents.randomEventCooldown -= 1;
+      }
+
+      // Tick all active events
+      const updatedActiveEvents = worldEvents.activeEvents.map(activeEvent => {
+        const eventDef = getEventById(activeEvent.definitionId);
+        if (!eventDef) return activeEvent;
+
+        const result = tickEvent(activeEvent, eventDef);
+        if (result.completed) {
+          completedEvents.push(activeEvent.definitionId);
+          // Record to history
+          worldEvents.eventHistory.push(endEvent(activeEvent, state.time));
+          // Set cooldown
+          if (eventDef.cooldownDays) {
+            worldEvents.eventCooldowns[eventDef.id] = eventDef.cooldownDays;
+          }
+          newLogs.push({
+            timestamp: state.time,
+            message: `${eventDef.chineseName} 已结束`,
+            type: 'event',
+          });
+          return null;
+        }
+
+        if (result.phaseChanged && result.event) {
+          const phase = eventDef.phases[result.event.currentPhaseIndex];
+          // Generate news for phase change
+          if (result.event.isDiscovered) {
+            const news = generateEventNews(eventDef, result.event, 'sect_notice', state.time, true);
+            worldEvents.eventNews.push(news);
+          }
+          newLogs.push({
+            timestamp: state.time,
+            message: `${eventDef.chineseName}: ${phase.chineseName}`,
+            type: 'event',
+          });
+        }
+
+        return result.event;
+      }).filter((e): e is NonNullable<typeof e> => e !== null);
+
+      worldEvents.activeEvents = updatedActiveEvents;
+
+      // Decrease event cooldowns
+      for (const eventId of Object.keys(worldEvents.eventCooldowns)) {
+        if (worldEvents.eventCooldowns[eventId] > 0) {
+          worldEvents.eventCooldowns[eventId] -= 1;
+        }
+      }
+
+      // Check for new random events (only if cooldown is 0)
+      if (worldEvents.randomEventCooldown <= 0) {
+        const talentIds = state.character.talents.majorTalents.map(t => t.talentId)
+          .concat(state.character.talents.minorTalents.map(t => t.talentId));
+        const realmIndex = ['qi_refining', 'foundation', 'core_formation', 'nascent_soul',
+          'spirit_transformation', 'void_refining', 'body_integration', 'mahayana', 'tribulation']
+          .indexOf(state.character.realm);
+
+        const triggeredEvents = getTriggeredRandomEvents(worldEvents, state.time, realmIndex, talentIds);
+        for (const eventDef of triggeredEvents) {
+          const newEvent = startEvent(eventDef, state.time);
+          worldEvents.activeEvents.push(newEvent);
+          worldEvents.randomEventCooldown = EVENT_CONFIG.minEventInterval;
+
+          // Generate initial rumor
+          const news = generateEventNews(eventDef, newEvent, 'rumor', state.time, true);
+          worldEvents.eventNews.push(news);
+
+          newLogs.push({
+            timestamp: state.time,
+            message: `传闻: ${eventDef.chineseName}`,
+            type: 'event',
+          });
+        }
+
+        // Check for timed events
+        const timedEvents = getTimedEvents(worldEvents, state.time, realmIndex);
+        for (const eventDef of timedEvents) {
+          const newEvent = startEvent(eventDef, state.time);
+          newEvent.isDiscovered = true; // Timed events are always discovered
+          worldEvents.activeEvents.push(newEvent);
+
+          const news = generateEventNews(eventDef, newEvent, 'sect_notice', state.time, true);
+          worldEvents.eventNews.push(news);
+
+          newLogs.push({
+            timestamp: state.time,
+            message: `宗门公告: ${eventDef.chineseName}`,
+            type: 'event',
+          });
+        }
+      }
+
+      // Clean up old news
+      const maxNewsAge = EVENT_CONFIG.newsRetentionDays;
+      worldEvents.eventNews = worldEvents.eventNews.filter(news => {
+        const daysSinceNews = (state.time.year - news.timestamp.year) * 365 +
+          (state.time.month - news.timestamp.month) * 30 +
+          (state.time.day - news.timestamp.day);
+        return daysSinceNews < maxNewsAge;
+      });
+
+      worldEvents.lastEventCheck = { ...state.time };
+
+      return {
+        ...state,
+        worldEvents,
+        logs: [...state.logs, ...newLogs].slice(-100),
+      };
+    }
+
+    case 'TRIGGER_WORLD_EVENT': {
+      const { eventId } = action.payload;
+      const eventDef = getEventById(eventId);
+      if (!eventDef) return state;
+
+      // Check if event is already active
+      if (state.worldEvents.activeEvents.some(e => e.definitionId === eventId)) {
+        return state;
+      }
+
+      const newEvent = startEvent(eventDef, state.time);
+      const news = generateEventNews(eventDef, newEvent, 'rumor', state.time, true);
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: `事件开始: ${eventDef.chineseName}`,
+        type: 'event',
+      };
+
+      return {
+        ...state,
+        worldEvents: {
+          ...state.worldEvents,
+          activeEvents: [...state.worldEvents.activeEvents, newEvent],
+          eventNews: [...state.worldEvents.eventNews, news],
+        },
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'DISCOVER_EVENT': {
+      const { eventId, source } = action.payload;
+      const activeEventIndex = state.worldEvents.activeEvents.findIndex(
+        e => e.definitionId === eventId
+      );
+
+      if (activeEventIndex === -1) return state;
+
+      const activeEvent = state.worldEvents.activeEvents[activeEventIndex];
+      if (activeEvent.isDiscovered) return state;
+
+      const updatedEvent = {
+        ...activeEvent,
+        isDiscovered: true,
+        discoverySource: source,
+      };
+
+      const eventDef = getEventById(eventId);
+      const news = eventDef
+        ? generateEventNews(eventDef, updatedEvent, source, state.time, true)
+        : null;
+
+      const updatedActiveEvents = [...state.worldEvents.activeEvents];
+      updatedActiveEvents[activeEventIndex] = updatedEvent;
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: `发现事件: ${eventDef?.chineseName || eventId}`,
+        type: 'event',
+      };
+
+      return {
+        ...state,
+        worldEvents: {
+          ...state.worldEvents,
+          activeEvents: updatedActiveEvents,
+          eventNews: news ? [...state.worldEvents.eventNews, news] : state.worldEvents.eventNews,
+        },
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'MARK_NEWS_READ': {
+      const { newsId } = action.payload;
+      const updatedNews = state.worldEvents.eventNews.map(news =>
+        news.id === newsId ? { ...news, isRead: true } : news
+      );
+
+      return {
+        ...state,
+        worldEvents: {
+          ...state.worldEvents,
+          eventNews: updatedNews,
+        },
+      };
+    }
+
     default:
       return state;
   }
@@ -1479,6 +1809,10 @@ interface GameContextType {
     generateBreakthroughOptions: (realmName: string) => void;
     clearTalentOptions: () => void;
     setShowTalentSelection: (show: boolean) => void;
+    // World Event actions
+    triggerWorldEvent: (eventId: string) => void;
+    discoverEvent: (eventId: string, source: IntelSourceType) => void;
+    markNewsRead: (newsId: string) => void;
   };
 }
 
@@ -1589,6 +1923,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dispatch({ type: 'CLEAR_TALENT_OPTIONS' }), []),
     setShowTalentSelection: useCallback((show: boolean) =>
       dispatch({ type: 'SET_SHOW_TALENT_SELECTION', payload: show }), []),
+    // World Event actions
+    triggerWorldEvent: useCallback((eventId: string) =>
+      dispatch({ type: 'TRIGGER_WORLD_EVENT', payload: { eventId } }), []),
+    discoverEvent: useCallback((eventId: string, source: IntelSourceType) =>
+      dispatch({ type: 'DISCOVER_EVENT', payload: { eventId, source } }), []),
+    markNewsRead: useCallback((newsId: string) =>
+      dispatch({ type: 'MARK_NEWS_READ', payload: { newsId } }), []),
   };
 
   return (
@@ -1631,4 +1972,9 @@ export const useCombat = (): CombatState => {
 export const useLogs = (): GameLog[] => {
   const { state } = useGame();
   return state.logs;
+};
+
+export const useWorldEvents = () => {
+  const { state } = useGame();
+  return state.worldEvents;
 };

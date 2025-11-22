@@ -506,6 +506,8 @@ export interface GameState {
   startingTalentOptions: import('./talent').TalentSelectionOption[];
   breakthroughTalentOptions: import('./talent').BreakthroughTalentOption[];
   breakthroughRealmName: string;
+  // World Event System
+  worldEvents: import('./worldEvent').WorldEventState;
 }
 
 export interface GameSettings {
