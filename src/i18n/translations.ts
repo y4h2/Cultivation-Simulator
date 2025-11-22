@@ -199,6 +199,68 @@ export interface Translations {
     resetTitle: string;
     confirmReset: string;
   };
+  // Talent System
+  talent: {
+    title: string;
+    majorTalents: string;
+    minorTalents: string;
+    flaws: string;
+    innateDestiny: string;
+    acquiredInsight: string;
+    shadowFlaw: string;
+    fateChange: string;
+    fateChangeCost: string;
+    fateChangeCount: string;
+    fateChangeDescription: string;
+    selectDestiny: string;
+    selectDestinyDescription: string;
+    breakthroughInsight: string;
+    breakthroughDescription: string;
+    confirmSelection: string;
+    gainInsight: string;
+    skipForNow: string;
+    currentBonuses: string;
+    noBonuses: string;
+    noTalents: string;
+    scopes: {
+      battle: string;
+      market: string;
+      cultivation: string;
+      spirit_beast: string;
+      world_event: string;
+    };
+    categories: {
+      combat: string;
+      cultivation: string;
+      market: string;
+      beast: string;
+    };
+    bonuses: {
+      damageBonus: string;
+      swordDamage: string;
+      damageReduction: string;
+      critRate: string;
+      critDamage: string;
+      hpBonus: string;
+      qiCap: string;
+      executeDamage: string;
+      lowHpShield: string;
+      cultivationExp: string;
+      combatExp: string;
+      idleExp: string;
+      breakthrough: string;
+      priceInsight: string;
+      tradeProfit: string;
+      stockpileBonus: string;
+      assetExp: string;
+      captureRate: string;
+      affinityCap: string;
+      encounterRate: string;
+      moodBoost: string;
+      trainingExp: string;
+      battleBond: string;
+    };
+  };
   // Spirit Beast System
   spiritBeast: {
     title: string;
@@ -505,6 +567,67 @@ export const translations: Record<Language, Translations> = {
       unlocksSkill: '解锁技能',
       resetTitle: '重置技能树',
       confirmReset: '确定重置',
+    },
+    talent: {
+      title: '天赋系统',
+      majorTalents: '先天气运',
+      minorTalents: '后天悟性',
+      flaws: '阴影缺陷',
+      innateDestiny: '先天气运',
+      acquiredInsight: '后天悟性',
+      shadowFlaw: '阴影缺陷',
+      fateChange: '改命',
+      fateChangeCost: '费用',
+      fateChangeCount: '改命次数',
+      fateChangeDescription: '消耗灵石更换天赋，每次费用翻倍。',
+      selectDestiny: '选择你的命运',
+      selectDestinyDescription: '每个命运组合包含一个先天气运和一个后天悟性，部分还有缺陷。',
+      breakthroughInsight: '突破感悟',
+      breakthroughDescription: '成功突破！你的经历让你获得了新的领悟。',
+      confirmSelection: '确认选择',
+      gainInsight: '获得领悟',
+      skipForNow: '暂时跳过',
+      currentBonuses: '当前加成',
+      noBonuses: '暂无加成效果',
+      noTalents: '尚未选择天赋，开始新游戏时选择',
+      scopes: {
+        battle: '战斗',
+        market: '商业',
+        cultivation: '修炼',
+        spirit_beast: '灵兽',
+        world_event: '世界事件',
+      },
+      categories: {
+        combat: '战斗',
+        cultivation: '修炼',
+        market: '商业',
+        beast: '灵兽',
+      },
+      bonuses: {
+        damageBonus: '伤害加成',
+        swordDamage: '剑系伤害',
+        damageReduction: '伤害减免',
+        critRate: '暴击率',
+        critDamage: '暴击伤害',
+        hpBonus: '生命加成',
+        qiCap: '气上限',
+        executeDamage: '处决伤害',
+        lowHpShield: '低血护盾',
+        cultivationExp: '修炼效率',
+        combatExp: '战斗修为',
+        idleExp: '闭关修炼',
+        breakthrough: '突破加成',
+        priceInsight: '价格洞察',
+        tradeProfit: '交易利润',
+        stockpileBonus: '囤货加成',
+        assetExp: '资产转修为',
+        captureRate: '捕获率',
+        affinityCap: '亲密上限',
+        encounterRate: '遭遇率',
+        moodBoost: '心情提升',
+        trainingExp: '训练经验',
+        battleBond: '共战伤害',
+      },
     },
     spiritBeast: {
       title: '灵兽',
@@ -828,6 +951,67 @@ export const translations: Record<Language, Translations> = {
       unlocksSkill: 'Unlocks Skill',
       resetTitle: 'Reset Skill Tree',
       confirmReset: 'Confirm Reset',
+    },
+    talent: {
+      title: 'Talent System',
+      majorTalents: 'Innate Destiny',
+      minorTalents: 'Acquired Insight',
+      flaws: 'Shadow Flaws',
+      innateDestiny: 'Innate Destiny',
+      acquiredInsight: 'Acquired Insight',
+      shadowFlaw: 'Shadow Flaw',
+      fateChange: 'Fate Change',
+      fateChangeCost: 'Cost',
+      fateChangeCount: 'Fate Changes',
+      fateChangeDescription: 'Spend spirit stones to change talents. Cost doubles each time.',
+      selectDestiny: 'Choose Your Destiny',
+      selectDestinyDescription: 'Each destiny contains one Innate Talent and one Acquired Insight. Some include a Flaw.',
+      breakthroughInsight: 'Breakthrough Insight',
+      breakthroughDescription: 'Breakthrough successful! Your experiences grant new insight.',
+      confirmSelection: 'Confirm Selection',
+      gainInsight: 'Gain Insight',
+      skipForNow: 'Skip for now',
+      currentBonuses: 'Current Bonuses',
+      noBonuses: 'No active bonuses',
+      noTalents: 'No talents selected. Choose when starting a new game.',
+      scopes: {
+        battle: 'Combat',
+        market: 'Market',
+        cultivation: 'Cultivation',
+        spirit_beast: 'Spirit Beast',
+        world_event: 'World Event',
+      },
+      categories: {
+        combat: 'Combat',
+        cultivation: 'Cultivation',
+        market: 'Market',
+        beast: 'Beast',
+      },
+      bonuses: {
+        damageBonus: 'Damage Bonus',
+        swordDamage: 'Sword Damage',
+        damageReduction: 'Damage Reduction',
+        critRate: 'Crit Rate',
+        critDamage: 'Crit Damage',
+        hpBonus: 'HP Bonus',
+        qiCap: 'Qi Cap',
+        executeDamage: 'Execute Damage',
+        lowHpShield: 'Low HP Shield',
+        cultivationExp: 'Cultivation Exp',
+        combatExp: 'Combat Exp',
+        idleExp: 'Idle Exp',
+        breakthrough: 'Breakthrough',
+        priceInsight: 'Price Insight',
+        tradeProfit: 'Trade Profit',
+        stockpileBonus: 'Stockpile Bonus',
+        assetExp: 'Asset Exp',
+        captureRate: 'Capture Rate',
+        affinityCap: 'Affinity Cap',
+        encounterRate: 'Encounter Rate',
+        moodBoost: 'Mood Boost',
+        trainingExp: 'Training Exp',
+        battleBond: 'Battle Bond',
+      },
     },
     spiritBeast: {
       title: 'Spirit Beast',

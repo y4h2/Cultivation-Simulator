@@ -13,4 +13,6 @@ export { HelpModal } from './HelpModal';
 export { SettingsPanel } from './SettingsPanel';
 export { BottomNav } from './BottomNav';
 export { SpiritBeastPanel } from './SpiritBeastPanel';
+export { TalentPanel } from './TalentPanel';
+export { TalentSelectionModal, BreakthroughTalentModal, FateChangeModal } from './TalentSelectionModal';
 export type { TabType } from './TabNavigation';

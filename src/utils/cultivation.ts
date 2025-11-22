@@ -4,6 +4,7 @@ import { REALM_INFO, REALM_ORDER, getNextRealm, getRealmDisplayName } from '../c
 import { ACTIVITY_INFO } from '../constants/activities';
 import { createInitialSkillPoints, createInitialLearnedSkills } from './skillTree';
 import { createInitialSpiritBeastCollection } from './spiritBeast';
+import { createInitialTalentState } from '../constants/talents';
 
 // Base cultivation value gained per ke
 const BASE_CULTIVATION_PER_KE = 1;
@@ -245,6 +246,16 @@ export const createInitialCharacter = (name: string): Character => {
     learnedSkills: createInitialLearnedSkills(),
     // Spirit Beast System
     spiritBeasts: createInitialSpiritBeastCollection(),
+    // Talent System
+    talents: createInitialTalentState(),
+    // Player behavior tracking
+    behaviorStats: {
+      combatCount: 0,
+      tradeCount: 0,
+      cultivationTicks: 0,
+      beastInteractions: 0,
+      eventsEncountered: 0,
+    },
   };
 };
 

@@ -10,6 +10,7 @@ import type {
   CombatEnemy,
   CombatLogEntry,
   SpiritBeast,
+  TalentSelectionOption,
 } from '../types/game';
 import { createInitialTime, advanceTime, isNewDay } from '../utils/time';
 import { createInitialMarket, updateMarketPrices } from '../utils/market';
@@ -50,6 +51,13 @@ import {
   updateBeastInCollection,
   addBeastToCollection,
 } from '../utils/spiritBeast';
+import {
+  addTalent,
+  removeTalent,
+  getTalentById,
+  generateStartingOptions,
+  generateBreakthroughOptions,
+} from '../constants/talents';
 import type { SkillTreeType, ElementTreeType } from '../types/game';
 
 // Action Types
@@ -86,7 +94,14 @@ type GameAction =
   | { type: 'FEED_BEAST'; payload: { beastId: string; feedItemId: string } }
   | { type: 'TRAIN_BEAST'; payload: { beastId: string; intensity: number } }
   | { type: 'SET_ACTIVE_BEAST'; payload: { beastId: string | null } }
-  | { type: 'BEAST_BREAKTHROUGH'; payload: { beastId: string } };
+  | { type: 'BEAST_BREAKTHROUGH'; payload: { beastId: string } }
+  // Talent Actions
+  | { type: 'SELECT_STARTING_TALENTS'; payload: TalentSelectionOption }
+  | { type: 'SELECT_BREAKTHROUGH_TALENT'; payload: { talentId: string; realm: string } }
+  | { type: 'PERFORM_FATE_CHANGE'; payload: { removeId: string; addId: string; cost: number } }
+  | { type: 'GENERATE_BREAKTHROUGH_OPTIONS'; payload: { realmName: string } }
+  | { type: 'CLEAR_TALENT_OPTIONS' }
+  | { type: 'SET_SHOW_TALENT_SELECTION'; payload: boolean };
 
 // Initial State
 const createInitialState = (): GameState => ({
@@ -115,6 +130,12 @@ const createInitialState = (): GameState => ({
     soundEnabled: false,
     notificationsEnabled: true,
   },
+  // Talent selection UI state
+  showTalentSelection: true, // Show at game start
+  talentSelectionType: 'starting',
+  startingTalentOptions: generateStartingOptions(3),
+  breakthroughTalentOptions: [],
+  breakthroughRealmName: '',
 });
 
 // Reducer
@@ -1268,6 +1289,148 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
       };
     }
 
+    // ========== Talent Actions ==========
+    case 'SELECT_STARTING_TALENTS': {
+      const option = action.payload;
+
+      let newTalents = state.character.talents;
+
+      // Add major talent
+      newTalents = addTalent(newTalents, option.majorTalent, 'start');
+
+      // Add minor talent
+      newTalents = addTalent(newTalents, option.minorTalent, 'start');
+
+      // Add flaw if present
+      if (option.flaw) {
+        newTalents = addTalent(newTalents, option.flaw, 'start');
+      }
+
+      // Get talent names for log
+      const majorDef = getTalentById(option.majorTalent);
+      const minorDef = getTalentById(option.minorTalent);
+      const flawDef = option.flaw ? getTalentById(option.flaw) : null;
+
+      let logMessage = `命运已定！获得天赋：${majorDef?.chineseName || option.majorTalent}、${minorDef?.chineseName || option.minorTalent}`;
+      if (flawDef) {
+        logMessage += `，同时承受缺陷：${flawDef.chineseName}`;
+      }
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: logMessage,
+        type: 'system',
+      };
+
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          talents: newTalents,
+        },
+        showTalentSelection: false,
+        talentSelectionType: null,
+        startingTalentOptions: [],
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'SELECT_BREAKTHROUGH_TALENT': {
+      const { talentId, realm } = action.payload;
+
+      const newTalents = addTalent(state.character.talents, talentId, 'breakthrough', realm);
+
+      const talentDef = getTalentById(talentId);
+      const log: GameLog = {
+        timestamp: state.time,
+        message: `突破感悟！领悟了新天赋：${talentDef?.chineseName || talentId}`,
+        type: 'cultivation',
+      };
+
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          talents: newTalents,
+        },
+        showTalentSelection: false,
+        talentSelectionType: null,
+        breakthroughTalentOptions: [],
+        breakthroughRealmName: '',
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'PERFORM_FATE_CHANGE': {
+      const { removeId, addId, cost } = action.payload;
+
+      // Check if player has enough spirit stones
+      if (state.character.spiritStones < cost) return state;
+
+      // Remove old talent and add new one
+      let newTalents = removeTalent(state.character.talents, removeId);
+      newTalents = addTalent(newTalents, addId, 'fate_change');
+      newTalents = {
+        ...newTalents,
+        fateChangeCount: newTalents.fateChangeCount + 1,
+      };
+
+      const removedDef = getTalentById(removeId);
+      const addedDef = getTalentById(addId);
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: `改命成功！失去：${removedDef?.chineseName || removeId}，获得：${addedDef?.chineseName || addId}`,
+        type: 'system',
+      };
+
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          talents: newTalents,
+          spiritStones: state.character.spiritStones - cost,
+        },
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'GENERATE_BREAKTHROUGH_OPTIONS': {
+      const { realmName } = action.payload;
+
+      const options = generateBreakthroughOptions(
+        state.character.talents,
+        state.character.behaviorStats,
+        3
+      );
+
+      return {
+        ...state,
+        showTalentSelection: true,
+        talentSelectionType: 'breakthrough',
+        breakthroughTalentOptions: options,
+        breakthroughRealmName: realmName,
+      };
+    }
+
+    case 'CLEAR_TALENT_OPTIONS': {
+      return {
+        ...state,
+        showTalentSelection: false,
+        talentSelectionType: null,
+        startingTalentOptions: [],
+        breakthroughTalentOptions: [],
+        breakthroughRealmName: '',
+      };
+    }
+
+    case 'SET_SHOW_TALENT_SELECTION': {
+      return {
+        ...state,
+        showTalentSelection: action.payload,
+      };
+    }
+
     default:
       return state;
   }
@@ -1309,6 +1472,13 @@ interface GameContextType {
     trainBeast: (beastId: string, intensity: number) => void;
     setActiveBeast: (beastId: string | null) => void;
     beastBreakthrough: (beastId: string) => void;
+    // Talent actions
+    selectStartingTalents: (option: TalentSelectionOption) => void;
+    selectBreakthroughTalent: (talentId: string, realm: string) => void;
+    performFateChange: (removeId: string, addId: string, cost: number) => void;
+    generateBreakthroughOptions: (realmName: string) => void;
+    clearTalentOptions: () => void;
+    setShowTalentSelection: (show: boolean) => void;
   };
 }
 
@@ -1406,6 +1576,19 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dispatch({ type: 'SET_ACTIVE_BEAST', payload: { beastId } }), []),
     beastBreakthrough: useCallback((beastId: string) =>
       dispatch({ type: 'BEAST_BREAKTHROUGH', payload: { beastId } }), []),
+    // Talent actions
+    selectStartingTalents: useCallback((option: TalentSelectionOption) =>
+      dispatch({ type: 'SELECT_STARTING_TALENTS', payload: option }), []),
+    selectBreakthroughTalent: useCallback((talentId: string, realm: string) =>
+      dispatch({ type: 'SELECT_BREAKTHROUGH_TALENT', payload: { talentId, realm } }), []),
+    performFateChange: useCallback((removeId: string, addId: string, cost: number) =>
+      dispatch({ type: 'PERFORM_FATE_CHANGE', payload: { removeId, addId, cost } }), []),
+    generateBreakthroughOptions: useCallback((realmName: string) =>
+      dispatch({ type: 'GENERATE_BREAKTHROUGH_OPTIONS', payload: { realmName } }), []),
+    clearTalentOptions: useCallback(() =>
+      dispatch({ type: 'CLEAR_TALENT_OPTIONS' }), []),
+    setShowTalentSelection: useCallback((show: boolean) =>
+      dispatch({ type: 'SET_SHOW_TALENT_SELECTION', payload: show }), []),
   };
 
   return (

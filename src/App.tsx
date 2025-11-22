@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { GameProvider } from './context/GameContext';
+import { GameProvider, useGame } from './context/GameContext';
 import { LanguageProvider } from './i18n';
 import {
   Layout,
@@ -11,11 +11,15 @@ import {
   TabNavigation,
   SkillTreePanel,
   SpiritBeastPanel,
+  TalentPanel,
+  TalentSelectionModal,
+  BreakthroughTalentModal,
 } from './components';
 import type { TabType } from './components';
 
 function GameContent() {
   const [activeTab, setActiveTab] = useState<TabType>('market');
+  const { state, actions } = useGame();
 
   return (
     <Layout>
@@ -37,12 +41,30 @@ function GameContent() {
             {activeTab === 'combat' && <CombatPanel />}
             {activeTab === 'skills' && <SkillTreePanel />}
             {activeTab === 'spiritBeast' && <SpiritBeastPanel />}
+            {activeTab === 'talents' && <TalentPanel />}
           </div>
         </div>
       </div>
 
       {/* Floating Chat Log */}
       <ChatLog />
+
+      {/* Talent Selection Modals */}
+      {state.showTalentSelection && state.talentSelectionType === 'starting' && (
+        <TalentSelectionModal
+          options={state.startingTalentOptions}
+          onSelect={(option) => actions.selectStartingTalents(option)}
+        />
+      )}
+
+      {state.showTalentSelection && state.talentSelectionType === 'breakthrough' && (
+        <BreakthroughTalentModal
+          options={state.breakthroughTalentOptions}
+          realmName={state.breakthroughRealmName}
+          onSelect={(talentId) => actions.selectBreakthroughTalent(talentId, state.breakthroughRealmName)}
+          onSkip={() => actions.clearTalentOptions()}
+        />
+      )}
     </Layout>
   );
 }

@@ -1,0 +1,556 @@
+{
+  "talents": [
+    {
+      "id": "sword_seed",
+      "name": "Sword Seed",
+      "chineseName": "剑道种子",
+      "description": "+10% sword damage. Unlocks Tier 2 sword tree at start.",
+      "chineseDescription": "剑系伤害+10%，开局解锁剑道第二阶。",
+      "type": "major",
+      "rarity": "rare",
+      "scopes": ["battle"],
+      "effects": [
+        {
+          "type": "damage_bonus",
+          "scope": "battle",
+          "value": 10,
+          "isPercentage": true,
+          "skillTreeType": "sword",
+          "description": "+10% sword damage",
+          "chineseDescription": "剑系伤害+10%"
+        },
+        {
+          "type": "skill_tree_tier_bonus",
+          "scope": "battle",
+          "value": 1,
+          "skillTreeType": "sword",
+          "description": "Unlock Tier 2 sword tree",
+          "chineseDescription": "解锁剑道第二阶"
+        }
+      ],
+      "stackable": false,
+      "conflictsWith": ["merchant_genius", "beast_resonance"]
+    },
+    {
+      "id": "battle_instinct",
+      "name": "Battle Instinct",
+      "chineseName": "战场直觉",
+      "description": "First critical hit received each battle deals 50% less damage.",
+      "chineseDescription": "每场战斗首次受到的暴击伤害降低50%。",
+      "type": "minor",
+      "rarity": "uncommon",
+      "scopes": ["battle"],
+      "effects": [
+        {
+          "type": "first_hit_reduction",
+          "scope": "battle",
+          "value": 50,
+          "isPercentage": true,
+          "condition": {
+            "type": "first_hit"
+          },
+          "description": "First crit received deals 50% less damage",
+          "chineseDescription": "首次受到暴击伤害-50%"
+        }
+      ],
+      "stackable": false
+    },
+    {
+      "id": "element_resonance",
+      "name": "Element Resonance",
+      "chineseName": "元素共鸣",
+      "description": "Using 3 skills of the same element in a row grants +10% damage for that element.",
+      "chineseDescription": "连续使用3个相同元素技能后，该元素伤害+10%。",
+      "type": "minor",
+      "rarity": "uncommon",
+      "scopes": ["battle"],
+      "effects": [
+        {
+          "type": "same_element_bonus",
+          "scope": "battle",
+          "value": 10,
+          "isPercentage": true,
+          "condition": {
+            "type": "consecutive_same_element",
+            "value": 3
+          },
+          "description": "+10% element damage after 3 same-element skills",
+          "chineseDescription": "连续3个同元素技能后伤害+10%"
+        }
+      ],
+      "stackable": false
+    },
+    {
+      "id": "indestructible_body",
+      "name": "Indestructible Body",
+      "chineseName": "不坏金身",
+      "description": "+10% max HP. When HP falls below 25%, gain a shield equal to 20% max HP (once per battle).",
+      "chineseDescription": "最大生命+10%，生命低于25%时获得最大生命20%的护盾（每场战斗一次）。",
+      "type": "major",
+      "rarity": "epic",
+      "scopes": ["battle"],
+      "effects": [
+        {
+          "type": "hp_bonus",
+          "scope": "battle",
+          "value": 10,
+          "isPercentage": true,
+          "description": "+10% max HP",
+          "chineseDescription": "最大生命+10%"
+        },
+        {
+          "type": "shield_on_low_hp",
+          "scope": "battle",
+          "value": 20,
+          "isPercentage": true,
+          "condition": {
+            "type": "hp_below",
+            "value": 25
+          },
+          "description": "20% HP shield when below 25% HP",
+          "chineseDescription": "生命低于25%时获得20%护盾"
+        }
+      ],
+      "stackable": false
+    },
+    {
+      "id": "combat_cultivation",
+      "name": "Combat Cultivation",
+      "chineseName": "以战养道",
+      "description": "+20% cultivation exp from combat, -5% idle cultivation exp.",
+      "chineseDescription": "战斗修为获取+20%，闭关修炼效率-5%。",
+      "type": "minor",
+      "rarity": "uncommon",
+      "scopes": ["battle", "cultivation"],
+      "effects": [
+        {
+          "type": "combat_exp_bonus",
+          "scope": "cultivation",
+          "value": 20,
+          "isPercentage": true,
+          "description": "+20% combat cultivation exp",
+          "chineseDescription": "战斗修为+20%"
+        },
+        {
+          "type": "idle_exp_bonus",
+          "scope": "cultivation",
+          "value": -5,
+          "isPercentage": true,
+          "description": "-5% idle cultivation exp",
+          "chineseDescription": "闭关修炼-5%"
+        }
+      ],
+      "stackable": false,
+      "conflictsWith": ["meditation_master"]
+    },
+    {
+      "id": "decisive_strike",
+      "name": "Decisive Strike",
+      "chineseName": "瞬机一击",
+      "description": "+30% damage to targets below 30% HP.",
+      "chineseDescription": "对生命低于30%的目标伤害+30%。",
+      "type": "minor",
+      "rarity": "uncommon",
+      "scopes": ["battle"],
+      "effects": [
+        {
+          "type": "execute_damage",
+          "scope": "battle",
+          "value": 30,
+          "isPercentage": true,
+          "condition": {
+            "type": "target_hp_below",
+            "value": 30
+          },
+          "description": "+30% damage to low HP targets",
+          "chineseDescription": "对低血目标伤害+30%"
+        }
+      ],
+      "stackable": false
+    },
+    {
+      "id": "merchant_genius",
+      "name": "Merchant Genius",
+      "chineseName": "天机商修",
+      "description": "Can see price trends 2 ticks ahead. +15% profit on all trades.",
+      "chineseDescription": "可预见价格趋势2个时间单位，所有交易利润+15%。",
+      "type": "major",
+      "rarity": "rare",
+      "scopes": ["market"],
+      "effects": [
+        {
+          "type": "price_insight",
+          "scope": "market",
+          "value": 2,
+          "description": "See 2 ticks of price trend ahead",
+          "chineseDescription": "预见2个时间单位价格走势"
+        },
+        {
+          "type": "trade_profit_bonus",
+          "scope": "market",
+          "value": 15,
+          "isPercentage": true,
+          "description": "+15% trade profit",
+          "chineseDescription": "交易利润+15%"
+        }
+      ],
+      "stackable": false,
+      "conflictsWith": ["sword_seed", "beast_resonance"]
+    },
+    {
+      "id": "financial_sense",
+      "name": "Financial Sense",
+      "chineseName": "灵敏财感",
+      "description": "Shows estimated price range for items in market.",
+      "chineseDescription": "在坊市中显示物品价格估值范围。",
+      "type": "minor",
+      "rarity": "common",
+      "scopes": ["market"],
+      "effects": [
+        {
+          "type": "price_insight",
+          "scope": "market",
+          "value": 1,
+          "description": "Show price estimates",
+          "chineseDescription": "显示价格估值"
+        }
+      ],
+      "stackable": false
+    },
+    {
+      "id": "market_advantage",
+      "name": "Market Advantage",
+      "chineseName": "涨跌先机",
+      "description": "Stockpiling items grants +5% combat damage per unique item type (max 25%).",
+      "chineseDescription": "每种囤积的物品类型提供+5%战斗伤害（最高25%）。",
+      "type": "minor",
+      "rarity": "uncommon",
+      "scopes": ["market", "battle"],
+      "effects": [
+        {
+          "type": "stockpile_bonus",
+          "scope": "battle",
+          "value": 5,
+          "isPercentage": true,
+          "condition": {
+            "type": "has_stockpile"
+          },
+          "description": "+5% combat damage per stockpiled item type",
+          "chineseDescription": "每种囤积物品+5%战斗伤害"
+        }
+      ],
+      "stackable": false
+    },
+    {
+      "id": "wealth_cultivation",
+      "name": "Wealth Cultivation",
+      "chineseName": "以财养道",
+      "description": "Gain cultivation exp equal to 0.1% of total assets every day.",
+      "chineseDescription": "每日获得总资产0.1%的修为。",
+      "type": "major",
+      "rarity": "epic",
+      "scopes": ["market", "cultivation"],
+      "effects": [
+        {
+          "type": "asset_exp_gain",
+          "scope": "cultivation",
+          "value": 0.1,
+          "isPercentage": true,
+          "description": "Gain 0.1% of assets as exp daily",
+          "chineseDescription": "每日获得资产0.1%修为"
+        }
+      ],
+      "stackable": false
+    },
+    {
+      "id": "beast_resonance",
+      "name": "Beast Resonance",
+      "chineseName": "灵兽共鸣",
+      "description": "+20% spirit beast capture rate. Affinity cap increased by 20.",
+      "chineseDescription": "灵兽捕获率+20%，亲密度上限+20。",
+      "type": "major",
+      "rarity": "rare",
+      "scopes": ["spirit_beast"],
+      "effects": [
+        {
+          "type": "capture_rate_bonus",
+          "scope": "spirit_beast",
+          "value": 20,
+          "isPercentage": true,
+          "description": "+20% capture rate",
+          "chineseDescription": "捕获率+20%"
+        },
+        {
+          "type": "affinity_cap_bonus",
+          "scope": "spirit_beast",
+          "value": 20,
+          "description": "+20 affinity cap",
+          "chineseDescription": "亲密度上限+20"
+        }
+      ],
+      "stackable": false,
+      "conflictsWith": ["sword_seed", "merchant_genius"]
+    },
+    {
+      "id": "nature_spirit",
+      "name": "Nature Spirit",
+      "chineseName": "草木有灵",
+      "description": "Increased chance to encounter spirit beasts and spirit plants while traveling.",
+      "chineseDescription": "游历时遇到灵兽和灵植的概率提升。",
+      "type": "minor",
+      "rarity": "uncommon",
+      "scopes": ["spirit_beast", "world_event"],
+      "effects": [
+        {
+          "type": "beast_encounter_bonus",
+          "scope": "spirit_beast",
+          "value": 30,
+          "isPercentage": true,
+          "description": "+30% beast/plant encounter rate",
+          "chineseDescription": "灵兽/灵植遭遇率+30%"
+        }
+      ],
+      "stackable": false
+    },
+    {
+      "id": "tamers_touch",
+      "name": "Tamer's Touch",
+      "chineseName": "驯兽之手",
+      "description": "+50% mood boost from feeding. +20% training exp for spirit beasts.",
+      "chineseDescription": "喂养时心情提升+50%，灵兽训练经验+20%。",
+      "type": "minor",
+      "rarity": "uncommon",
+      "scopes": ["spirit_beast"],
+      "effects": [
+        {
+          "type": "mood_boost_bonus",
+          "scope": "spirit_beast",
+          "value": 50,
+          "isPercentage": true,
+          "description": "+50% mood boost from feeding",
+          "chineseDescription": "喂养心情+50%"
+        },
+        {
+          "type": "beast_training_exp_bonus",
+          "scope": "spirit_beast",
+          "value": 20,
+          "isPercentage": true,
+          "description": "+20% beast training exp",
+          "chineseDescription": "训练经验+20%"
+        }
+      ],
+      "stackable": false
+    },
+    {
+      "id": "battle_bond",
+      "name": "Battle Bond",
+      "chineseName": "共战之契",
+      "description": "+10% combined damage when fighting alongside spirit beast.",
+      "chineseDescription": "与灵兽共战时总伤害+10%。",
+      "type": "minor",
+      "rarity": "uncommon",
+      "scopes": ["battle", "spirit_beast"],
+      "effects": [
+        {
+          "type": "beast_combat_bonus",
+          "scope": "battle",
+          "value": 10,
+          "isPercentage": true,
+          "description": "+10% damage with active beast",
+          "chineseDescription": "有灵兽时伤害+10%"
+        }
+      ],
+      "stackable": false
+    },
+    {
+      "id": "spiritual_channels",
+      "name": "Spiritual Channels",
+      "chineseName": "灵窍通达",
+      "description": "-10% spell cost. Unlocks Tier 2 for one element tree.",
+      "chineseDescription": "法术消耗-10%，解锁一个元素树第二阶。",
+      "type": "major",
+      "rarity": "rare",
+      "scopes": ["battle", "cultivation"],
+      "effects": [
+        {
+          "type": "spell_cost_reduction",
+          "scope": "battle",
+          "value": 10,
+          "isPercentage": true,
+          "description": "-10% spell cost",
+          "chineseDescription": "法术消耗-10%"
+        },
+        {
+          "type": "element_tier_bonus",
+          "scope": "cultivation",
+          "value": 1,
+          "description": "Unlock Tier 2 for one element",
+          "chineseDescription": "解锁元素第二阶"
+        }
+      ],
+      "stackable": false
+    },
+    {
+      "id": "qi_flow",
+      "name": "Qi Flow",
+      "chineseName": "气机顺流",
+      "description": "+1 Qi on critical hit. +2 max Qi capacity.",
+      "chineseDescription": "暴击时+1气，气上限+2。",
+      "type": "minor",
+      "rarity": "uncommon",
+      "scopes": ["battle"],
+      "effects": [
+        {
+          "type": "qi_gain",
+          "scope": "battle",
+          "value": 1,
+          "condition": {
+            "type": "on_crit"
+          },
+          "description": "+1 Qi on crit",
+          "chineseDescription": "暴击+1气"
+        },
+        {
+          "type": "qi_cap_bonus",
+          "scope": "battle",
+          "value": 2,
+          "description": "+2 max Qi",
+          "chineseDescription": "气上限+2"
+        }
+      ],
+      "stackable": false
+    },
+    {
+      "id": "meditation_master",
+      "name": "Meditation Master",
+      "chineseName": "静心悟道",
+      "description": "+15% idle cultivation exp. -10% combat cultivation exp.",
+      "chineseDescription": "闭关修炼效率+15%，战斗修为-10%。",
+      "type": "minor",
+      "rarity": "uncommon",
+      "scopes": ["cultivation"],
+      "effects": [
+        {
+          "type": "idle_exp_bonus",
+          "scope": "cultivation",
+          "value": 15,
+          "isPercentage": true,
+          "description": "+15% idle cultivation exp",
+          "chineseDescription": "闭关修炼+15%"
+        },
+        {
+          "type": "combat_exp_bonus",
+          "scope": "cultivation",
+          "value": -10,
+          "isPercentage": true,
+          "description": "-10% combat cultivation exp",
+          "chineseDescription": "战斗修为-10%"
+        }
+      ],
+      "stackable": false,
+      "conflictsWith": ["combat_cultivation"]
+    },
+    {
+      "id": "world_resonance",
+      "name": "World Resonance",
+      "chineseName": "天地共鸣",
+      "description": "+15% element damage that matches current world event element.",
+      "chineseDescription": "与当前世界事件相同元素伤害+15%。",
+      "type": "major",
+      "rarity": "epic",
+      "scopes": ["battle", "world_event"],
+      "effects": [
+        {
+          "type": "element_damage_by_event",
+          "scope": "battle",
+          "value": 15,
+          "isPercentage": true,
+          "description": "+15% matching element damage",
+          "chineseDescription": "匹配元素伤害+15%"
+        }
+      ],
+      "stackable": false
+    },
+    {
+      "id": "disaster_fate",
+      "name": "Disaster Fate",
+      "chineseName": "命格：多灾多难",
+      "description": "+50% chance of negative events. Each survived negative event permanently grants +1 to a random stat.",
+      "chineseDescription": "负面事件概率+50%，每次存活负面事件永久获得随机属性+1。",
+      "type": "flaw",
+      "rarity": "rare",
+      "scopes": ["world_event", "cultivation"],
+      "effects": [
+        {
+          "type": "event_frequency_bonus",
+          "scope": "world_event",
+          "value": 50,
+          "isPercentage": true,
+          "description": "+50% negative event chance",
+          "chineseDescription": "负面事件+50%"
+        },
+        {
+          "type": "bad_event_bonus",
+          "scope": "cultivation",
+          "value": 1,
+          "description": "+1 random stat per survived event",
+          "chineseDescription": "存活事件+1随机属性"
+        }
+      ],
+      "stackable": false
+    },
+    {
+      "id": "restless_mind",
+      "name": "Restless Mind",
+      "chineseName": "难以静心",
+      "description": "-20% idle cultivation exp. Battles lasting 10+ rounds grant +30% combat exp.",
+      "chineseDescription": "闭关修炼效率-20%，持续10回合以上的战斗修为+30%。",
+      "type": "flaw",
+      "rarity": "uncommon",
+      "scopes": ["cultivation", "battle"],
+      "effects": [
+        {
+          "type": "idle_exp_bonus",
+          "scope": "cultivation",
+          "value": -20,
+          "isPercentage": true,
+          "description": "-20% idle cultivation exp",
+          "chineseDescription": "闭关修炼-20%"
+        },
+        {
+          "type": "long_battle_bonus",
+          "scope": "battle",
+          "value": 30,
+          "isPercentage": true,
+          "condition": {
+            "type": "battle_round_above",
+            "value": 10
+          },
+          "description": "+30% exp for 10+ round battles",
+          "chineseDescription": "10回合+战斗修为+30%"
+        }
+      ],
+      "stackable": false
+    }
+  ],
+  "rarityWeights": {
+    "common": 40,
+    "uncommon": 30,
+    "rare": 20,
+    "epic": 8,
+    "legendary": 2
+  },
+  "startingSelectionConfig": {
+    "majorCount": 3,
+    "flawChance": 0.5
+  },
+  "breakthroughConfig": {
+    "optionsCount": 3,
+    "behaviorWeightMultiplier": 2.0
+  },
+  "fateChangeConfig": {
+    "baseCost": 10000,
+    "costMultiplier": 2.0,
+    "maxChanges": 5
+  }
+}

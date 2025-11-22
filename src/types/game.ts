@@ -2,6 +2,19 @@
 // Core Game Types for Xiuxian (Cultivation) Game
 // ============================================
 
+// Re-export talent types for convenience
+export type {
+  TalentDefinition,
+  TalentType,
+  TalentEffectScope,
+  TalentEffect,
+  CharacterTalent,
+  TalentState,
+  TalentSelectionOption,
+  BreakthroughTalentOption,
+  ComputedTalentBonuses,
+} from './talent';
+
 // ============================================
 // Element System Types
 // ============================================
@@ -273,6 +286,19 @@ export interface Character {
   learnedSkills: LearnedSkillsState;
   // Spirit Beast System
   spiritBeasts: SpiritBeastCollection;
+  // Talent System
+  talents: import('./talent').TalentState;
+  // Player behavior tracking for talent selection
+  behaviorStats: PlayerBehaviorStats;
+}
+
+// Player behavior tracking for breakthrough talent selection
+export interface PlayerBehaviorStats {
+  combatCount: number;
+  tradeCount: number;
+  cultivationTicks: number;
+  beastInteractions: number;
+  eventsEncountered: number;
 }
 
 // Inventory System
@@ -474,6 +500,12 @@ export interface GameState {
   isPaused: boolean;
   gameSpeed: number;  // 1 = normal, 2 = 2x, etc.
   settings: GameSettings;
+  // Talent selection UI state
+  showTalentSelection: boolean;
+  talentSelectionType: 'starting' | 'breakthrough' | null;
+  startingTalentOptions: import('./talent').TalentSelectionOption[];
+  breakthroughTalentOptions: import('./talent').BreakthroughTalentOption[];
+  breakthroughRealmName: string;
 }
 
 export interface GameSettings {
