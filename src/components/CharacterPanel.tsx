@@ -79,6 +79,17 @@ export const CharacterPanel: React.FC = () => {
         )}
       </div>
 
+      {/* Skill Points */}
+      <div className="mb-6 p-3 bg-gradient-to-r from-purple-900/30 to-amber-900/30 rounded-lg border border-purple-500/30">
+        <div className="flex justify-between items-center">
+          <span className="text-purple-300 font-medium">{t.skillTree.wudaoPoints}</span>
+          <span className="text-amber-400 font-bold text-lg">{character.skillPoints.wudaoPoints}</span>
+        </div>
+        <div className="text-xs text-gray-500 mt-1">
+          {language === 'zh' ? '累计获得' : 'Total earned'}: {character.skillPoints.totalPointsEarned}
+        </div>
+      </div>
+
       {/* Stats */}
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-gray-200 mb-3">{t.character.attributes}</h3>

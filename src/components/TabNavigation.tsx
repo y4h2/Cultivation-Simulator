@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../i18n';
 
-export type TabType = 'cultivation' | 'market' | 'inventory' | 'combat';
+export type TabType = 'market' | 'inventory' | 'combat' | 'skills';
 
 interface TabNavigationProps {
   activeTab: TabType;
@@ -15,10 +15,10 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
   const { t } = useLanguage();
 
   const TABS: Array<{ id: TabType; labelKey: keyof typeof t.tabs }> = [
-    { id: 'cultivation', labelKey: 'cultivation' },
     { id: 'market', labelKey: 'market' },
     { id: 'inventory', labelKey: 'inventory' },
     { id: 'combat', labelKey: 'combat' },
+    { id: 'skills', labelKey: 'skills' },
   ];
 
   return (

@@ -21,6 +21,7 @@ export interface Translations {
     market: string;
     inventory: string;
     combat: string;
+    skills: string;
   };
   // Character Panel
   character: {
@@ -144,6 +145,44 @@ export interface Translations {
     bought: string;
     sold: string;
   };
+  // Skill Trees
+  skillTree: {
+    title: string;
+    skillPoints: string;
+    wudaoPoints: string;
+    learned: string;
+    learn: string;
+    reset: string;
+    resetConfirm: string;
+    refund: string;
+    requires: string;
+    cost: string;
+    tier: string;
+    mainTrees: string;
+    elementTrees: string;
+    primary: string;
+    secondary: string;
+    locked: string;
+    maxTier: string;
+    trees: {
+      sword: string;
+      spell: string;
+      body: string;
+      mind: string;
+      commerce: string;
+    };
+    elements: {
+      fire: string;
+      water: string;
+      wood: string;
+      metal: string;
+      earth: string;
+    };
+    nodeTypes: {
+      passive: string;
+      active: string;
+    };
+  };
 }
 
 export const translations: Record<Language, Translations> = {
@@ -165,6 +204,7 @@ export const translations: Record<Language, Translations> = {
       market: '坊市',
       inventory: '储物',
       combat: '战斗',
+      skills: '功法',
     },
     character: {
       cultivationProgress: '修为进度',
@@ -277,6 +317,43 @@ export const translations: Record<Language, Translations> = {
       bought: '购买了 {quantity} 个{item}，花费 {cost} 灵石',
       sold: '出售了 {quantity} 个{item}，获得 {revenue} 灵石',
     },
+    skillTree: {
+      title: '功法天赋',
+      skillPoints: '技能点',
+      wudaoPoints: '悟道点',
+      learned: '已学习',
+      learn: '学习',
+      reset: '重置',
+      resetConfirm: '确定要重置吗？将退还80%的悟道点。',
+      refund: '退还',
+      requires: '需要',
+      cost: '消耗',
+      tier: '阶',
+      mainTrees: '功法树',
+      elementTrees: '元素树',
+      primary: '主修',
+      secondary: '副修',
+      locked: '锁定',
+      maxTier: '最高阶',
+      trees: {
+        sword: '剑道',
+        spell: '法术',
+        body: '身法',
+        mind: '心法',
+        commerce: '商道',
+      },
+      elements: {
+        fire: '火',
+        water: '水',
+        wood: '木',
+        metal: '金',
+        earth: '土',
+      },
+      nodeTypes: {
+        passive: '被动',
+        active: '主动',
+      },
+    },
   },
   en: {
     app: {
@@ -296,6 +373,7 @@ export const translations: Record<Language, Translations> = {
       market: 'Market',
       inventory: 'Inventory',
       combat: 'Combat',
+      skills: 'Skills',
     },
     character: {
       cultivationProgress: 'Cultivation Progress',
@@ -407,6 +485,43 @@ export const translations: Record<Language, Translations> = {
       cultivationGain: 'Gained {value} cultivation',
       bought: 'Bought {quantity} {item} for {cost} spirit stones',
       sold: 'Sold {quantity} {item} for {revenue} spirit stones',
+    },
+    skillTree: {
+      title: 'Skill Trees',
+      skillPoints: 'Skill Points',
+      wudaoPoints: 'Dao Points',
+      learned: 'Learned',
+      learn: 'Learn',
+      reset: 'Reset',
+      resetConfirm: 'Are you sure? You will receive 80% refund.',
+      refund: 'Refund',
+      requires: 'Requires',
+      cost: 'Cost',
+      tier: 'Tier',
+      mainTrees: 'Main Trees',
+      elementTrees: 'Element Trees',
+      primary: 'Primary',
+      secondary: 'Secondary',
+      locked: 'Locked',
+      maxTier: 'Max Tier',
+      trees: {
+        sword: 'Sword',
+        spell: 'Spell',
+        body: 'Body',
+        mind: 'Mind',
+        commerce: 'Commerce',
+      },
+      elements: {
+        fire: 'Fire',
+        water: 'Water',
+        wood: 'Wood',
+        metal: 'Metal',
+        earth: 'Earth',
+      },
+      nodeTypes: {
+        passive: 'Passive',
+        active: 'Active',
+      },
     },
   },
 };

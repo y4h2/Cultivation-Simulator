@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { useLanguage } from '../i18n';
 import { formatTimeDetailed } from '../utils/time';
+import { HelpModal } from './HelpModal';
 
 export const Header: React.FC = () => {
   const { state, actions } = useGame();
   const { time, isPaused, gameSpeed, character } = state;
   const { t, language, toggleLanguage } = useLanguage();
+  const [showHelp, setShowHelp] = useState(false);
 
   return (
     <header className="bg-gray-900/80 border-b border-amber-900/30 backdrop-blur-sm sticky top-0 z-50">
@@ -78,6 +80,15 @@ export const Header: React.FC = () => {
               <span className="text-gray-400">{language === 'zh' ? 'EN' : '中'}</span>
             </button>
 
+            {/* Help Button */}
+            <button
+              onClick={() => setShowHelp(true)}
+              className="w-9 h-9 flex items-center justify-center text-lg bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-amber-400 hover:text-amber-300"
+              title={language === 'zh' ? '帮助' : 'Help'}
+            >
+              ?
+            </button>
+
             {/* Save/Load */}
             <div className="flex items-center gap-2">
               <button
@@ -96,6 +107,9 @@ export const Header: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Help Modal */}
+      <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
     </header>
   );
 };

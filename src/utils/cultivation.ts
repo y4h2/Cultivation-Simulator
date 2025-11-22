@@ -2,6 +2,7 @@ import type { Character, Realm, GameLog, GameTime } from '../types/game';
 import { ActivityType } from '../types/game';
 import { REALM_INFO, REALM_ORDER, getNextRealm, getRealmDisplayName } from '../constants/realms';
 import { ACTIVITY_INFO } from '../constants/activities';
+import { createInitialSkillPoints, createInitialLearnedSkills } from './skillTree';
 
 // Base cultivation value gained per ke
 const BASE_CULTIVATION_PER_KE = 1;
@@ -223,6 +224,9 @@ export const createInitialCharacter = (name: string): Character => {
     spiritStones: 100,
     reputation: 0,
     currentActivity: ActivityType.ClosedDoorCultivation,
+    // Skill Tree System
+    skillPoints: createInitialSkillPoints(),
+    learnedSkills: createInitialLearnedSkills(),
   };
 };
 

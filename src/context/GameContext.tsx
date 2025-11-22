@@ -35,6 +35,13 @@ import {
   consumeQi,
 } from '../utils/combat';
 import { COMBAT_ITEMS } from '../constants/combat';
+import {
+  learnSkillNode,
+  learnElementNode,
+  resetSkillTree,
+  resetElementTree,
+} from '../utils/skillTree';
+import type { SkillTreeType, ElementTreeType } from '../types/game';
 
 // Action Types
 type GameAction =
@@ -60,7 +67,11 @@ type GameAction =
   | { type: 'ENEMY_ACTION' }
   | { type: 'END_COMBAT'; payload: { victory: boolean } }
   | { type: 'COLLECT_REWARDS' }
-  | { type: 'TRIGGER_RANDOM_ENCOUNTER' };
+  | { type: 'TRIGGER_RANDOM_ENCOUNTER' }
+  // Skill Tree Actions
+  | { type: 'LEARN_SKILL_NODE'; payload: { nodeId: string; treeType: 'main' | 'element' } }
+  | { type: 'RESET_SKILL_TREE'; payload: { tree: SkillTreeType | ElementTreeType; treeType: 'main' | 'element' } }
+  | { type: 'AWARD_SKILL_POINTS'; payload: { amount: number } };
 
 // Initial State
 const createInitialState = (): GameState => ({
@@ -215,10 +226,29 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
     }
 
     case 'ATTEMPT_BREAKTHROUGH': {
-      const { character, log } = attemptBreakthrough(state.character, state.time);
+      const { character, success, log } = attemptBreakthrough(state.character, state.time);
+
+      // Award skill points on successful breakthrough
+      let updatedCharacter = character;
+      if (success) {
+        const realmIndex = ['qi_refining', 'foundation', 'core_formation', 'nascent_soul',
+          'spirit_transformation', 'void_refining', 'body_integration', 'mahayana', 'tribulation']
+          .indexOf(character.realm);
+        const pointsAwarded = Math.max(2, realmIndex + 1);
+
+        updatedCharacter = {
+          ...character,
+          skillPoints: {
+            ...character.skillPoints,
+            wudaoPoints: character.skillPoints.wudaoPoints + pointsAwarded,
+            totalPointsEarned: character.skillPoints.totalPointsEarned + pointsAwarded,
+          },
+        };
+      }
+
       return {
         ...state,
-        character,
+        character: updatedCharacter,
         logs: [...state.logs, log].slice(-100),
       };
     }
@@ -854,9 +884,29 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         };
       }
 
+      // Chance to award skill points for combat victory
+      const isBossKill = state.combat.enemy?.isBoss || false;
+      const skillPointChance = isBossKill ? 0.5 : 0.1;
+      let skillPointsAwarded = 0;
+      if (Math.random() < skillPointChance) {
+        skillPointsAwarded = isBossKill ? 2 : 1;
+        updatedCharacter = {
+          ...updatedCharacter,
+          skillPoints: {
+            ...updatedCharacter.skillPoints,
+            wudaoPoints: updatedCharacter.skillPoints.wudaoPoints + skillPointsAwarded,
+            totalPointsEarned: updatedCharacter.skillPoints.totalPointsEarned + skillPointsAwarded,
+          },
+        };
+      }
+
+      const skillPointMsg = skillPointsAwarded > 0
+        ? `，${skillPointsAwarded} 悟道点`
+        : '';
+
       const log: GameLog = {
         timestamp: state.time,
-        message: `战斗胜利！获得 ${spiritStones} 灵石，${cultivationExp} 修为`,
+        message: `战斗胜利！获得 ${spiritStones} 灵石，${cultivationExp} 修为${skillPointMsg}`,
         type: 'combat',
       };
 
@@ -935,6 +985,86 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
       };
     }
 
+    // ========== Skill Tree Actions ==========
+    case 'LEARN_SKILL_NODE': {
+      const { nodeId, treeType } = action.payload;
+
+      if (treeType === 'main') {
+        const result = learnSkillNode(state.character, nodeId);
+        if (!result.success) {
+          return state;
+        }
+
+        const log: GameLog = {
+          timestamp: state.time,
+          message: result.messageChinese,
+          type: 'system',
+        };
+
+        return {
+          ...state,
+          character: result.character,
+          logs: [...state.logs, log].slice(-100),
+        };
+      } else {
+        const result = learnElementNode(state.character, nodeId);
+        if (!result.success) {
+          return state;
+        }
+
+        const log: GameLog = {
+          timestamp: state.time,
+          message: result.messageChinese,
+          type: 'system',
+        };
+
+        return {
+          ...state,
+          character: result.character,
+          logs: [...state.logs, log].slice(-100),
+        };
+      }
+    }
+
+    case 'RESET_SKILL_TREE': {
+      const { tree, treeType } = action.payload;
+
+      let updatedCharacter;
+      if (treeType === 'main') {
+        updatedCharacter = resetSkillTree(state.character, tree as SkillTreeType);
+      } else {
+        updatedCharacter = resetElementTree(state.character, tree as ElementTreeType);
+      }
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: `重置了${tree}技能树`,
+        type: 'system',
+      };
+
+      return {
+        ...state,
+        character: updatedCharacter,
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'AWARD_SKILL_POINTS': {
+      const { amount } = action.payload;
+
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          skillPoints: {
+            ...state.character.skillPoints,
+            wudaoPoints: state.character.skillPoints.wudaoPoints + amount,
+            totalPointsEarned: state.character.skillPoints.totalPointsEarned + amount,
+          },
+        },
+      };
+    }
+
     default:
       return state;
   }
@@ -966,6 +1096,10 @@ interface GameContextType {
     endCombat: (victory: boolean) => void;
     collectRewards: () => void;
     triggerRandomEncounter: () => void;
+    // Skill Tree actions
+    learnSkillNode: (nodeId: string, treeType: 'main' | 'element') => void;
+    resetSkillTreeAction: (tree: SkillTreeType | ElementTreeType, treeType: 'main' | 'element') => void;
+    awardSkillPoints: (amount: number) => void;
   };
 }
 
@@ -1045,6 +1179,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     endCombat: useCallback((victory: boolean) => dispatch({ type: 'END_COMBAT', payload: { victory } }), []),
     collectRewards: useCallback(() => dispatch({ type: 'COLLECT_REWARDS' }), []),
     triggerRandomEncounter: useCallback(() => dispatch({ type: 'TRIGGER_RANDOM_ENCOUNTER' }), []),
+    // Skill Tree actions
+    learnSkillNode: useCallback((nodeId: string, treeType: 'main' | 'element') =>
+      dispatch({ type: 'LEARN_SKILL_NODE', payload: { nodeId, treeType } }), []),
+    resetSkillTreeAction: useCallback((tree: SkillTreeType | ElementTreeType, treeType: 'main' | 'element') =>
+      dispatch({ type: 'RESET_SKILL_TREE', payload: { tree, treeType } }), []),
+    awardSkillPoints: useCallback((amount: number) =>
+      dispatch({ type: 'AWARD_SKILL_POINTS', payload: { amount } }), []),
   };
 
   return (

@@ -267,6 +267,9 @@ export interface Character {
   spiritStones: number;
   reputation: number;
   currentActivity: ActivityType;
+  // Skill Tree System
+  skillPoints: SkillPointsState;
+  learnedSkills: LearnedSkillsState;
 }
 
 // Inventory System
@@ -525,4 +528,147 @@ export interface WorldEvent {
   }>;
   duration: number;
   startsAt: GameTime;
+}
+
+// ============================================
+// Skill Tree System Types
+// ============================================
+
+export type SkillTreeType = 'sword' | 'spell' | 'body' | 'mind' | 'commerce';
+export type ElementTreeType = 'fire' | 'water' | 'wood' | 'metal' | 'earth';
+export type SkillTier = 1 | 2 | 3 | 4 | 5;
+export type SkillNodeType = 'passive' | 'active';
+
+// Trigger conditions for passive effects
+export type PassiveTriggerType =
+  | 'on_attack'           // When attacking
+  | 'on_crit'             // When landing critical hit
+  | 'on_kill'             // When defeating enemy
+  | 'on_hit'              // When being hit
+  | 'on_dodge'            // When dodging
+  | 'on_defend'           // When using defend action
+  | 'on_combat_start'     // At combat start
+  | 'on_combat_end'       // At combat end
+  | 'on_turn_start'       // At turn start
+  | 'on_turn_end'         // At turn end
+  | 'on_low_hp'           // When HP falls below threshold
+  | 'on_skill_use'        // When using a skill
+  | 'on_observe'          // When using observe action
+  | 'on_buff_apply'       // When applying buff
+  | 'on_debuff_apply'     // When applying debuff
+  | 'on_trade'            // When trading in market
+  | 'on_breakthrough';    // When breaking through realm
+
+export interface PassiveTrigger {
+  type: PassiveTriggerType;
+  chance: number;           // 0-100, percentage chance to trigger
+  condition?: {
+    type: 'hp_below' | 'hp_above' | 'enemy_hp_below' | 'has_buff' | 'stack_count' | 'consecutive_crits';
+    value: number;
+    buffId?: string;
+  };
+  effect: PassiveEffect;
+}
+
+export interface PassiveEffect {
+  type: 'damage_bonus' | 'heal' | 'apply_buff' | 'apply_debuff' | 'gain_qi' | 'reduce_cooldown'
+      | 'gain_shield' | 'stat_boost' | 'skill_point_bonus' | 'cultivation_bonus' | 'market_insight';
+  value: number;
+  isPercentage?: boolean;
+  duration?: number;
+  stat?: keyof CombatStats;
+  buffId?: string;
+  skillId?: string;
+  element?: Element;
+  description?: string;
+  chineseDescription?: string;
+}
+
+export interface SkillTreeNode {
+  id: string;
+  name: string;
+  chineseName: string;
+  tree: SkillTreeType;
+  tier: SkillTier;
+  type: SkillNodeType;
+  cost: number;                      // Skill points required
+  scrollRequired?: string;           // Technique scroll id if needed
+  prerequisites: string[];           // Required node ids
+  realmRequired: Realm;
+  mutuallyExclusive?: string[];     // Cannot be learned if these are learned
+
+  // For passive nodes
+  modifiers?: StatModifier[];        // Permanent stat modifiers
+  triggers?: PassiveTrigger[];       // Event-based triggers
+
+  // For active nodes - grants a new skill
+  skill?: Skill;
+
+  description: string;
+  chineseDescription: string;
+
+  // Position for UI rendering
+  position: { x: number; y: number };
+}
+
+export interface ElementTreeNode extends Omit<SkillTreeNode, 'tree'> {
+  tree: ElementTreeType;
+  elementSynergy?: {
+    itemCategory?: string;           // Market item category that boosts this
+    marketTrend?: 'rising' | 'falling';
+    bonusEffect: PassiveEffect;
+  };
+}
+
+// Skill Point Resources
+export interface SkillPointsState {
+  wudaoPoints: number;              // 悟道点 - Main skill points
+  techniqueScrolls: string[];       // 功法残页 - Unlocks specific branches
+  totalPointsEarned: number;        // Lifetime total for stats
+}
+
+// Character's learned skills state
+export interface LearnedSkillsState {
+  mainTree: {
+    sword: string[];                // Learned node ids
+    spell: string[];
+    body: string[];
+    mind: string[];
+    commerce: string[];
+  };
+  elementTree: {
+    fire: string[];
+    water: string[];
+    wood: string[];
+    metal: string[];
+    earth: string[];
+  };
+  primaryElement?: ElementTreeType;   // Main element (can unlock T3-T4)
+  secondaryElement?: ElementTreeType; // Secondary element (can unlock T3)
+}
+
+// Computed passive bonuses from skill tree
+export interface ComputedPassives {
+  statModifiers: StatModifier[];
+  triggers: PassiveTrigger[];
+  combatBonuses: {
+    swordDamageBonus: number;
+    spellDamageBonus: number;
+    elementDamageBonus: Record<Element, number>;
+    critBonus: number;
+    critDamageBonus: number;
+    defenseBonus: number;
+    evasionBonus: number;
+    accuracyBonus: number;
+    lifestealPercent: number;
+    shieldOnCombatStart: number;
+  };
+  marketBonuses: {
+    priceInsightLevel: number;      // Better price visibility
+    tradingBonus: number;           // Better buy/sell rates
+  };
+  cultivationBonuses: {
+    efficiencyBonus: number;        // Faster cultivation
+    breakthroughBonus: number;      // Better breakthrough chance
+  };
 }
