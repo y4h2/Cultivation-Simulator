@@ -262,6 +262,7 @@ export interface Character {
   realmStage: number;       // 1-4 (early, mid, late, peak)
   cultivationValue: number; // Current cultivation progress
   cultivationMax: number;   // Required for next breakthrough
+  breakthroughNotified: boolean; // Whether the breakthrough ready message has been shown
   stats: CharacterStats;
   inventory: Inventory;
   spiritStones: number;

@@ -27,15 +27,26 @@ export const processCultivation = (
 
   // Check if cultivation value exceeds max (ready for breakthrough)
   if (newCultivationValue >= character.cultivationMax) {
+    // Only show notification once
+    if (!character.breakthroughNotified) {
+      return {
+        character: {
+          ...character,
+          cultivationValue: character.cultivationMax,
+          breakthroughNotified: true,
+        },
+        log: {
+          timestamp: time,
+          message: `修为已达圆满，可以尝试突破了！当前境界：${getRealmDisplayName(character.realm, character.realmStage)}`,
+          type: 'cultivation',
+        },
+      };
+    }
+    // Already notified, just cap the value without logging
     return {
       character: {
         ...character,
         cultivationValue: character.cultivationMax,
-      },
-      log: {
-        timestamp: time,
-        message: `修为已达圆满，可以尝试突破了！当前境界：${getRealmDisplayName(character.realm, character.realmStage)}`,
-        type: 'cultivation',
       },
     };
   }
@@ -77,6 +88,7 @@ export const attemptBreakthrough = (
           realmStage: newStage,
           cultivationValue: 0,
           cultivationMax: newCultivationMax,
+          breakthroughNotified: false, // Reset notification flag for next breakthrough
           stats: {
             ...character.stats,
             maxHp: newStats.maxHp,
@@ -108,6 +120,7 @@ export const attemptBreakthrough = (
           realmStage: 1,
           cultivationValue: 0,
           cultivationMax: newCultivationMax,
+          breakthroughNotified: false, // Reset notification flag for next breakthrough
           stats: {
             ...character.stats,
             maxHp: newStats.maxHp,
@@ -137,6 +150,7 @@ export const attemptBreakthrough = (
     character: {
       ...character,
       cultivationValue: character.cultivationValue - cultivationLoss,
+      breakthroughNotified: false, // Reset so next time cultivation is full, notify again
     },
     success: false,
     log: {
@@ -201,6 +215,7 @@ export const createInitialCharacter = (name: string): Character => {
     realmStage: 1,
     cultivationValue: 0,
     cultivationMax: calculateCultivationMax('qi_refining', 1),
+    breakthroughNotified: false,
     stats: {
       hp: initialStats.maxHp,
       maxHp: initialStats.maxHp,

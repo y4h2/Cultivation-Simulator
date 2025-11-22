@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { useLanguage } from '../i18n';
 import { useGame } from '../context/GameContext';
 import type {
@@ -21,8 +21,21 @@ import {
   getSkillTreeProgress,
   getElementTreeProgress,
 } from '../utils/skillTree';
+import { SkillTreeBackground } from './SkillTreeBackground';
 
 type TreeCategory = 'main' | 'element';
+
+// Node dimensions for positioning
+const NODE_HEIGHT = 80;
+const TIER_HEIGHT = 100;
+const TREE_PADDING_TOP = 40;
+const TREE_PADDING_LEFT = 60;
+
+interface NodePosition {
+  x: number;
+  y: number;
+  node: SkillTreeNode | ElementTreeNode;
+}
 
 export const SkillTreePanel: React.FC = () => {
   const { language, t } = useLanguage();
@@ -33,8 +46,22 @@ export const SkillTreePanel: React.FC = () => {
   const [selectedMainTree, setSelectedMainTree] = useState<SkillTreeType>('sword');
   const [selectedElementTree, setSelectedElementTree] = useState<ElementTreeType>('fire');
   const [selectedNode, setSelectedNode] = useState<SkillTreeNode | ElementTreeNode | null>(null);
+  const [containerWidth, setContainerWidth] = useState(600);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const isZh = language === 'zh';
+
+  // Track container width for responsive layout
+  useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.offsetWidth);
+      }
+    };
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
 
   // Get current tree nodes
   const currentNodes = useMemo(() => {
@@ -59,6 +86,43 @@ export const SkillTreePanel: React.FC = () => {
     }
     return getElementTreeProgress(character, selectedElementTree);
   }, [treeCategory, selectedMainTree, selectedElementTree, character]);
+
+  // Calculate node positions organized by tier
+  const { nodePositions, svgHeight } = useMemo(() => {
+    const nodesByTier: Record<number, (SkillTreeNode | ElementTreeNode)[]> = {};
+    currentNodes.forEach(node => {
+      if (!nodesByTier[node.tier]) {
+        nodesByTier[node.tier] = [];
+      }
+      nodesByTier[node.tier].push(node);
+    });
+
+    const positions: Map<string, NodePosition> = new Map();
+    const availableWidth = containerWidth - TREE_PADDING_LEFT * 2;
+
+    // Calculate positions for each tier
+    [1, 2, 3, 4, 5].forEach(tier => {
+      const tierNodes = nodesByTier[tier] || [];
+      const nodeCount = tierNodes.length;
+
+      if (nodeCount === 0) return;
+
+      // Calculate horizontal spacing
+      const spacing = availableWidth / (nodeCount + 1);
+
+      tierNodes.forEach((node, index) => {
+        const x = TREE_PADDING_LEFT + spacing * (index + 1);
+        const y = TREE_PADDING_TOP + (tier - 1) * TIER_HEIGHT + NODE_HEIGHT / 2;
+
+        positions.set(node.id, { x, y, node });
+      });
+    });
+
+    const maxTier = Math.max(...Object.keys(nodesByTier).map(Number), 5);
+    const svgHeight = TREE_PADDING_TOP + maxTier * TIER_HEIGHT + 20;
+
+    return { nodePositions: positions, svgHeight, nodesByTier };
+  }, [currentNodes, containerWidth]);
 
   // Handle node click
   const handleNodeClick = useCallback((node: SkillTreeNode | ElementTreeNode) => {
@@ -100,18 +164,39 @@ export const SkillTreePanel: React.FC = () => {
     return ELEMENT_TREE_INFO[selectedElementTree];
   }, [treeCategory, selectedMainTree, selectedElementTree]);
 
-  // Node color based on state
-  const getNodeColor = useCallback((node: SkillTreeNode | ElementTreeNode) => {
-    const isLearned = learnedNodeIds.includes(node.id);
-    if (isLearned) return 'bg-green-600 border-green-400';
+  // Get node state: 'learned', 'unlockable', 'locked'
+  const getNodeState = useCallback((node: SkillTreeNode | ElementTreeNode) => {
+    if (learnedNodeIds.includes(node.id)) return 'learned';
 
     const canUnlock = treeCategory === 'main'
       ? canUnlockSkillNode(character, node as SkillTreeNode).canUnlock
       : canUnlockElementNode(character, node as ElementTreeNode).canUnlock;
 
-    if (canUnlock) return 'bg-amber-600 border-amber-400 hover:bg-amber-500';
-    return 'bg-gray-700 border-gray-500 opacity-60';
+    if (canUnlock) return 'unlockable';
+    return 'locked';
   }, [learnedNodeIds, treeCategory, character]);
+
+  // Node color based on state
+  const getNodeColor = useCallback((node: SkillTreeNode | ElementTreeNode) => {
+    const state = getNodeState(node);
+    if (state === 'learned') return 'bg-green-600 border-green-400';
+    if (state === 'unlockable') return 'bg-amber-600 border-amber-400 hover:bg-amber-500';
+    return 'bg-gray-700 border-gray-500 opacity-60';
+  }, [getNodeState]);
+
+  // Get connection line color
+  const getConnectionColor = useCallback((fromId: string, toId: string) => {
+    const fromLearned = learnedNodeIds.includes(fromId);
+    const toLearned = learnedNodeIds.includes(toId);
+
+    if (fromLearned && toLearned) {
+      return '#22c55e'; // Green - both learned
+    }
+    if (fromLearned) {
+      return '#f59e0b'; // Amber - path available
+    }
+    return '#4b5563'; // Gray - locked
+  }, [learnedNodeIds]);
 
   // Render tree navigation tabs
   const renderTreeTabs = () => {
@@ -188,70 +273,183 @@ export const SkillTreePanel: React.FC = () => {
     );
   };
 
-  // Render skill tree visualization
-  const renderTree = () => {
-    // Group nodes by tier
-    const nodesByTier: Record<number, (SkillTreeNode | ElementTreeNode)[]> = {};
+  // Render connection lines between nodes
+  const renderConnections = () => {
+    const connections: React.ReactNode[] = [];
+
     currentNodes.forEach(node => {
-      if (!nodesByTier[node.tier]) {
-        nodesByTier[node.tier] = [];
-      }
-      nodesByTier[node.tier].push(node);
+      const toPos = nodePositions.get(node.id);
+      if (!toPos) return;
+
+      node.prerequisites.forEach(prereqId => {
+        const fromPos = nodePositions.get(prereqId);
+        if (!fromPos) return;
+
+        const color = getConnectionColor(prereqId, node.id);
+        const isActive = learnedNodeIds.includes(prereqId);
+
+        // Calculate control points for curved line
+        const midY = (fromPos.y + toPos.y) / 2;
+
+        connections.push(
+          <g key={`${prereqId}-${node.id}`}>
+            {/* Glow effect for active connections */}
+            {isActive && (
+              <path
+                d={`M ${fromPos.x} ${fromPos.y + NODE_HEIGHT / 2 - 8}
+                    Q ${fromPos.x} ${midY}, ${(fromPos.x + toPos.x) / 2} ${midY}
+                    Q ${toPos.x} ${midY}, ${toPos.x} ${toPos.y - NODE_HEIGHT / 2 + 8}`}
+                fill="none"
+                stroke={color}
+                strokeWidth="6"
+                strokeOpacity="0.3"
+                strokeLinecap="round"
+              />
+            )}
+            {/* Main connection line */}
+            <path
+              d={`M ${fromPos.x} ${fromPos.y + NODE_HEIGHT / 2 - 8}
+                  Q ${fromPos.x} ${midY}, ${(fromPos.x + toPos.x) / 2} ${midY}
+                  Q ${toPos.x} ${midY}, ${toPos.x} ${toPos.y - NODE_HEIGHT / 2 + 8}`}
+              fill="none"
+              stroke={color}
+              strokeWidth="2"
+              strokeLinecap="round"
+              className="transition-colors duration-300"
+            />
+            {/* Arrow head */}
+            <polygon
+              points={`${toPos.x},${toPos.y - NODE_HEIGHT / 2 + 8}
+                       ${toPos.x - 5},${toPos.y - NODE_HEIGHT / 2 + 2}
+                       ${toPos.x + 5},${toPos.y - NODE_HEIGHT / 2 + 2}`}
+              fill={color}
+              className="transition-colors duration-300"
+            />
+          </g>
+        );
+      });
     });
 
+    return connections;
+  };
+
+  // Get current tree type for background
+  const currentTreeType = treeCategory === 'main' ? selectedMainTree : selectedElementTree;
+
+  // Render skill tree visualization
+  const renderTree = () => {
     return (
-      <div className="relative min-h-[400px] bg-gray-800/50 rounded-lg p-4">
+      <div
+        ref={containerRef}
+        className="relative bg-gray-900/80 rounded-lg overflow-hidden"
+        style={{ minHeight: `${svgHeight}px` }}
+      >
+        {/* Background effect */}
+        <SkillTreeBackground treeType={currentTreeType} />
+
+        {/* SVG for connection lines */}
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none z-10"
+          style={{ height: `${svgHeight}px` }}
+        >
+          <defs>
+            {/* Gradient definitions for connections */}
+            <linearGradient id="activeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#22c55e" />
+              <stop offset="100%" stopColor="#16a34a" />
+            </linearGradient>
+            <linearGradient id="availableGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#f59e0b" />
+              <stop offset="100%" stopColor="#d97706" />
+            </linearGradient>
+          </defs>
+          {renderConnections()}
+        </svg>
+
         {/* Tier labels */}
-        <div className="absolute left-2 top-0 bottom-0 flex flex-col justify-around text-xs text-gray-500">
+        <div className="absolute left-2 top-0 bottom-0 flex flex-col z-20" style={{ paddingTop: `${TREE_PADDING_TOP}px` }}>
           {[1, 2, 3, 4, 5].map(tier => (
-            <div key={tier} className="py-4">T{tier}</div>
+            <div
+              key={tier}
+              className="text-xs text-gray-400 font-medium flex items-center"
+              style={{ height: `${TIER_HEIGHT}px` }}
+            >
+              <span className="bg-gray-700/50 px-2 py-1 rounded">T{tier}</span>
+            </div>
           ))}
         </div>
 
-        {/* Nodes grid */}
-        <div className="ml-8 space-y-6">
-          {[1, 2, 3, 4, 5].map(tier => {
-            const tierNodes = nodesByTier[tier] || [];
-            return (
-              <div key={tier} className="flex gap-4 justify-center flex-wrap min-h-[60px]">
-                {tierNodes.map(node => {
-                  const isLearned = learnedNodeIds.includes(node.id);
-                  const isSelected = selectedNode?.id === node.id;
+        {/* Nodes */}
+        {currentNodes.map(node => {
+          const pos = nodePositions.get(node.id);
+          if (!pos) return null;
 
-                  return (
-                    <button
-                      key={node.id}
-                      onClick={() => handleNodeClick(node)}
-                      className={`
-                        relative w-16 h-16 rounded-lg border-2 flex flex-col items-center justify-center
-                        transition-all cursor-pointer
-                        ${getNodeColor(node)}
-                        ${isSelected ? 'ring-2 ring-white ring-offset-2 ring-offset-gray-900' : ''}
-                      `}
-                      title={isZh ? node.chineseName : node.name}
-                    >
-                      {/* Node type indicator */}
-                      <span className={`text-xs px-1 rounded absolute -top-2 ${
-                        node.type === 'active' ? 'bg-purple-600' : 'bg-blue-600'
-                      }`}>
-                        {isZh ? t.skillTree.nodeTypes[node.type] : node.type.charAt(0).toUpperCase()}
-                      </span>
+          const isSelected = selectedNode?.id === node.id;
+          const nodeState = getNodeState(node);
 
-                      {/* Node icon or tier */}
-                      <span className="text-lg font-bold">
-                        {isLearned ? '!' : node.tier}
-                      </span>
+          return (
+            <button
+              key={node.id}
+              onClick={() => handleNodeClick(node)}
+              className={`
+                absolute transform -translate-x-1/2 -translate-y-1/2
+                w-16 h-16 rounded-lg border-2 flex flex-col items-center justify-center
+                transition-all duration-200 cursor-pointer z-20
+                ${getNodeColor(node)}
+                ${isSelected ? 'ring-2 ring-white ring-offset-2 ring-offset-gray-900 scale-110 z-30' : 'hover:scale-105'}
+              `}
+              style={{
+                left: `${pos.x}px`,
+                top: `${pos.y}px`,
+              }}
+              title={isZh ? node.chineseName : node.name}
+            >
+              {/* Node type indicator */}
+              <span className={`text-xs px-1 rounded absolute -top-2 ${
+                node.type === 'active' ? 'bg-purple-600' : 'bg-blue-600'
+              }`}>
+                {isZh ? t.skillTree.nodeTypes[node.type] : node.type.charAt(0).toUpperCase()}
+              </span>
 
-                      {/* Node name (truncated) */}
-                      <span className="text-[10px] text-center leading-tight px-1 truncate w-full">
-                        {isZh ? node.chineseName : node.name}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            );
-          })}
+              {/* Node icon or status */}
+              <span className="text-lg font-bold">
+                {nodeState === 'learned' ? (
+                  <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : nodeState === 'unlockable' ? (
+                  <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                )}
+              </span>
+
+              {/* Node name (truncated) */}
+              <span className="text-[9px] text-center leading-tight px-1 truncate w-full mt-1">
+                {isZh ? node.chineseName : node.name}
+              </span>
+            </button>
+          );
+        })}
+
+        {/* Legend */}
+        <div className="absolute bottom-2 right-2 flex gap-3 text-xs text-gray-400 bg-gray-900/90 px-3 py-2 rounded z-20 border border-gray-700/50">
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded bg-green-600 border border-green-400"></div>
+            <span>{isZh ? '已学习' : 'Learned'}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded bg-amber-600 border border-amber-400"></div>
+            <span>{isZh ? '可学习' : 'Available'}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded bg-gray-700 border border-gray-500 opacity-60"></div>
+            <span>{isZh ? '锁定' : 'Locked'}</span>
+          </div>
         </div>
       </div>
     );

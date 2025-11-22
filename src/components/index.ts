@@ -8,5 +8,6 @@ export { ChatLog } from './ChatLog';
 export { CombatPanel } from './CombatPanel';
 export { TabNavigation } from './TabNavigation';
 export { SkillTreePanel } from './SkillTreePanel';
+export { SkillTreeBackground } from './SkillTreeBackground';
 export { HelpModal } from './HelpModal';
 export type { TabType } from './TabNavigation';
