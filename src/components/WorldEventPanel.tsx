@@ -18,8 +18,20 @@ import { EventNewsModal } from './EventNewsModal';
 
 export const WorldEventPanel: React.FC = () => {
   const { state } = useGame();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const isZh = language === 'zh';
+
+  // Helper to translate effect targets
+  const translateTarget = (target: string): string => {
+    const key = target as keyof typeof t.worldEvent.targets;
+    return t.worldEvent.targets[key] || target;
+  };
+
+  // Helper to translate effect types
+  const translateEffectType = (effectType: string): string => {
+    const key = effectType as keyof typeof t.worldEvent.effectTypes;
+    return t.worldEvent.effectTypes[key] || effectType;
+  };
 
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [showNewsModal, setShowNewsModal] = useState(false);
@@ -113,9 +125,11 @@ export const WorldEventPanel: React.FC = () => {
               eventId={selectedEventId}
               activeEvent={worldEvents.activeEvents.find(e => e.definitionId === selectedEventId)}
               isZh={isZh}
+              translateTarget={translateTarget}
+              translateEffectType={translateEffectType}
             />
           ) : (
-            <EffectsSummary modifiers={modifiers} isZh={isZh} />
+            <EffectsSummary modifiers={modifiers} isZh={isZh} translateTarget={translateTarget} />
           )}
         </div>
       </div>
@@ -238,9 +252,11 @@ interface EventDetailsProps {
   eventId: string;
   activeEvent?: ActiveWorldEvent;
   isZh: boolean;
+  translateTarget: (target: string) => string;
+  translateEffectType: (effectType: string) => string;
 }
 
-const EventDetails: React.FC<EventDetailsProps> = ({ eventId, activeEvent, isZh }) => {
+const EventDetails: React.FC<EventDetailsProps> = ({ eventId, activeEvent, isZh, translateTarget, translateEffectType }) => {
   const eventDef = getEventById(eventId);
   if (!eventDef || !activeEvent) return null;
 
@@ -333,7 +349,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({ eventId, activeEvent, isZh 
                 className="flex items-center justify-between text-xs bg-gray-900/50 rounded p-2"
               >
                 <span className="text-gray-400">
-                  {effect.target} ({effect.effectType})
+                  {translateTarget(effect.target)} ({translateEffectType(effect.effectType)})
                 </span>
                 <span className={effect.value >= 0 ? 'text-green-400' : 'text-red-400'}>
                   {effect.value >= 0 ? '+' : ''}{effect.value}{effect.isPercentage ? '%' : ''}
@@ -354,9 +370,10 @@ const EventDetails: React.FC<EventDetailsProps> = ({ eventId, activeEvent, isZh 
 interface EffectsSummaryProps {
   modifiers: ReturnType<typeof computeEventModifiers> | null;
   isZh: boolean;
+  translateTarget: (target: string) => string;
 }
 
-const EffectsSummary: React.FC<EffectsSummaryProps> = ({ modifiers, isZh }) => {
+const EffectsSummary: React.FC<EffectsSummaryProps> = ({ modifiers, isZh, translateTarget }) => {
   if (!modifiers) {
     return (
       <div className="bg-gray-800/50 rounded-lg p-4">
@@ -409,6 +426,7 @@ const EffectsSummary: React.FC<EffectsSummaryProps> = ({ modifiers, isZh }) => {
           effects={priceEffects}
           suffix="%"
           color="text-yellow-400"
+          translateTarget={translateTarget}
         />
       )}
 
@@ -419,6 +437,7 @@ const EffectsSummary: React.FC<EffectsSummaryProps> = ({ modifiers, isZh }) => {
           effects={encounterEffects}
           suffix="%"
           color="text-red-400"
+          translateTarget={translateTarget}
         />
       )}
 
@@ -429,6 +448,7 @@ const EffectsSummary: React.FC<EffectsSummaryProps> = ({ modifiers, isZh }) => {
           effects={dropEffects}
           suffix="%"
           color="text-blue-400"
+          translateTarget={translateTarget}
         />
       )}
 
@@ -439,6 +459,7 @@ const EffectsSummary: React.FC<EffectsSummaryProps> = ({ modifiers, isZh }) => {
           effects={elementEffects}
           suffix="%"
           color="text-purple-400"
+          translateTarget={translateTarget}
         />
       )}
 
@@ -481,7 +502,7 @@ const EffectsSummary: React.FC<EffectsSummaryProps> = ({ modifiers, isZh }) => {
                 key={area}
                 className="px-2 py-0.5 bg-cyan-900/30 text-cyan-300 rounded text-xs"
               >
-                {area}
+                {translateTarget(area)}
               </span>
             ))}
           </div>
@@ -500,15 +521,16 @@ interface EffectCategoryProps {
   effects: [string, number][];
   suffix: string;
   color: string;
+  translateTarget: (target: string) => string;
 }
 
-const EffectCategory: React.FC<EffectCategoryProps> = ({ title, effects, suffix, color }) => (
+const EffectCategory: React.FC<EffectCategoryProps> = ({ title, effects, suffix, color, translateTarget }) => (
   <div>
     <div className={`text-xs font-medium ${color} mb-1`}>{title}</div>
     <div className="grid grid-cols-2 gap-1">
       {effects.map(([key, value]) => (
         <div key={key} className="flex justify-between text-xs bg-gray-900/50 rounded p-2">
-          <span className="text-gray-400 truncate">{key}</span>
+          <span className="text-gray-400 truncate">{translateTarget(key)}</span>
           <span className={value >= 0 ? 'text-green-400' : 'text-red-400'}>
             {value >= 0 ? '+' : ''}{value}{suffix}
           </span>

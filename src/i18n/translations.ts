@@ -387,6 +387,29 @@ export interface Translations {
       related: string;
       footer: string;
     };
+    targets: {
+      herbs: string;
+      beast_materials: string;
+      fire: string;
+      fire_materials: string;
+      rare_materials: string;
+      pills: string;
+      beasts: string;
+      bosses: string;
+      cultivators: string;
+      combat: string;
+      all: string;
+      secret_realm: string;
+    };
+    effectTypes: {
+      price_modifier: string;
+      drop_rate_bonus: string;
+      encounter_rate: string;
+      element_damage_bonus: string;
+      cultivation_bonus: string;
+      capture_rate_bonus: string;
+      unlock_area: string;
+    };
   };
   // Help Modal
   help: {
@@ -807,6 +830,29 @@ export const translations: Record<Language, Translations> = {
         reliable: '可信',
         related: '相关事件',
         footer: '情报来源不同，可靠性也各异。天机阁情报最为准确，但需付费。',
+      },
+      targets: {
+        herbs: '草药',
+        beast_materials: '妖兽材料',
+        fire: '火系',
+        fire_materials: '火属性材料',
+        rare_materials: '稀有材料',
+        pills: '丹药',
+        beasts: '妖兽',
+        bosses: '首领',
+        cultivators: '修士',
+        combat: '战斗',
+        all: '全部',
+        secret_realm: '秘境',
+      },
+      effectTypes: {
+        price_modifier: '价格',
+        drop_rate_bonus: '掉落率',
+        encounter_rate: '遭遇率',
+        element_damage_bonus: '元素伤害',
+        cultivation_bonus: '修炼效率',
+        capture_rate_bonus: '捕获率',
+        unlock_area: '解锁区域',
       },
     },
     help: {
@@ -1245,6 +1291,29 @@ export const translations: Record<Language, Translations> = {
         reliable: 'reliable',
         related: 'Related Event',
         footer: 'Intel reliability varies by source. Tianji Oracle is most accurate but requires payment.',
+      },
+      targets: {
+        herbs: 'Herbs',
+        beast_materials: 'Beast Materials',
+        fire: 'Fire',
+        fire_materials: 'Fire Materials',
+        rare_materials: 'Rare Materials',
+        pills: 'Pills',
+        beasts: 'Beasts',
+        bosses: 'Bosses',
+        cultivators: 'Cultivators',
+        combat: 'Combat',
+        all: 'All',
+        secret_realm: 'Secret Realm',
+      },
+      effectTypes: {
+        price_modifier: 'Price',
+        drop_rate_bonus: 'Drop Rate',
+        encounter_rate: 'Encounter Rate',
+        element_damage_bonus: 'Element Damage',
+        cultivation_bonus: 'Cultivation',
+        capture_rate_bonus: 'Capture Rate',
+        unlock_area: 'Unlock Area',
       },
     },
     help: {
