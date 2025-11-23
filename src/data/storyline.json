@@ -221,6 +221,11 @@
           "target": "passed_entrance_exam"
         },
         {
+          "type": "join_clan",
+          "target": "Azure Cloud Sect",
+          "chineseTarget": "青云宗"
+        },
+        {
           "type": "give_spirit_stones",
           "value": 100
         },

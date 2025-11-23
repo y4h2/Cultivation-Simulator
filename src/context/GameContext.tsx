@@ -2587,6 +2587,22 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
           ...updatedCharacter,
           inventory: { ...updatedCharacter.inventory, items: newInventoryItems },
         };
+
+        // Handle join_clan effect
+        for (const effect of effects) {
+          if (effect.type === 'join_clan' && !updatedClanState?.founded) {
+            const clanName = effect.target || 'Azure Cloud Sect';
+            const chineseClanName = effect.chineseTarget || '青云宗';
+            const initialClanState = createInitialClanState();
+            updatedClanState = {
+              ...initialClanState,
+              clanName,
+              chineseClanName,
+              founded: true,
+              joinedAt: { ...state.time },
+            };
+          }
+        }
       }
 
       // Check for chapter completion

@@ -58,6 +58,7 @@ export const StoryEffectType = {
   StartNextChapter: 'start_next_chapter', // Begin next chapter
   AddBehaviorTag: 'add_behavior_tag', // Add player behavior tag
   GiveCultivation: 'give_cultivation', // Give cultivation experience
+  JoinClan: 'join_clan',              // Auto-join a clan/sect
 } as const;
 
 export type StoryEffectType = typeof StoryEffectType[keyof typeof StoryEffectType];
@@ -98,6 +99,7 @@ export interface StoryCondition {
 export interface StoryEffect {
   type: StoryEffectType;
   target?: string;                // System/area/flag/event ID
+  chineseTarget?: string;         // Chinese name (for join_clan effect)
   value?: number | string;        // Amount or value
   itemId?: string;                // For item rewards
   quantity?: number;              // For item rewards

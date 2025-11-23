@@ -63,8 +63,47 @@ export const ClanPanel: React.FC = () => {
     ? clanState.npcs.find(n => n.id === clanState.masterNPCId)
     : null;
 
-  // If clan system not founded yet, show join prompt
+  // Check if player can join clan (requires completing storyline quest)
+  const canJoinClan = state.storylineState?.storyFlags?.can_join_clan === true;
+
+  // If clan system not founded yet, show appropriate state
   if (!clanState || !clanState.founded) {
+    // If player hasn't completed the storyline quest, show locked/grayed state
+    if (!canJoinClan) {
+      return (
+        <div className="bg-gray-900/70 rounded-xl border border-gray-700/50 p-4 sm:p-6 opacity-60">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-500 mb-4">
+            {t.clan.title}
+          </h2>
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4 opacity-30">
+              <svg className="w-24 h-24 mx-auto text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <p className="text-gray-500 text-lg font-medium">
+              {isZh ? '宗门系统未解锁' : 'Clan System Locked'}
+            </p>
+            <p className="text-gray-600 text-sm mt-2 max-w-md mx-auto">
+              {isZh
+                ? '请先完成主线任务「宗门考核」以解锁宗门系统'
+                : 'Complete the main quest "Sect Entrance Exam" to unlock the clan system'}
+            </p>
+            <div className="mt-6 px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg inline-flex items-center gap-2">
+              <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-gray-400 text-sm">
+                {isZh ? '前往主线查看任务进度' : 'Go to Story to check quest progress'}
+              </span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // This state should not normally be reached since join_clan is automatic
+    // But show a loading/transitional state just in case
     return (
       <div className="bg-gray-900/70 rounded-xl border border-amber-900/30 p-4 sm:p-6">
         <h2 className="text-lg sm:text-xl font-bold text-amber-400 mb-4">
@@ -72,18 +111,16 @@ export const ClanPanel: React.FC = () => {
         </h2>
         <div className="text-center py-12">
           <div className="text-6xl mb-4 opacity-50">
-            <svg className="w-24 h-24 mx-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-24 h-24 mx-auto text-amber-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
           </div>
-          <p className="text-gray-400 text-lg">{t.clan.notJoined}</p>
-          <p className="text-gray-500 text-sm mt-2">{t.clan.notJoinedDesc}</p>
-          <button
-            onClick={() => actions.joinClan?.('Azure Cloud Sect', '青云宗')}
-            className="mt-6 px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-medium transition-colors"
-          >
-            {t.clan.joinClan}
-          </button>
+          <p className="text-amber-400 text-lg">
+            {isZh ? '正在加入宗门...' : 'Joining sect...'}
+          </p>
+          <p className="text-gray-500 text-sm mt-2">
+            {isZh ? '请完成主线任务「宗门考核」' : 'Please complete the "Sect Entrance Exam" quest'}
+          </p>
         </div>
       </div>
     );
