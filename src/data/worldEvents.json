@@ -32,9 +32,9 @@
           "chineseName": "暴乱",
           "durationDays": 20,
           "effects": [
-            { "hook": "market_tick", "effectType": "price_modifier", "target": "beast_materials", "value": 30, "isPercentage": true },
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "beast_materials", "value": 50, "isPercentage": true, "comment": "Balance Spec: beast_tide event +50%" },
             { "hook": "battle_init", "effectType": "encounter_rate", "target": "beasts", "value": 50, "isPercentage": true },
-            { "hook": "item_drop", "effectType": "drop_rate_bonus", "target": "beast_materials", "value": 20, "isPercentage": true }
+            { "hook": "item_drop", "effectType": "drop_rate_bonus", "target": "beast_materials", "value": 25, "isPercentage": true }
           ],
           "newsKey": "official"
         },
@@ -93,8 +93,9 @@
           "chineseName": "大会期",
           "durationDays": 7,
           "effects": [
-            { "hook": "market_tick", "effectType": "price_modifier", "target": "herbs", "value": 30, "isPercentage": true },
-            { "hook": "market_tick", "effectType": "price_modifier", "target": "pills", "value": 20, "isPercentage": true }
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "herbs", "value": 25, "isPercentage": true },
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "pills", "value": 35, "isPercentage": true, "comment": "Balance Spec: sect_competition +35% for pills" },
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "equipment", "value": 35, "isPercentage": true, "comment": "Balance Spec: sect_competition +35% for equipment" }
           ],
           "newsKey": "official"
         },
@@ -266,7 +267,7 @@
           "durationDays": 5,
           "effects": [
             { "hook": "item_drop", "effectType": "drop_rate_bonus", "target": "herbs", "value": 50, "isPercentage": true },
-            { "hook": "market_tick", "effectType": "price_modifier", "target": "herbs", "value": -25, "isPercentage": true }
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "herbs", "value": -25, "isPercentage": true, "comment": "Balance Spec: rare_material_discovery -25%" }
           ],
           "newsKey": "official"
         }
@@ -311,7 +312,7 @@
           "chineseName": "交易",
           "durationDays": 2,
           "effects": [
-            { "hook": "market_tick", "effectType": "price_modifier", "target": "all", "value": -10, "isPercentage": true }
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "all", "value": -15, "isPercentage": true, "comment": "Balance Spec: festival -15%" }
           ],
           "newsKey": "official"
         }
@@ -422,7 +423,7 @@
             { "hook": "battle_init", "effectType": "encounter_rate", "target": "beasts", "value": 100, "isPercentage": true },
             { "hook": "beast_capture", "effectType": "capture_rate_bonus", "target": "all", "value": -30, "isPercentage": true },
             { "hook": "item_drop", "effectType": "drop_rate_bonus", "target": "beast_materials", "value": 60, "isPercentage": true },
-            { "hook": "market_tick", "effectType": "price_modifier", "target": "beast_materials", "value": 50, "isPercentage": true }
+            { "hook": "market_tick", "effectType": "price_modifier", "target": "beast_materials", "value": 50, "isPercentage": true, "comment": "Balance Spec: beast_tide +50%" }
           ],
           "newsKey": "official"
         },

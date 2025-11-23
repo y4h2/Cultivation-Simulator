@@ -6,6 +6,7 @@ interface LanguageContextType {
   setLanguage: (lang: Language) => void;
   t: Translations;
   toggleLanguage: () => void;
+  isZh: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | null>(null);
@@ -40,6 +41,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setLanguage,
     t: translations[language],
     toggleLanguage,
+    isZh: language === 'zh',
   };
 
   return (

@@ -1,29 +1,51 @@
 import type { MarketItem, Market, MarketEvent, GameTime } from '../types/game';
 import { ITEMS } from '../constants/items';
 
+// ============================================
+// Balance Spec v1 - Market System
+// ============================================
 // Price calculation constants
 const MIN_PRICE_RATIO = 0.3;  // Minimum 30% of base price
 const MAX_PRICE_RATIO = 3.0;  // Maximum 300% of base price
 const TREND_DECAY = 0.95;     // Trend weakens over time
 
+// Event-based price multipliers (Balance Spec)
+export const EVENT_PRICE_MULTIPLIERS = {
+  beast_tide: 1.5,           // Beast materials +50% during beast tide
+  sect_competition: 1.35,    // Pills and equipment +35% before competitions
+  natural_disaster: 1.25,    // Affected region materials +25%
+  rare_material_discovery: 0.75, // Specific material -25% on discovery
+  war: 2.0,                  // Equipment and pills +100% during war
+  festival: 0.85,            // All prices -15% during festival
+};
+
+// Trading talent bonuses (Balance Spec)
+export const TRADING_TALENT_BONUSES = {
+  merchant_prodigy: 0.05,    // +5% profit margins
+  sharp_eye: 0.03,           // +3% better buy prices
+  silver_tongue: 0.03,       // +3% better sell prices
+};
+
 export const createInitialMarket = (): Market => {
   const marketItems: MarketItem[] = [
-    // Spirit Materials
-    createMarketItem('spirit_grass', 0.3, 100),
-    createMarketItem('jade_lotus', 0.4, 30),
-    createMarketItem('thunder_root', 0.5, 10),
-    createMarketItem('spirit_stone_ore', 0.25, 150),
-    createMarketItem('jade_essence', 0.35, 25),
-    createMarketItem('demon_core_low', 0.3, 50),
-    createMarketItem('demon_core_mid', 0.4, 20),
-    // Pills
-    createMarketItem('qi_gathering_pill', 0.2, 40),
-    createMarketItem('spirit_recovery_pill', 0.2, 40),
-    createMarketItem('healing_pill', 0.2, 50),
-    // Talismans
-    createMarketItem('fire_talisman', 0.25, 60),
-    createMarketItem('lightning_talisman', 0.3, 30),
-    createMarketItem('shield_talisman', 0.25, 40),
+    // Spirit Materials - Herbs (3-6% volatility based on Balance Spec)
+    createMarketItem('spirit_grass', 0.045, 100),  // 4.5% avg volatility
+    createMarketItem('jade_lotus', 0.055, 30),     // 5.5% - higher rarity = higher volatility
+    createMarketItem('thunder_root', 0.06, 10),    // 6% - rare herb
+    // Spirit Materials - Ores (2-5% volatility based on Balance Spec)
+    createMarketItem('spirit_stone_ore', 0.025, 150),  // 2.5% - common ore
+    createMarketItem('jade_essence', 0.035, 25),       // 3.5% - uncommon ore
+    // Spirit Materials - Beast Materials (4-7% volatility based on Balance Spec)
+    createMarketItem('demon_core_low', 0.045, 50),     // 4.5% - common beast material
+    createMarketItem('demon_core_mid', 0.055, 20),     // 5.5% - uncommon beast material
+    // Pills (5-8% volatility based on Balance Spec)
+    createMarketItem('qi_gathering_pill', 0.06, 40),   // 6% - common pill
+    createMarketItem('spirit_recovery_pill', 0.055, 40), // 5.5% - common pill
+    createMarketItem('healing_pill', 0.055, 50),       // 5.5% - common pill
+    // Talismans (3-5% volatility based on Balance Spec)
+    createMarketItem('fire_talisman', 0.04, 60),       // 4% - common talisman
+    createMarketItem('lightning_talisman', 0.045, 30), // 4.5% - uncommon talisman
+    createMarketItem('shield_talisman', 0.04, 40),     // 4% - common talisman
   ];
 
   return {

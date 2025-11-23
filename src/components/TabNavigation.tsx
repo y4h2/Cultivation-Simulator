@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../i18n';
 
-export type TabType = 'market' | 'inventory' | 'combat' | 'skills' | 'spiritBeast' | 'talents' | 'worldEvents';
+export type TabType = 'market' | 'combat' | 'character' | 'worldEvents' | 'clan' | 'storyline';
 
 interface TabNavigationProps {
   activeTab: TabType;
@@ -12,15 +12,14 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
   activeTab,
   onTabChange,
 }) => {
-  const { t } = useLanguage();
+  const { t, isZh } = useLanguage();
 
   const TABS: Array<{ id: TabType; label: string }> = [
+    { id: 'storyline', label: t.storyline.title },
+    { id: 'clan', label: t.clan.title },
+    { id: 'character', label: isZh ? '角色' : 'Character' },
     { id: 'market', label: t.tabs.market },
-    { id: 'inventory', label: t.tabs.inventory },
     { id: 'combat', label: t.tabs.combat },
-    { id: 'skills', label: t.tabs.skills },
-    { id: 'spiritBeast', label: t.spiritBeast.title },
-    { id: 'talents', label: t.talent.title },
     { id: 'worldEvents', label: t.worldEvent.title },
   ];
 

@@ -6,6 +6,123 @@ export interface Translations {
     title: string;
     subtitle: string;
   };
+  // Clan System
+  clan: {
+    title: string;
+    joinClan: string;
+    clanName: string;
+    notJoined: string;
+    notJoinedDesc: string;
+    status: string;
+    contributions: string;
+    monthlyContributions: string;
+    affinity: string;
+    atmosphere: string;
+    temperature: string;
+    methods: string;
+    peaks: string;
+    halls: string;
+    activities: string;
+    npcs: string;
+    master: string;
+    noMaster: string;
+    reputation: string;
+    selectActivity: string;
+    doActivity: string;
+    visitPeak: string;
+    visitHall: string;
+    interactNPC: string;
+    peakNames: {
+      sword_peak: string;
+      alchemy_peak: string;
+      beast_garden: string;
+      scripture_cliff: string;
+      commerce_hall: string;
+    };
+    hallNames: {
+      dining_hall: string;
+      discipline_hall: string;
+      teaching_hall: string;
+      chores_hall: string;
+    };
+    statusNames: {
+      guest: string;
+      registered: string;
+      direct_disciple: string;
+      successor: string;
+    };
+    lifeCircles: {
+      below_mountain: string;
+      main_gate: string;
+      cloud_peak: string;
+    };
+    roles: {
+      peak_master: string;
+      grand_elder: string;
+      elder: string;
+      instructor: string;
+      senior_disciple: string;
+      junior_disciple: string;
+      logistics: string;
+      worker: string;
+      merchant: string;
+      guest_cultivator: string;
+    };
+    personalities: {
+      warm: string;
+      strict: string;
+      pragmatic: string;
+      carefree: string;
+      eccentric: string;
+      cold: string;
+      jealous: string;
+      supportive: string;
+    };
+    activityNames: {
+      eat_meal: string;
+      gossip: string;
+      attend_lecture: string;
+      group_training: string;
+      seek_guidance: string;
+      do_chores: string;
+      deliver_message: string;
+      help_trade: string;
+      review_accounts: string;
+      visit_beasts: string;
+      beast_training: string;
+      attend_class: string;
+      find_mentor: string;
+      study_techniques: string;
+      read_records: string;
+      meet_master: string;
+    };
+    relationship: {
+      affection: string;
+      trust: string;
+      respect: string;
+      familiarity: string;
+      mood: string;
+    };
+    relationshipLevels: {
+      very_close: string;
+      close: string;
+      friendly: string;
+      acquaintance: string;
+      stranger: string;
+      hostile: string;
+    };
+    messages: {
+      activityComplete: string;
+      gossipHeard: string;
+      eventTriggered: string;
+      relationshipUp: string;
+      relationshipDown: string;
+      contributionGained: string;
+      wudaoGained: string;
+    };
+    eventChoice: string;
+    noEvents: string;
+  };
   // Header
   header: {
     spiritStones: string;
@@ -32,6 +149,7 @@ export interface Translations {
     inventory: string;
     combat: string;
     skills: string;
+    character: string;
   };
   // Character Panel
   character: {
@@ -222,6 +340,11 @@ export interface Translations {
     currentBonuses: string;
     noBonuses: string;
     noTalents: string;
+    refreshTalents: string;
+    refreshTalentsDesc: string;
+    refreshTalentsCost: string;
+    confirmRefresh: string;
+    confirmRefreshDesc: string;
     scopes: {
       battle: string;
       market: string;
@@ -460,6 +583,130 @@ export interface Translations {
     noCombatItems: string;
     noFeedItems: string;
   };
+  // Equipment System
+  equipment: {
+    title: string;
+    equipped: string;
+    inventory: string;
+    empty: string;
+    emptySlot: string;
+    equip: string;
+    unequip: string;
+    enhance: string;
+    compare: string;
+    discard: string;
+    details: string;
+    stats: string;
+    setBonus: string;
+    activePieces: string;
+    currentStats: string;
+    newStats: string;
+    difference: string;
+    enhanceLevel: string;
+    enhanceCost: string;
+    enhanceSuccess: string;
+    enhanceFailed: string;
+    maxLevel: string;
+    inventoryFull: string;
+    noEquipment: string;
+    grade: string;
+    element: string;
+    affixes: string;
+    slots: {
+      weapon: string;
+      armor: string;
+      helmet: string;
+      accessory: string;
+      boots: string;
+      talisman: string;
+    };
+    rarities: {
+      common: string;
+      uncommon: string;
+      rare: string;
+      epic: string;
+      legendary: string;
+    };
+    grades: {
+      lower: string;
+      middle: string;
+      upper: string;
+      supreme: string;
+    };
+    statNames: {
+      atk: string;
+      def: string;
+      hp: string;
+      mp: string;
+      spd: string;
+      crit: string;
+      critDmg: string;
+      acc: string;
+      eva: string;
+      wis: string;
+      sense: string;
+      luck: string;
+      cultivationBonus: string;
+    };
+  };
+  // Storyline/Main Quest System
+  storyline: {
+    title: string;
+    chapter: string;
+    currentChapter: string;
+    progress: string;
+    mainQuest: string;
+    branchQuest: string;
+    optionalQuest: string;
+    available: string;
+    inProgress: string;
+    completed: string;
+    locked: string;
+    requirements: string;
+    rewards: string;
+    startQuest: string;
+    continueQuest: string;
+    completeQuest: string;
+    makeChoice: string;
+    nextDialogue: string;
+    skipDialogue: string;
+    questLog: string;
+    noQuests: string;
+    noQuestsDesc: string;
+    chapterComplete: string;
+    newQuestAvailable: string;
+    nodeTypes: {
+      main: string;
+      branch: string;
+      optional: string;
+    };
+    conditionTypes: {
+      realm: string;
+      time: string;
+      contribution: string;
+      affinity: string;
+      nodeComplete: string;
+      chapterComplete: string;
+      spiritStones: string;
+      beastCount: string;
+    };
+    effectTypes: {
+      unlockSystem: string;
+      unlockArea: string;
+      giveItem: string;
+      giveSpiritStones: string;
+      giveContribution: string;
+      giveWudaoPoints: string;
+      giveCultivation: string;
+    };
+    messages: {
+      questStarted: string;
+      questCompleted: string;
+      chapterCompleted: string;
+      choiceMade: string;
+      rewardReceived: string;
+    };
+  };
 }
 
 export const translations: Record<Language, Translations> = {
@@ -467,6 +714,122 @@ export const translations: Record<Language, Translations> = {
     app: {
       title: '修仙模拟器',
       subtitle: 'Cultivation Simulator',
+    },
+    clan: {
+      title: '宗门',
+      joinClan: '加入宗门',
+      clanName: '宗门名称',
+      notJoined: '尚未加入宗门',
+      notJoinedDesc: '寻找一个宗门开始你的修炼之路...',
+      status: '身份',
+      contributions: '贡献',
+      monthlyContributions: '本月贡献',
+      affinity: '亲和度',
+      atmosphere: '宗门氛围',
+      temperature: '温度',
+      methods: '手段',
+      peaks: '峰脉',
+      halls: '事务堂',
+      activities: '日常活动',
+      npcs: '宗门人物',
+      master: '师父',
+      noMaster: '尚无师父',
+      reputation: '声望',
+      selectActivity: '选择活动',
+      doActivity: '进行活动',
+      visitPeak: '前往峰脉',
+      visitHall: '前往事务堂',
+      interactNPC: '与人交流',
+      peakNames: {
+        sword_peak: '剑锋',
+        alchemy_peak: '丹台',
+        beast_garden: '灵兽苑',
+        scripture_cliff: '藏经崖',
+        commerce_hall: '商行阁',
+      },
+      hallNames: {
+        dining_hall: '斋堂',
+        discipline_hall: '刑堂',
+        teaching_hall: '传功堂',
+        chores_hall: '杂务堂',
+      },
+      statusNames: {
+        guest: '过客',
+        registered: '座下弟子',
+        direct_disciple: '亲传弟子',
+        successor: '继承人',
+      },
+      lifeCircles: {
+        below_mountain: '山下圈',
+        main_gate: '山门圈',
+        cloud_peak: '云巅圈',
+      },
+      roles: {
+        peak_master: '峰主',
+        grand_elder: '太上长老',
+        elder: '长老',
+        instructor: '传功师',
+        senior_disciple: '师兄/姐',
+        junior_disciple: '师弟/妹',
+        logistics: '后勤弟子',
+        worker: '杂役',
+        merchant: '商贩',
+        guest_cultivator: '客卿',
+      },
+      personalities: {
+        warm: '温柔',
+        strict: '严厉',
+        pragmatic: '功利',
+        carefree: '佛系',
+        eccentric: '疯批',
+        cold: '冷漠',
+        jealous: '嫉妒',
+        supportive: '热心',
+      },
+      activityNames: {
+        eat_meal: '用餐',
+        gossip: '闲聊',
+        attend_lecture: '听道',
+        group_training: '集体修炼',
+        seek_guidance: '请教',
+        do_chores: '做杂务',
+        deliver_message: '送信',
+        help_trade: '协助贸易',
+        review_accounts: '查账',
+        visit_beasts: '看灵兽',
+        beast_training: '灵兽训练',
+        attend_class: '上课',
+        find_mentor: '寻师',
+        study_techniques: '研习功法',
+        read_records: '查阅典籍',
+        meet_master: '请安',
+      },
+      relationship: {
+        affection: '情谊',
+        trust: '信任',
+        respect: '尊敬',
+        familiarity: '熟悉度',
+        mood: '心情',
+      },
+      relationshipLevels: {
+        very_close: '亲密无间',
+        close: '亲近',
+        friendly: '友善',
+        acquaintance: '相识',
+        stranger: '陌生',
+        hostile: '敌对',
+      },
+      messages: {
+        activityComplete: '完成了{activity}',
+        gossipHeard: '听到了一些传闻：{gossip}',
+        eventTriggered: '发生了意外事件！',
+        relationshipUp: '与{name}的关系提升了',
+        relationshipDown: '与{name}的关系下降了',
+        contributionGained: '获得{value}贡献点',
+        wudaoGained: '获得{value}悟道点',
+      },
+      eventChoice: '做出选择',
+      noEvents: '当前没有待处理的事件',
     },
     header: {
       spiritStones: '灵石',
@@ -491,6 +854,7 @@ export const translations: Record<Language, Translations> = {
       inventory: '储物',
       combat: '战斗',
       skills: '功法',
+      character: '角色',
     },
     character: {
       cultivationProgress: '修为进度',
@@ -667,7 +1031,12 @@ export const translations: Record<Language, Translations> = {
       skipForNow: '暂时跳过',
       currentBonuses: '当前加成',
       noBonuses: '暂无加成效果',
-      noTalents: '尚未选择天赋，开始新游戏时选择',
+      noTalents: '尚无天赋',
+      refreshTalents: '刷新天赋',
+      refreshTalentsDesc: '消耗灵石重新随机天赋，将获得全新的天赋组合。',
+      refreshTalentsCost: '费用',
+      confirmRefresh: '确认刷新天赋',
+      confirmRefreshDesc: '确定要刷新天赋吗？当前所有天赋将被替换为新的随机天赋。',
       scopes: {
         battle: '战斗',
         market: '商业',
@@ -923,11 +1292,249 @@ export const translations: Record<Language, Translations> = {
       noCombatItems: '没有可用的战斗物品',
       noFeedItems: '没有可用的喂养物品',
     },
+    equipment: {
+      title: '装备',
+      equipped: '已装备',
+      inventory: '装备背包',
+      empty: '装备栏为空',
+      emptySlot: '空槽位',
+      equip: '装备',
+      unequip: '卸下',
+      enhance: '强化',
+      compare: '对比',
+      discard: '丢弃',
+      details: '详情',
+      stats: '属性',
+      setBonus: '套装效果',
+      activePieces: '激活件数',
+      currentStats: '当前属性',
+      newStats: '新属性',
+      difference: '差异',
+      enhanceLevel: '强化等级',
+      enhanceCost: '强化消耗',
+      enhanceSuccess: '强化成功！',
+      enhanceFailed: '强化失败',
+      maxLevel: '已达最高等级',
+      inventoryFull: '装备背包已满',
+      noEquipment: '暂无装备',
+      grade: '品阶',
+      element: '元素',
+      affixes: '词条',
+      slots: {
+        weapon: '武器',
+        armor: '护甲',
+        helmet: '头饰',
+        accessory: '饰品',
+        boots: '靴子',
+        talisman: '护符',
+      },
+      rarities: {
+        common: '凡品',
+        uncommon: '灵品',
+        rare: '宝品',
+        epic: '地品',
+        legendary: '仙品',
+      },
+      grades: {
+        lower: '下品',
+        middle: '中品',
+        upper: '上品',
+        supreme: '极品',
+      },
+      statNames: {
+        atk: '攻击',
+        def: '防御',
+        hp: '生命',
+        mp: '灵力',
+        spd: '速度',
+        crit: '暴击',
+        critDmg: '暴伤',
+        acc: '命中',
+        eva: '闪避',
+        wis: '悟性',
+        sense: '神识',
+        luck: '气运',
+        cultivationBonus: '修炼效率',
+      },
+    },
+    storyline: {
+      title: '主线',
+      chapter: '章节',
+      currentChapter: '当前章节',
+      progress: '进度',
+      mainQuest: '主线任务',
+      branchQuest: '支线任务',
+      optionalQuest: '可选任务',
+      available: '可接取',
+      inProgress: '进行中',
+      completed: '已完成',
+      locked: '未解锁',
+      requirements: '要求',
+      rewards: '奖励',
+      startQuest: '开始任务',
+      continueQuest: '继续',
+      completeQuest: '完成任务',
+      makeChoice: '做出选择',
+      nextDialogue: '继续',
+      skipDialogue: '跳过',
+      questLog: '任务日志',
+      noQuests: '暂无可用任务',
+      noQuestsDesc: '继续修炼，等待机缘...',
+      chapterComplete: '章节完成',
+      newQuestAvailable: '新任务可接取',
+      nodeTypes: {
+        main: '主线',
+        branch: '支线',
+        optional: '可选',
+      },
+      conditionTypes: {
+        realm: '境界',
+        time: '时间',
+        contribution: '贡献',
+        affinity: '亲和',
+        nodeComplete: '任务完成',
+        chapterComplete: '章节完成',
+        spiritStones: '灵石',
+        beastCount: '灵兽数量',
+      },
+      effectTypes: {
+        unlockSystem: '解锁系统',
+        unlockArea: '解锁区域',
+        giveItem: '获得物品',
+        giveSpiritStones: '获得灵石',
+        giveContribution: '获得贡献',
+        giveWudaoPoints: '获得悟道点',
+        giveCultivation: '获得修为',
+      },
+      messages: {
+        questStarted: '任务开始：{quest}',
+        questCompleted: '任务完成：{quest}',
+        chapterCompleted: '章节完成：{chapter}',
+        choiceMade: '做出了选择',
+        rewardReceived: '获得奖励',
+      },
+    },
   },
   en: {
     app: {
       title: 'Cultivation Simulator',
       subtitle: 'Xiuxian',
+    },
+    clan: {
+      title: 'Sect',
+      joinClan: 'Join Sect',
+      clanName: 'Sect Name',
+      notJoined: 'Not Yet Joined',
+      notJoinedDesc: 'Find a sect to begin your cultivation path...',
+      status: 'Status',
+      contributions: 'Contributions',
+      monthlyContributions: 'Monthly Contributions',
+      affinity: 'Affinity',
+      atmosphere: 'Sect Atmosphere',
+      temperature: 'Temperature',
+      methods: 'Methods',
+      peaks: 'Peaks',
+      halls: 'Halls',
+      activities: 'Daily Activities',
+      npcs: 'Sect Members',
+      master: 'Master',
+      noMaster: 'No Master',
+      reputation: 'Reputation',
+      selectActivity: 'Select Activity',
+      doActivity: 'Do Activity',
+      visitPeak: 'Visit Peak',
+      visitHall: 'Visit Hall',
+      interactNPC: 'Interact',
+      peakNames: {
+        sword_peak: 'Sword Peak',
+        alchemy_peak: 'Alchemy Peak',
+        beast_garden: 'Beast Garden',
+        scripture_cliff: 'Scripture Cliff',
+        commerce_hall: 'Commerce Hall',
+      },
+      hallNames: {
+        dining_hall: 'Dining Hall',
+        discipline_hall: 'Discipline Hall',
+        teaching_hall: 'Teaching Hall',
+        chores_hall: 'Chores Hall',
+      },
+      statusNames: {
+        guest: 'Guest',
+        registered: 'Registered Disciple',
+        direct_disciple: 'Direct Disciple',
+        successor: 'Successor',
+      },
+      lifeCircles: {
+        below_mountain: 'Below Mountain',
+        main_gate: 'Main Gate',
+        cloud_peak: 'Cloud Peak',
+      },
+      roles: {
+        peak_master: 'Peak Master',
+        grand_elder: 'Grand Elder',
+        elder: 'Elder',
+        instructor: 'Instructor',
+        senior_disciple: 'Senior Disciple',
+        junior_disciple: 'Junior Disciple',
+        logistics: 'Logistics',
+        worker: 'Worker',
+        merchant: 'Merchant',
+        guest_cultivator: 'Guest Cultivator',
+      },
+      personalities: {
+        warm: 'Warm',
+        strict: 'Strict',
+        pragmatic: 'Pragmatic',
+        carefree: 'Carefree',
+        eccentric: 'Eccentric',
+        cold: 'Cold',
+        jealous: 'Jealous',
+        supportive: 'Supportive',
+      },
+      activityNames: {
+        eat_meal: 'Eat Meal',
+        gossip: 'Gossip',
+        attend_lecture: 'Attend Lecture',
+        group_training: 'Group Training',
+        seek_guidance: 'Seek Guidance',
+        do_chores: 'Do Chores',
+        deliver_message: 'Deliver Message',
+        help_trade: 'Help Trade',
+        review_accounts: 'Review Accounts',
+        visit_beasts: 'Visit Beasts',
+        beast_training: 'Beast Training',
+        attend_class: 'Attend Class',
+        find_mentor: 'Find Mentor',
+        study_techniques: 'Study Techniques',
+        read_records: 'Read Records',
+        meet_master: 'Meet Master',
+      },
+      relationship: {
+        affection: 'Affection',
+        trust: 'Trust',
+        respect: 'Respect',
+        familiarity: 'Familiarity',
+        mood: 'Mood',
+      },
+      relationshipLevels: {
+        very_close: 'Very Close',
+        close: 'Close',
+        friendly: 'Friendly',
+        acquaintance: 'Acquaintance',
+        stranger: 'Stranger',
+        hostile: 'Hostile',
+      },
+      messages: {
+        activityComplete: 'Completed {activity}',
+        gossipHeard: 'Heard some gossip: {gossip}',
+        eventTriggered: 'An event occurred!',
+        relationshipUp: 'Relationship with {name} improved',
+        relationshipDown: 'Relationship with {name} declined',
+        contributionGained: 'Gained {value} contribution points',
+        wudaoGained: 'Gained {value} Dao points',
+      },
+      eventChoice: 'Make a Choice',
+      noEvents: 'No pending events',
     },
     header: {
       spiritStones: 'Spirit Stones',
@@ -952,6 +1559,7 @@ export const translations: Record<Language, Translations> = {
       inventory: 'Inventory',
       combat: 'Combat',
       skills: 'Skills',
+      character: 'Character',
     },
     character: {
       cultivationProgress: 'Cultivation Progress',
@@ -1128,7 +1736,12 @@ export const translations: Record<Language, Translations> = {
       skipForNow: 'Skip for now',
       currentBonuses: 'Current Bonuses',
       noBonuses: 'No active bonuses',
-      noTalents: 'No talents selected. Choose when starting a new game.',
+      noTalents: 'No talents yet',
+      refreshTalents: 'Refresh Talents',
+      refreshTalentsDesc: 'Spend spirit stones to re-roll talents. You will get a completely new talent set.',
+      refreshTalentsCost: 'Cost',
+      confirmRefresh: 'Confirm Talent Refresh',
+      confirmRefreshDesc: 'Are you sure you want to refresh talents? All current talents will be replaced with new random ones.',
       scopes: {
         battle: 'Combat',
         market: 'Market',
@@ -1383,6 +1996,128 @@ export const translations: Record<Language, Translations> = {
       enemyActing: 'Enemy is acting...',
       noCombatItems: 'No combat items available',
       noFeedItems: 'No feed items available',
+    },
+    equipment: {
+      title: 'Equipment',
+      equipped: 'Equipped',
+      inventory: 'Equipment Bag',
+      empty: 'Equipment is empty',
+      emptySlot: 'Empty Slot',
+      equip: 'Equip',
+      unequip: 'Unequip',
+      enhance: 'Enhance',
+      compare: 'Compare',
+      discard: 'Discard',
+      details: 'Details',
+      stats: 'Stats',
+      setBonus: 'Set Bonus',
+      activePieces: 'Active Pieces',
+      currentStats: 'Current Stats',
+      newStats: 'New Stats',
+      difference: 'Difference',
+      enhanceLevel: 'Enhancement Level',
+      enhanceCost: 'Enhancement Cost',
+      enhanceSuccess: 'Enhancement successful!',
+      enhanceFailed: 'Enhancement failed',
+      maxLevel: 'Max level reached',
+      inventoryFull: 'Equipment bag is full',
+      noEquipment: 'No equipment',
+      grade: 'Grade',
+      element: 'Element',
+      affixes: 'Affixes',
+      slots: {
+        weapon: 'Weapon',
+        armor: 'Armor',
+        helmet: 'Helmet',
+        accessory: 'Accessory',
+        boots: 'Boots',
+        talisman: 'Talisman',
+      },
+      rarities: {
+        common: 'Common',
+        uncommon: 'Uncommon',
+        rare: 'Rare',
+        epic: 'Epic',
+        legendary: 'Legendary',
+      },
+      grades: {
+        lower: 'Lower',
+        middle: 'Middle',
+        upper: 'Upper',
+        supreme: 'Supreme',
+      },
+      statNames: {
+        atk: 'ATK',
+        def: 'DEF',
+        hp: 'HP',
+        mp: 'MP',
+        spd: 'SPD',
+        crit: 'CRIT',
+        critDmg: 'CRIT DMG',
+        acc: 'ACC',
+        eva: 'EVA',
+        wis: 'WIS',
+        sense: 'Sense',
+        luck: 'Luck',
+        cultivationBonus: 'Cultivation Bonus',
+      },
+    },
+    storyline: {
+      title: 'Story',
+      chapter: 'Chapter',
+      currentChapter: 'Current Chapter',
+      progress: 'Progress',
+      mainQuest: 'Main Quest',
+      branchQuest: 'Branch Quest',
+      optionalQuest: 'Optional Quest',
+      available: 'Available',
+      inProgress: 'In Progress',
+      completed: 'Completed',
+      locked: 'Locked',
+      requirements: 'Requirements',
+      rewards: 'Rewards',
+      startQuest: 'Start Quest',
+      continueQuest: 'Continue',
+      completeQuest: 'Complete Quest',
+      makeChoice: 'Make Choice',
+      nextDialogue: 'Continue',
+      skipDialogue: 'Skip',
+      questLog: 'Quest Log',
+      noQuests: 'No Available Quests',
+      noQuestsDesc: 'Continue cultivating, await opportunities...',
+      chapterComplete: 'Chapter Complete',
+      newQuestAvailable: 'New Quest Available',
+      nodeTypes: {
+        main: 'Main',
+        branch: 'Branch',
+        optional: 'Optional',
+      },
+      conditionTypes: {
+        realm: 'Realm',
+        time: 'Time',
+        contribution: 'Contribution',
+        affinity: 'Affinity',
+        nodeComplete: 'Quest Complete',
+        chapterComplete: 'Chapter Complete',
+        spiritStones: 'Spirit Stones',
+        beastCount: 'Beast Count',
+      },
+      effectTypes: {
+        unlockSystem: 'Unlock System',
+        unlockArea: 'Unlock Area',
+        giveItem: 'Receive Item',
+        giveSpiritStones: 'Receive Spirit Stones',
+        giveContribution: 'Receive Contribution',
+        giveWudaoPoints: 'Receive Dao Points',
+        giveCultivation: 'Receive Cultivation',
+      },
+      messages: {
+        questStarted: 'Quest started: {quest}',
+        questCompleted: 'Quest completed: {quest}',
+        chapterCompleted: 'Chapter completed: {chapter}',
+        choiceMade: 'Choice made',
+        rewardReceived: 'Rewards received',
+      },
     },
   },
 };

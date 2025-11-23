@@ -4,17 +4,15 @@ import { LanguageProvider } from './i18n';
 import {
   Layout,
   CharacterPanel,
+  CharacterSubPanel,
   MarketPanel,
-  InventoryPanel,
   ChatLog,
   CombatPanel,
   TabNavigation,
-  SkillTreePanel,
-  SpiritBeastPanel,
-  TalentPanel,
-  TalentSelectionModal,
   BreakthroughTalentModal,
   WorldEventPanel,
+  ClanPanel,
+  StoryPanel,
 } from './components';
 import type { TabType } from './components';
 
@@ -37,12 +35,11 @@ function GameContent() {
 
           {/* Tab Content */}
           <div className="min-h-[300px] sm:min-h-[400px]">
+            {activeTab === 'storyline' && <StoryPanel />}
+            {activeTab === 'clan' && <ClanPanel />}
+            {activeTab === 'character' && <CharacterSubPanel />}
             {activeTab === 'market' && <MarketPanel />}
-            {activeTab === 'inventory' && <InventoryPanel />}
             {activeTab === 'combat' && <CombatPanel />}
-            {activeTab === 'skills' && <SkillTreePanel />}
-            {activeTab === 'spiritBeast' && <SpiritBeastPanel />}
-            {activeTab === 'talents' && <TalentPanel />}
             {activeTab === 'worldEvents' && <WorldEventPanel />}
           </div>
         </div>
@@ -51,14 +48,7 @@ function GameContent() {
       {/* Floating Chat Log */}
       <ChatLog />
 
-      {/* Talent Selection Modals */}
-      {state.showTalentSelection && state.talentSelectionType === 'starting' && (
-        <TalentSelectionModal
-          options={state.startingTalentOptions}
-          onSelect={(option) => actions.selectStartingTalents(option)}
-        />
-      )}
-
+      {/* Breakthrough Talent Selection Modal */}
       {state.showTalentSelection && state.talentSelectionType === 'breakthrough' && (
         <BreakthroughTalentModal
           options={state.breakthroughTalentOptions}

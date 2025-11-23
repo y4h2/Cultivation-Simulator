@@ -4,7 +4,8 @@ import { REALM_INFO, REALM_ORDER, getNextRealm, getRealmDisplayName } from '../c
 import { ACTIVITY_INFO } from '../constants/activities';
 import { createInitialSkillPoints, createInitialLearnedSkills } from './skillTree';
 import { createInitialSpiritBeastCollection } from './spiritBeast';
-import { createInitialTalentState } from '../constants/talents';
+import { createRandomInitialTalents } from '../constants/talents';
+import { createInitialCharacterEquipment, createEquipmentInstance } from '../constants/equipment';
 
 // Base cultivation value gained per ke
 const BASE_CULTIVATION_PER_KE = 1;
@@ -246,8 +247,8 @@ export const createInitialCharacter = (name: string): Character => {
     learnedSkills: createInitialLearnedSkills(),
     // Spirit Beast System
     spiritBeasts: createInitialSpiritBeastCollection(),
-    // Talent System
-    talents: createInitialTalentState(),
+    // Talent System - start with random talents
+    talents: createRandomInitialTalents(),
     // Player behavior tracking
     behaviorStats: {
       combatCount: 0,
@@ -256,8 +257,26 @@ export const createInitialCharacter = (name: string): Character => {
       beastInteractions: 0,
       eventsEncountered: 0,
     },
+    // Equipment System - start with basic equipment
+    equipment: createInitialEquipmentWithStarterItems(),
   };
 };
+
+// Create initial equipment with some starter items
+function createInitialEquipmentWithStarterItems() {
+  const equipment = createInitialCharacterEquipment();
+
+  // Add some starter equipment to inventory
+  const starterItems = ['wooden_sword', 'cloth_robe', 'leather_boots'];
+  for (const itemId of starterItems) {
+    const instance = createEquipmentInstance(itemId, false);
+    if (instance) {
+      equipment.inventory.push(instance);
+    }
+  }
+
+  return equipment;
+}
 
 export const changeActivity = (
   character: Character,

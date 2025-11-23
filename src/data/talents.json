@@ -172,8 +172,8 @@
       "id": "merchant_genius",
       "name": "Merchant Genius",
       "chineseName": "天机商修",
-      "description": "Can see price trends 2 ticks ahead. +15% profit on all trades.",
-      "chineseDescription": "可预见价格趋势2个时间单位，所有交易利润+15%。",
+      "description": "Can see price trends 2 ticks ahead. +5% profit on all trades (Balance Spec).",
+      "chineseDescription": "可预见价格趋势2个时间单位，所有交易利润+5%。",
       "type": "major",
       "rarity": "rare",
       "scopes": ["market"],
@@ -188,10 +188,10 @@
         {
           "type": "trade_profit_bonus",
           "scope": "market",
-          "value": 15,
+          "value": 5,
           "isPercentage": true,
-          "description": "+15% trade profit",
-          "chineseDescription": "交易利润+15%"
+          "description": "+5% trade profit (Balance Spec)",
+          "chineseDescription": "交易利润+5%"
         }
       ],
       "stackable": false,
@@ -221,8 +221,8 @@
       "id": "market_advantage",
       "name": "Market Advantage",
       "chineseName": "涨跌先机",
-      "description": "Stockpiling items grants +5% combat damage per unique item type (max 25%).",
-      "chineseDescription": "每种囤积的物品类型提供+5%战斗伤害（最高25%）。",
+      "description": "Stockpiling items grants +3% combat damage per unique item type (max 15%).",
+      "chineseDescription": "每种囤积的物品类型提供+3%战斗伤害（最高15%）。",
       "type": "minor",
       "rarity": "uncommon",
       "scopes": ["market", "battle"],
@@ -230,13 +230,14 @@
         {
           "type": "stockpile_bonus",
           "scope": "battle",
-          "value": 5,
+          "value": 3,
           "isPercentage": true,
           "condition": {
-            "type": "has_stockpile"
+            "type": "has_stockpile",
+            "maxStacks": 5
           },
-          "description": "+5% combat damage per stockpiled item type",
-          "chineseDescription": "每种囤积物品+5%战斗伤害"
+          "description": "+3% combat damage per stockpiled item type (max 15%)",
+          "chineseDescription": "每种囤积物品+3%战斗伤害（上限15%）"
         }
       ],
       "stackable": false

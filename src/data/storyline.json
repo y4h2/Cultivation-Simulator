@@ -1,0 +1,894 @@
+{
+  "chapters": [
+    {
+      "id": "chapter_1",
+      "number": 1,
+      "name": "Joining and Establishing",
+      "chineseName": "入宗与立足",
+      "description": "Begin your journey as a new cultivator. Join a sect, learn the basics, and establish your foundation.",
+      "chineseDescription": "开启你的修仙之旅。加入宗门，学习基础，打下根基。",
+      "nodeIds": [
+        "node_1_1",
+        "node_1_2",
+        "node_1_3",
+        "node_1_4",
+        "node_1_5"
+      ],
+      "requiredNodeIds": [
+        "node_1_1",
+        "node_1_2",
+        "node_1_3",
+        "node_1_4"
+      ],
+      "completionEffects": [
+        {
+          "type": "unlock_system",
+          "target": "spirit_beast_capture"
+        },
+        {
+          "type": "give_spirit_stones",
+          "value": 500
+        },
+        {
+          "type": "set_flag",
+          "target": "chapter_1_complete"
+        }
+      ],
+      "completionSummary": "You have successfully established yourself in the sect. The elders recognize your potential, and new opportunities await.",
+      "chineseCompletionSummary": "你已成功在宗门立足。长老们认可你的潜力，新的机遇正等着你。",
+      "nextChapterId": "chapter_2"
+    },
+    {
+      "id": "chapter_2",
+      "number": 2,
+      "name": "Sect Resource Crisis",
+      "chineseName": "宗门资源危机",
+      "description": "The sect faces a resource shortage. Multiple paths lie ahead - combat, commerce, or diplomacy.",
+      "chineseDescription": "宗门面临资源短缺。前方有多条道路——战斗、商贸或外交。",
+      "unlockConditions": [
+        {
+          "type": "story_flag",
+          "value": "chapter_1_complete",
+          "comparison": "has"
+        },
+        {
+          "type": "realm",
+          "realmRequired": "qi_refining"
+        }
+      ],
+      "nodeIds": [
+        "node_2_1",
+        "node_2_2a",
+        "node_2_2b",
+        "node_2_2c",
+        "node_2_3",
+        "node_2_4"
+      ],
+      "requiredNodeIds": [
+        "node_2_1",
+        "node_2_3"
+      ],
+      "completionEffects": [
+        {
+          "type": "unlock_area",
+          "target": "advanced_market"
+        },
+        {
+          "type": "give_spirit_stones",
+          "value": 1000
+        },
+        {
+          "type": "give_wudao_points",
+          "value": 5
+        },
+        {
+          "type": "set_flag",
+          "target": "chapter_2_complete"
+        }
+      ],
+      "completionSummary": "The resource crisis has been resolved through your efforts. Your reputation in the sect has grown significantly.",
+      "chineseCompletionSummary": "资源危机在你的努力下得到解决。你在宗门的声望大幅提升。",
+      "nextChapterId": "chapter_3"
+    },
+    {
+      "id": "chapter_3",
+      "number": 3,
+      "name": "Rising Shadows",
+      "chineseName": "暗影崛起",
+      "description": "Dark forces stir in the cultivation world. The sect must prepare for what lies ahead.",
+      "chineseDescription": "黑暗势力在修仙界蠢蠢欲动。宗门必须为即将到来的一切做好准备。",
+      "unlockConditions": [
+        {
+          "type": "story_flag",
+          "value": "chapter_2_complete",
+          "comparison": "has"
+        },
+        {
+          "type": "realm",
+          "realmRequired": "foundation"
+        }
+      ],
+      "nodeIds": [
+        "node_3_1",
+        "node_3_2"
+      ],
+      "requiredNodeIds": [
+        "node_3_1"
+      ],
+      "completionEffects": [
+        {
+          "type": "give_spirit_stones",
+          "value": 2000
+        },
+        {
+          "type": "set_flag",
+          "target": "chapter_3_complete"
+        }
+      ],
+      "completionSummary": "You have proven yourself against the gathering darkness. Greater challenges await.",
+      "chineseCompletionSummary": "你已证明自己能够对抗聚集的黑暗。更大的挑战在等着你。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "node_1_1",
+      "chapterId": "chapter_1",
+      "name": "First Arrival",
+      "chineseName": "初临宗门",
+      "type": "main",
+      "triggerConditions": [],
+      "description": "You arrive at the sect gates, ready to begin your cultivation journey.",
+      "chineseDescription": "你来到宗门门前，准备开始你的修仙之旅。",
+      "dialogue": [
+        {
+          "text": "The massive gates of Azure Cloud Sect loom before you, ancient and majestic.",
+          "chineseText": "青云宗的巨大山门矗立在你面前，古老而庄严。"
+        },
+        {
+          "speaker": "Gate Guardian",
+          "chineseSpeaker": "守门弟子",
+          "text": "Halt, traveler. State your purpose.",
+          "chineseText": "止步，旅人。说明你的来意。",
+          "emotion": "serious"
+        },
+        {
+          "text": "You explain your desire to join the sect and walk the path of cultivation.",
+          "chineseText": "你说明了你想加入宗门、踏上修仙之路的意愿。"
+        },
+        {
+          "speaker": "Gate Guardian",
+          "chineseSpeaker": "守门弟子",
+          "text": "Very well. Follow me to the registration hall. The entrance examination will test your potential.",
+          "chineseText": "很好。跟我来登记处。入门考核将测试你的潜力。",
+          "emotion": "neutral"
+        }
+      ],
+      "isRequired": true,
+      "autoTrigger": true,
+      "onCompleteEffects": [
+        {
+          "type": "set_flag",
+          "target": "arrived_at_sect"
+        },
+        {
+          "type": "set_flag",
+          "target": "joined_sect_day"
+        }
+      ],
+      "nextNodes": ["node_1_2"],
+      "icon": "gate",
+      "priority": 100
+    },
+    {
+      "id": "node_1_2",
+      "chapterId": "chapter_1",
+      "name": "Sect Entrance Exam",
+      "chineseName": "宗门考核",
+      "type": "main",
+      "triggerConditions": [
+        {
+          "type": "node_complete",
+          "value": "node_1_1"
+        }
+      ],
+      "description": "Take the sect entrance examination to prove your cultivation potential.",
+      "chineseDescription": "参加宗门入门考核，证明你的修炼潜力。",
+      "dialogue": [
+        {
+          "speaker": "Elder Zhang",
+          "chineseSpeaker": "张长老",
+          "text": "Place your hand on the Spirit Testing Stone. It will reveal your aptitude.",
+          "chineseText": "把手放在测灵石上。它会显示你的资质。",
+          "emotion": "neutral"
+        },
+        {
+          "text": "The stone glows faintly as spiritual energy flows through you.",
+          "chineseText": "灵气流过你的身体，石头微微发光。"
+        },
+        {
+          "speaker": "Elder Zhang",
+          "chineseSpeaker": "张长老",
+          "text": "Acceptable. You show promise, young one. Welcome to Azure Cloud Sect.",
+          "chineseText": "可以。你有潜力，年轻人。欢迎加入青云宗。",
+          "emotion": "happy"
+        }
+      ],
+      "isRequired": true,
+      "autoTrigger": false,
+      "onCompleteEffects": [
+        {
+          "type": "set_flag",
+          "target": "passed_entrance_exam"
+        },
+        {
+          "type": "give_spirit_stones",
+          "value": 100
+        },
+        {
+          "type": "give_contribution",
+          "value": 10
+        }
+      ],
+      "nextNodes": ["node_1_3"],
+      "icon": "scroll",
+      "priority": 90
+    },
+    {
+      "id": "node_1_3",
+      "chapterId": "chapter_1",
+      "name": "First Assignment",
+      "chineseName": "首次任务",
+      "type": "main",
+      "triggerConditions": [
+        {
+          "type": "node_complete",
+          "value": "node_1_2"
+        },
+        {
+          "type": "time",
+          "daysSince": "joined_sect_day",
+          "value": 3,
+          "comparison": "gte"
+        }
+      ],
+      "description": "Receive your first assignment from the sect.",
+      "chineseDescription": "从宗门接受你的第一个任务。",
+      "dialogue": [
+        {
+          "speaker": "Senior Brother Liu",
+          "chineseSpeaker": "刘师兄",
+          "text": "Junior, the sect has tasks suitable for new disciples. This will help you earn contribution points.",
+          "chineseText": "师弟，宗门有适合新弟子的任务。这能帮你赚取贡献点。",
+          "emotion": "neutral"
+        },
+        {
+          "text": "You are offered a choice of assignments.",
+          "chineseText": "你可以选择不同的任务。"
+        }
+      ],
+      "isRequired": true,
+      "autoTrigger": false,
+      "choices": [
+        {
+          "id": "choice_gather_herbs",
+          "text": "Gather spirit herbs from the mountain",
+          "chineseText": "去山上采集灵药",
+          "effects": [
+            {
+              "type": "give_contribution",
+              "value": 20
+            },
+            {
+              "type": "give_item",
+              "itemId": "spirit_herb",
+              "quantity": 5
+            }
+          ],
+          "addsTags": ["alchemist"]
+        },
+        {
+          "id": "choice_patrol_duty",
+          "text": "Join the patrol team",
+          "chineseText": "加入巡逻队",
+          "effects": [
+            {
+              "type": "give_contribution",
+              "value": 25
+            },
+            {
+              "type": "give_cultivation",
+              "value": 50
+            }
+          ],
+          "addsTags": ["sword_cultivator"]
+        },
+        {
+          "id": "choice_help_trading",
+          "text": "Assist in the trading hall",
+          "chineseText": "在商行阁帮忙",
+          "effects": [
+            {
+              "type": "give_contribution",
+              "value": 15
+            },
+            {
+              "type": "give_spirit_stones",
+              "value": 50
+            }
+          ],
+          "addsTags": ["merchant"]
+        }
+      ],
+      "onCompleteEffects": [
+        {
+          "type": "set_flag",
+          "target": "first_task_complete"
+        }
+      ],
+      "nextNodes": ["node_1_4"],
+      "icon": "task",
+      "priority": 80
+    },
+    {
+      "id": "node_1_4",
+      "chapterId": "chapter_1",
+      "name": "First Breakthrough Guidance",
+      "chineseName": "首次突破指引",
+      "type": "main",
+      "triggerConditions": [
+        {
+          "type": "node_complete",
+          "value": "node_1_3"
+        },
+        {
+          "type": "realm_stage",
+          "value": 3,
+          "comparison": "gte"
+        }
+      ],
+      "description": "An elder notices your progress and offers guidance for your first major breakthrough.",
+      "chineseDescription": "一位长老注意到你的进步，为你的第一次重大突破提供指导。",
+      "dialogue": [
+        {
+          "speaker": "Elder Chen",
+          "chineseSpeaker": "陈长老",
+          "text": "Your cultivation has been progressing well. It is time to prepare for the breakthrough to the next stage.",
+          "chineseText": "你的修炼进展顺利。是时候准备突破到下一阶段了。",
+          "emotion": "happy"
+        },
+        {
+          "speaker": "Elder Chen",
+          "chineseSpeaker": "陈长老",
+          "text": "Remember: stability is key. Do not rush. Let your spiritual energy circulate naturally.",
+          "chineseText": "记住：稳定是关键。不要急躁。让灵气自然流转。",
+          "emotion": "serious"
+        },
+        {
+          "text": "Elder Chen teaches you several techniques to stabilize your cultivation base.",
+          "chineseText": "陈长老教了你几个稳固修为的技巧。"
+        }
+      ],
+      "isRequired": true,
+      "autoTrigger": false,
+      "onCompleteEffects": [
+        {
+          "type": "give_wudao_points",
+          "value": 3
+        },
+        {
+          "type": "set_flag",
+          "target": "breakthrough_guidance_received"
+        }
+      ],
+      "nextNodes": ["node_1_5"],
+      "icon": "cultivation",
+      "priority": 70
+    },
+    {
+      "id": "node_1_5",
+      "chapterId": "chapter_1",
+      "name": "Secret of the Old Library",
+      "chineseName": "旧藏书阁之秘",
+      "type": "branch",
+      "triggerConditions": [
+        {
+          "type": "node_complete",
+          "value": "node_1_2"
+        },
+        {
+          "type": "contribution",
+          "value": 30,
+          "comparison": "gte"
+        }
+      ],
+      "description": "You discover a hidden passage in the old library. Optional side quest with special rewards.",
+      "chineseDescription": "你在旧藏书阁发现了一条隐藏通道。可选支线任务，有特殊奖励。",
+      "dialogue": [
+        {
+          "text": "While studying in the old library, you notice a bookshelf that seems slightly different from the others.",
+          "chineseText": "在旧藏书阁学习时，你注意到有一个书架似乎与其他的不太一样。"
+        },
+        {
+          "text": "Behind it, a narrow passage leads to a hidden chamber.",
+          "chineseText": "书架后面，一条狭窄的通道通向一个隐藏的房间。"
+        }
+      ],
+      "isRequired": false,
+      "autoTrigger": false,
+      "choices": [
+        {
+          "id": "choice_explore",
+          "text": "Explore the hidden chamber",
+          "chineseText": "探索隐藏房间",
+          "effects": [
+            {
+              "type": "give_item",
+              "itemId": "ancient_scroll",
+              "quantity": 1
+            },
+            {
+              "type": "give_wudao_points",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "id": "choice_report",
+          "text": "Report to an elder",
+          "chineseText": "向长老汇报",
+          "effects": [
+            {
+              "type": "give_contribution",
+              "value": 50
+            },
+            {
+              "type": "change_affinity",
+              "value": 5
+            }
+          ]
+        }
+      ],
+      "icon": "book",
+      "priority": 50
+    },
+    {
+      "id": "node_2_1",
+      "chapterId": "chapter_2",
+      "name": "Resource Shortage Announcement",
+      "chineseName": "资源短缺公告",
+      "type": "main",
+      "triggerConditions": [
+        {
+          "type": "chapter_complete",
+          "value": "chapter_1"
+        }
+      ],
+      "description": "The sect announces a critical resource shortage. All disciples are called to help.",
+      "chineseDescription": "宗门宣布资源严重短缺。所有弟子都被召集来帮忙。",
+      "dialogue": [
+        {
+          "speaker": "Sect Leader",
+          "chineseSpeaker": "宗主",
+          "text": "Disciples, our sect faces a grave situation. The spirit mine to the north has been overrun by demonic beasts.",
+          "chineseText": "弟子们，我们宗门面临严峻形势。北边的灵矿被妖兽占领了。",
+          "emotion": "serious"
+        },
+        {
+          "speaker": "Sect Leader",
+          "chineseSpeaker": "宗主",
+          "text": "Without these resources, our cultivation pills and formations will soon be depleted. We need every disciple's help.",
+          "chineseText": "没有这些资源，我们的修炼丹药和阵法很快就会消耗殆尽。我们需要每一位弟子的帮助。",
+          "emotion": "serious"
+        },
+        {
+          "text": "You sense this is an opportunity to prove yourself and advance in the sect.",
+          "chineseText": "你感觉这是证明自己、在宗门晋升的机会。"
+        }
+      ],
+      "isRequired": true,
+      "autoTrigger": true,
+      "onStartEffects": [
+        {
+          "type": "trigger_event",
+          "target": "resource_crisis"
+        }
+      ],
+      "onCompleteEffects": [
+        {
+          "type": "set_flag",
+          "target": "crisis_known"
+        }
+      ],
+      "nextNodes": ["node_2_2a", "node_2_2b", "node_2_2c"],
+      "icon": "announcement",
+      "priority": 100
+    },
+    {
+      "id": "node_2_2a",
+      "chapterId": "chapter_2",
+      "name": "Combat Path - Beast Hunting",
+      "chineseName": "战斗路线 - 狩猎妖兽",
+      "type": "branch",
+      "triggerConditions": [
+        {
+          "type": "node_complete",
+          "value": "node_2_1"
+        }
+      ],
+      "description": "Join the combat teams to clear the demonic beasts from the spirit mine.",
+      "chineseDescription": "加入战斗队伍，清除灵矿中的妖兽。",
+      "dialogue": [
+        {
+          "speaker": "Captain Wang",
+          "chineseSpeaker": "王队长",
+          "text": "We need strong fighters. The beasts are numerous but not particularly powerful. With enough numbers, we can clear them.",
+          "chineseText": "我们需要强大的战士。妖兽数量众多但不是特别强大。人数够多的话，我们可以清除它们。",
+          "emotion": "serious"
+        },
+        {
+          "speaker": "Captain Wang",
+          "chineseSpeaker": "王队长",
+          "text": "Those who contribute to the battle will receive combat merit and first pick of the beast materials.",
+          "chineseText": "参与战斗的人将获得战功和妖兽材料的优先选择权。",
+          "emotion": "neutral"
+        }
+      ],
+      "isRequired": false,
+      "autoTrigger": false,
+      "onCompleteEffects": [
+        {
+          "type": "set_flag",
+          "target": "chose_combat_path"
+        },
+        {
+          "type": "give_contribution",
+          "value": 100
+        },
+        {
+          "type": "give_item",
+          "itemId": "beast_core",
+          "quantity": 3
+        },
+        {
+          "type": "add_behavior_tag",
+          "target": "sword_cultivator"
+        }
+      ],
+      "nextNodes": ["node_2_3"],
+      "icon": "sword",
+      "priority": 80
+    },
+    {
+      "id": "node_2_2b",
+      "chapterId": "chapter_2",
+      "name": "Trade Path - Market Investigation",
+      "chineseName": "商贸路线 - 市场调查",
+      "type": "branch",
+      "triggerConditions": [
+        {
+          "type": "node_complete",
+          "value": "node_2_1"
+        }
+      ],
+      "description": "Investigate the market to find alternative resource suppliers.",
+      "chineseDescription": "调查市场，寻找其他资源供应商。",
+      "dialogue": [
+        {
+          "speaker": "Hall Master Qian",
+          "chineseSpeaker": "钱堂主",
+          "text": "Not all solutions require combat. If we can secure alternative supply routes, the sect can survive this crisis.",
+          "chineseText": "不是所有解决方案都需要战斗。如果我们能确保其他的供应渠道，宗门可以度过这次危机。",
+          "emotion": "neutral"
+        },
+        {
+          "speaker": "Hall Master Qian",
+          "chineseSpeaker": "钱堂主",
+          "text": "I need someone with sharp eyes for commerce. The rewards will be... substantial.",
+          "chineseText": "我需要有商业眼光的人。报酬会...非常丰厚。",
+          "emotion": "happy"
+        }
+      ],
+      "isRequired": false,
+      "autoTrigger": false,
+      "onCompleteEffects": [
+        {
+          "type": "set_flag",
+          "target": "chose_trade_path"
+        },
+        {
+          "type": "give_spirit_stones",
+          "value": 300
+        },
+        {
+          "type": "give_contribution",
+          "value": 60
+        },
+        {
+          "type": "add_behavior_tag",
+          "target": "merchant"
+        }
+      ],
+      "nextNodes": ["node_2_3"],
+      "icon": "coin",
+      "priority": 75
+    },
+    {
+      "id": "node_2_2c",
+      "chapterId": "chapter_2",
+      "name": "Beast Path - Spirit Beast Alliance",
+      "chineseName": "灵兽路线 - 灵兽联盟",
+      "type": "branch",
+      "triggerConditions": [
+        {
+          "type": "node_complete",
+          "value": "node_2_1"
+        },
+        {
+          "type": "beast_count",
+          "value": 1,
+          "comparison": "gte"
+        }
+      ],
+      "description": "Use your connection with spirit beasts to negotiate a peaceful resolution.",
+      "chineseDescription": "利用你与灵兽的联系，谈判和平解决方案。",
+      "dialogue": [
+        {
+          "speaker": "Elder Mu",
+          "chineseSpeaker": "木长老",
+          "text": "I sense you have an affinity with spirit beasts. The creatures in the mine... they are not truly demonic. They are territorial spirit beasts defending their young.",
+          "chineseText": "我感觉你与灵兽有缘分。矿中的生物...它们并非真正的妖兽。它们是保护幼崽的领地灵兽。",
+          "emotion": "neutral"
+        },
+        {
+          "speaker": "Elder Mu",
+          "chineseSpeaker": "木长老",
+          "text": "Perhaps... a different approach could work. One that benefits both the sect and the beasts.",
+          "chineseText": "也许...换一种方式可以奏效。一种对宗门和灵兽都有益的方式。",
+          "emotion": "happy"
+        }
+      ],
+      "isRequired": false,
+      "autoTrigger": false,
+      "onCompleteEffects": [
+        {
+          "type": "set_flag",
+          "target": "chose_beast_path"
+        },
+        {
+          "type": "give_contribution",
+          "value": 80
+        },
+        {
+          "type": "change_affinity",
+          "value": 15
+        },
+        {
+          "type": "add_behavior_tag",
+          "target": "beast_tamer"
+        }
+      ],
+      "nextNodes": ["node_2_3"],
+      "icon": "beast",
+      "priority": 70
+    },
+    {
+      "id": "node_2_3",
+      "chapterId": "chapter_2",
+      "name": "Crisis Resolution",
+      "chineseName": "危机解决",
+      "type": "main",
+      "triggerConditions": [
+        {
+          "type": "story_flag",
+          "value": "chose_combat_path",
+          "comparison": "has"
+        }
+      ],
+      "conditionalNextNodes": [
+        {
+          "conditions": [
+            {
+              "type": "story_flag",
+              "value": "chose_trade_path",
+              "comparison": "has"
+            }
+          ],
+          "nodeId": "node_2_3"
+        },
+        {
+          "conditions": [
+            {
+              "type": "story_flag",
+              "value": "chose_beast_path",
+              "comparison": "has"
+            }
+          ],
+          "nodeId": "node_2_3"
+        }
+      ],
+      "description": "The crisis reaches its climax. Your chosen path determines the outcome.",
+      "chineseDescription": "危机达到高潮。你选择的道路决定了结果。",
+      "dialogue": [
+        {
+          "speaker": "Sect Leader",
+          "chineseSpeaker": "宗主",
+          "text": "Thanks to the efforts of disciples like you, the crisis has been averted.",
+          "chineseText": "多亏了像你这样的弟子的努力，危机已经化解。",
+          "emotion": "happy"
+        },
+        {
+          "speaker": "Sect Leader",
+          "chineseSpeaker": "宗主",
+          "text": "Your contribution will not be forgotten. The sect rewards those who serve it well.",
+          "chineseText": "你的贡献不会被遗忘。宗门会奖励那些尽心效力的人。",
+          "emotion": "happy"
+        }
+      ],
+      "isRequired": true,
+      "autoTrigger": false,
+      "onCompleteEffects": [
+        {
+          "type": "set_flag",
+          "target": "crisis_resolved"
+        },
+        {
+          "type": "give_wudao_points",
+          "value": 5
+        }
+      ],
+      "nextNodes": ["node_2_4"],
+      "icon": "victory",
+      "priority": 60
+    },
+    {
+      "id": "node_2_4",
+      "chapterId": "chapter_2",
+      "name": "Hidden Conspiracy",
+      "chineseName": "隐藏阴谋",
+      "type": "optional",
+      "triggerConditions": [
+        {
+          "type": "node_complete",
+          "value": "node_2_3"
+        },
+        {
+          "type": "story_flag",
+          "value": "chose_trade_path",
+          "comparison": "has"
+        }
+      ],
+      "description": "Your investigation reveals something darker behind the resource crisis.",
+      "chineseDescription": "你的调查揭示了资源危机背后更黑暗的东西。",
+      "dialogue": [
+        {
+          "text": "While reviewing the trade documents, you notice discrepancies that suggest the crisis was not entirely natural...",
+          "chineseText": "在审查贸易文件时，你注意到一些差异，表明这次危机并非完全是自然发生的..."
+        },
+        {
+          "speaker": "???",
+          "chineseSpeaker": "???",
+          "text": "So, you've discovered our little secret. How... inconvenient.",
+          "chineseText": "所以，你发现了我们的小秘密。真是...麻烦。",
+          "emotion": "angry"
+        }
+      ],
+      "isRequired": false,
+      "autoTrigger": false,
+      "choices": [
+        {
+          "id": "choice_confront",
+          "text": "Confront the conspirator",
+          "chineseText": "直面阴谋者",
+          "effects": [
+            {
+              "type": "set_flag",
+              "target": "conspiracy_confronted"
+            },
+            {
+              "type": "give_cultivation",
+              "value": 100
+            }
+          ]
+        },
+        {
+          "id": "choice_gather_evidence",
+          "text": "Quietly gather more evidence",
+          "chineseText": "悄悄收集更多证据",
+          "effects": [
+            {
+              "type": "set_flag",
+              "target": "conspiracy_investigated"
+            },
+            {
+              "type": "give_contribution",
+              "value": 100
+            }
+          ]
+        }
+      ],
+      "icon": "mystery",
+      "priority": 40
+    },
+    {
+      "id": "node_3_1",
+      "chapterId": "chapter_3",
+      "name": "Ominous Signs",
+      "chineseName": "不祥之兆",
+      "type": "main",
+      "triggerConditions": [
+        {
+          "type": "chapter_complete",
+          "value": "chapter_2"
+        },
+        {
+          "type": "realm",
+          "realmRequired": "foundation"
+        }
+      ],
+      "description": "Strange phenomena appear across the cultivation world. The elders are troubled.",
+      "chineseDescription": "奇异现象出现在修仙界各处。长老们忧心忡忡。",
+      "dialogue": [
+        {
+          "text": "The sky has been darker than usual lately. Even the spiritual energy in the air feels... corrupted.",
+          "chineseText": "最近天空比平时更暗。甚至空气中的灵气都感觉...被污染了。"
+        },
+        {
+          "speaker": "Grand Elder",
+          "chineseSpeaker": "太上长老",
+          "text": "These signs... I have only read about them in ancient texts. The Demonic Tide approaches.",
+          "chineseText": "这些迹象...我只在古籍中读到过。魔潮将至。",
+          "emotion": "serious"
+        }
+      ],
+      "isRequired": true,
+      "autoTrigger": true,
+      "onCompleteEffects": [
+        {
+          "type": "set_flag",
+          "target": "demonic_tide_known"
+        }
+      ],
+      "nextNodes": ["node_3_2"],
+      "icon": "warning",
+      "priority": 100
+    },
+    {
+      "id": "node_3_2",
+      "chapterId": "chapter_3",
+      "name": "Preparation Begins",
+      "chineseName": "开始准备",
+      "type": "main",
+      "triggerConditions": [
+        {
+          "type": "node_complete",
+          "value": "node_3_1"
+        }
+      ],
+      "description": "The sect begins preparations for the coming threat. Every disciple must do their part.",
+      "chineseDescription": "宗门开始为即将到来的威胁做准备。每个弟子都必须尽自己的一份力。",
+      "dialogue": [
+        {
+          "speaker": "Sect Leader",
+          "chineseSpeaker": "宗主",
+          "text": "All disciples will receive additional training. We must be ready.",
+          "chineseText": "所有弟子将接受额外训练。我们必须做好准备。",
+          "emotion": "serious"
+        }
+      ],
+      "isRequired": true,
+      "autoTrigger": false,
+      "onCompleteEffects": [
+        {
+          "type": "give_wudao_points",
+          "value": 10
+        },
+        {
+          "type": "give_cultivation",
+          "value": 200
+        }
+      ],
+      "icon": "training",
+      "priority": 90
+    }
+  ]
+}

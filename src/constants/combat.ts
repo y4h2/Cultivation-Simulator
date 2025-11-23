@@ -41,6 +41,33 @@ export const ELEMENT_ADVANTAGE_MODIFIER = 0.25;     // +25% damage when strong
 export const ELEMENT_DISADVANTAGE_MODIFIER = -0.2;  // -20% damage when weak
 
 // ============================================
+// Element Power System (Balance Spec v1)
+// ElementPower bonus = 1 + (EP / 100), soft cap at EP=80 (1.8x)
+// ============================================
+export const ELEMENT_POWER_CONSTANTS = {
+  DIVISOR: 100,           // EP / 100 for damage multiplier
+  SOFT_CAP: 80,           // Maximum effective EP from equipment
+  SOFT_CAP_MULTIPLIER: 1.8, // Maximum damage multiplier from EP
+};
+
+// ============================================
+// Skill Power Multiplier Guidelines (Balance Spec)
+// Basic attack: 1.0-1.2
+// Normal skill: 1.2-1.8
+// Ultimate skill: 2.0-3.0
+// ============================================
+
+// ============================================
+// Defense Formula Constants (Balance Spec)
+// Defense coefficient K = 3-5x average ATK of same stage
+// DEF_REDUCTION = DEF_target / (DEF_target + K)
+// ============================================
+export const DEFENSE_FORMULA_CONSTANTS = {
+  K_MULTIPLIER: 4,        // K = 4x average ATK (middle of 3-5 range)
+  QI_REFINING_BASE_ATK: 75,  // Average ATK for qi refining stage
+};
+
+// ============================================
 // Combat Formula Constants
 // ============================================
 
@@ -85,40 +112,46 @@ export const createDefaultQiGauge = (): QiGauge => ({
 // ============================================
 
 export const BUFF_TEMPLATES: Record<string, Omit<Buff, 'remainingDuration' | 'currentStacks'>> = {
-  // Debuffs
+  // Debuffs - Values based on Balance Spec v1
+  // Fire: 2% max_hp per turn, 3 turns, stackable up to 3
   burn: {
     id: 'burn',
     name: 'Burn',
     chineseName: '焚灼',
-    description: 'Takes 5% max HP fire damage each turn',
-    chineseDescription: '每回合受到5%最大生命值的火焰伤害',
+    description: 'Takes 2% max HP fire damage each turn, stackable up to 3',
+    chineseDescription: '每回合受到2%最大生命值的火焰伤害，可叠加3层',
     duration: 3,
-    stackable: false,
+    stackable: true,
+    maxStacks: 3,
     isDebuff: true,
-    onTurnStart: [{ type: 'damage', value: 5, isPercentage: true, stat: 'maxHp' }],
+    onTurnStart: [{ type: 'damage', value: 2, isPercentage: true, stat: 'maxHp' }],
   },
+  // Wood: 1.5% max_hp per turn, 4 turns, stackable up to 5
   poison: {
     id: 'poison',
     name: 'Poison',
     chineseName: '剧毒',
-    description: 'Takes 3% max HP poison damage each turn, stackable',
-    chineseDescription: '每回合受到3%最大生命值毒素伤害，可叠加',
+    description: 'Takes 1.5% max HP poison damage each turn, stackable up to 5',
+    chineseDescription: '每回合受到1.5%最大生命值毒素伤害，可叠加5层',
     duration: 4,
     stackable: true,
     maxStacks: 5,
     isDebuff: true,
-    onTurnStart: [{ type: 'damage', value: 3, isPercentage: true, stat: 'maxHp' }],
+    onTurnStart: [{ type: 'damage', value: 1.5, isPercentage: true, stat: 'maxHp' }],
   },
+  // Water: 3% speed reduction per stack, up to 5 stacks (15% total at 5 stacks)
+  // At 3+ stacks: 25% chance for control effect
   frozen: {
     id: 'frozen',
     name: 'Frozen',
-    chineseName: '冰冻',
-    description: 'Speed reduced by 30%',
-    chineseDescription: '速度降低30%',
-    duration: 2,
-    stackable: false,
+    chineseName: '寒意',
+    description: 'Speed reduced by 3% per stack, up to 5 stacks',
+    chineseDescription: '每层减速3%，最多叠加5层',
+    duration: 3,
+    stackable: true,
+    maxStacks: 5,
     isDebuff: true,
-    modifiers: [{ stat: 'spd', value: -30, isPercentage: true }],
+    modifiers: [{ stat: 'spd', value: -3, isPercentage: true }],
   },
   mind_break: {
     id: 'mind_break',
@@ -142,29 +175,47 @@ export const BUFF_TEMPLATES: Record<string, Omit<Buff, 'remainingDuration' | 'cu
     isDebuff: true,
     modifiers: [{ stat: 'atk', value: -20, isPercentage: true }],
   },
+  // Metal: 5% DEF reduction per stack, up to 3 stacks (15% total)
   armor_break: {
     id: 'armor_break',
     name: 'Armor Break',
     chineseName: '破甲',
-    description: 'Defense reduced by 25%',
-    chineseDescription: '防御力降低25%',
+    description: 'Defense reduced by 5% per stack, up to 3 stacks',
+    chineseDescription: '每层降低5%防御力，最多叠加3层',
     duration: 3,
-    stackable: false,
+    stackable: true,
+    maxStacks: 3,
     isDebuff: true,
-    modifiers: [{ stat: 'def', value: -25, isPercentage: true }],
+    modifiers: [{ stat: 'def', value: -5, isPercentage: true }],
+  },
+
+  // Earth: 3% damage reduction per stack, up to 3 stacks (9% total)
+  // Also provides +10-20% crit resistance
+  suppression: {
+    id: 'suppression',
+    name: 'Suppression',
+    chineseName: '镇压',
+    description: 'Deals 3% less damage per stack, up to 3 stacks',
+    chineseDescription: '每层造成的伤害降低3%，最多叠加3层',
+    duration: 3,
+    stackable: true,
+    maxStacks: 3,
+    isDebuff: true,
+    modifiers: [{ stat: 'atk', value: -3, isPercentage: true }],
   },
 
   // Buffs
+  // Metal: Shield equal to 10-15% max HP (using 12% as middle value)
   spirit_shield: {
     id: 'spirit_shield',
     name: 'Spirit Shield',
     chineseName: '护体灵纹',
-    description: 'Gain shield equal to 10% max HP, reduce damage taken by 15%',
-    chineseDescription: '获得最大生命值10%的护盾，受到伤害降低15%',
+    description: 'Gain shield equal to 12% max HP',
+    chineseDescription: '获得最大生命值12%的护盾',
     duration: 2,
     stackable: false,
     isDebuff: false,
-    onApply: [{ type: 'shield', value: 10, isPercentage: true, stat: 'maxHp' }],
+    onApply: [{ type: 'shield', value: 12, isPercentage: true, stat: 'maxHp' }],
   },
   attack_up: {
     id: 'attack_up',
@@ -228,10 +279,14 @@ export const BUFF_TEMPLATES: Record<string, Omit<Buff, 'remainingDuration' | 'cu
 
 // ============================================
 // Player Skills
+// Balance Spec Power Multiplier Guidelines:
+// - Basic attack: 1.0-1.2
+// - Normal skill: 1.2-1.8
+// - Ultimate skill: 2.0-3.0
 // ============================================
 
 export const PLAYER_SKILLS: Skill[] = [
-  // Basic Attack
+  // Basic Attack (Balance Spec: 1.0-1.2)
   {
     id: 'basic_attack',
     name: 'Basic Attack',
@@ -242,11 +297,11 @@ export const PLAYER_SKILLS: Skill[] = [
     costMp: 0,
     cooldown: 0,
     target: 'single_enemy',
-    powerMultiplier: 1.0,
+    powerMultiplier: 1.0, // Balance Spec: basic 1.0-1.2
     effects: [],
   },
 
-  // Fire Skills
+  // Fire Skills (Balance Spec adjusted)
   {
     id: 'fire_bolt',
     name: 'Fire Bolt',
@@ -258,7 +313,7 @@ export const PLAYER_SKILLS: Skill[] = [
     costMp: 15,
     cooldown: 0,
     target: 'single_enemy',
-    powerMultiplier: 1.5,
+    powerMultiplier: 1.3, // Balance Spec: normal 1.2-1.8
     effects: [],
   },
   {
@@ -272,7 +327,7 @@ export const PLAYER_SKILLS: Skill[] = [
     costMp: 25,
     cooldown: 2,
     target: 'single_enemy',
-    powerMultiplier: 1.8,
+    powerMultiplier: 1.6, // Balance Spec: normal 1.2-1.8
     effects: [{ type: 'debuff', value: 0.4, buffId: 'burn' }], // 40% chance to burn
   },
   {
@@ -288,12 +343,12 @@ export const PLAYER_SKILLS: Skill[] = [
     qiElement: 'fire',
     cooldown: 4,
     target: 'single_enemy',
-    powerMultiplier: 3.5,
+    powerMultiplier: 2.8, // Balance Spec: ultimate 2.0-3.0
     critBonus: 15,
     effects: [{ type: 'debuff', value: 0.8, buffId: 'burn' }],
   },
 
-  // Water Skills
+  // Water Skills (Balance Spec adjusted)
   {
     id: 'water_arrow',
     name: 'Water Arrow',
@@ -305,7 +360,7 @@ export const PLAYER_SKILLS: Skill[] = [
     costMp: 15,
     cooldown: 0,
     target: 'single_enemy',
-    powerMultiplier: 1.4,
+    powerMultiplier: 1.25, // Balance Spec: normal 1.2-1.8
     hitBonus: 10,
     effects: [],
   },
@@ -320,11 +375,11 @@ export const PLAYER_SKILLS: Skill[] = [
     costMp: 25,
     cooldown: 2,
     target: 'single_enemy',
-    powerMultiplier: 1.6,
+    powerMultiplier: 1.5, // Balance Spec: normal 1.2-1.8
     effects: [{ type: 'debuff', value: 0.35, buffId: 'frozen' }],
   },
 
-  // Wood Skills
+  // Wood Skills (Balance Spec adjusted)
   {
     id: 'vine_strike',
     name: 'Vine Strike',
@@ -336,7 +391,7 @@ export const PLAYER_SKILLS: Skill[] = [
     costMp: 15,
     cooldown: 0,
     target: 'single_enemy',
-    powerMultiplier: 1.3,
+    powerMultiplier: 1.2, // Balance Spec: normal 1.2-1.8
     effects: [],
   },
   {
@@ -357,7 +412,7 @@ export const PLAYER_SKILLS: Skill[] = [
     ],
   },
 
-  // Metal Skills
+  // Metal Skills (Balance Spec adjusted)
   {
     id: 'sword_qi',
     name: 'Sword Qi',
@@ -369,7 +424,7 @@ export const PLAYER_SKILLS: Skill[] = [
     costMp: 15,
     cooldown: 0,
     target: 'single_enemy',
-    powerMultiplier: 1.4,
+    powerMultiplier: 1.3, // Balance Spec: normal 1.2-1.8
     critBonus: 5,
     effects: [],
   },
@@ -384,11 +439,11 @@ export const PLAYER_SKILLS: Skill[] = [
     costMp: 20,
     cooldown: 2,
     target: 'single_enemy',
-    powerMultiplier: 1.3,
+    powerMultiplier: 1.2, // Balance Spec: normal 1.2-1.8 (lower power but has armor break)
     effects: [{ type: 'debuff', value: 0.6, buffId: 'armor_break' }],
   },
 
-  // Earth Skills
+  // Earth Skills (Balance Spec adjusted)
   {
     id: 'stone_fist',
     name: 'Stone Fist',
@@ -400,15 +455,15 @@ export const PLAYER_SKILLS: Skill[] = [
     costMp: 15,
     cooldown: 0,
     target: 'single_enemy',
-    powerMultiplier: 1.3,
+    powerMultiplier: 1.25, // Balance Spec: normal 1.2-1.8
     effects: [],
   },
   {
     id: 'earth_shield',
     name: 'Earth Shield',
     chineseName: '土盾术',
-    description: 'Create a protective earth barrier',
-    chineseDescription: '创造保护性土系屏障',
+    description: 'Create a protective earth barrier (12% HP shield)',
+    chineseDescription: '创造保护性土系屏障（12%生命值护盾）',
     type: 'defense',
     element: 'earth',
     costMp: 25,
@@ -416,12 +471,12 @@ export const PLAYER_SKILLS: Skill[] = [
     target: 'self',
     powerMultiplier: 0,
     effects: [
-      { type: 'buff', value: 1, buffId: 'spirit_shield' },
+      { type: 'buff', value: 1, buffId: 'spirit_shield' }, // Balance Spec: 12% max HP shield
       { type: 'buff', value: 1, buffId: 'defense_up' },
     ],
   },
 
-  // Wind Skills
+  // Wind Skills (Balance Spec adjusted)
   {
     id: 'wind_blade',
     name: 'Wind Blade',
@@ -433,7 +488,7 @@ export const PLAYER_SKILLS: Skill[] = [
     costMp: 15,
     cooldown: 0,
     target: 'single_enemy',
-    powerMultiplier: 1.35,
+    powerMultiplier: 1.25, // Balance Spec: normal 1.2-1.8
     hitBonus: 5,
     effects: [],
   },
@@ -452,7 +507,7 @@ export const PLAYER_SKILLS: Skill[] = [
     effects: [{ type: 'buff', value: 1, buffId: 'speed_up' }],
   },
 
-  // Neutral/Support Skills
+  // Neutral/Support Skills (Balance Spec adjusted)
   {
     id: 'focus_mind',
     name: 'Focus Mind',
@@ -476,7 +531,7 @@ export const PLAYER_SKILLS: Skill[] = [
     costMp: 20,
     cooldown: 1,
     target: 'single_enemy',
-    powerMultiplier: 2.0,
+    powerMultiplier: 1.8, // Balance Spec: normal 1.2-1.8 (high end for charged attack)
     critBonus: 10,
     effects: [],
   },
@@ -511,7 +566,8 @@ const createBaseCombatStats = (
   reswind: 0,
 });
 
-// Enemy skill templates
+// Enemy skill templates (Balance Spec adjusted)
+// Basic attack: 1.0-1.2, Normal skill: 1.2-1.8, Ultimate skill: 2.0-3.0
 const ENEMY_SKILLS: Record<string, Skill> = {
   beast_bite: {
     id: 'beast_bite',
@@ -523,7 +579,7 @@ const ENEMY_SKILLS: Record<string, Skill> = {
     costMp: 0,
     cooldown: 0,
     target: 'single_enemy',
-    powerMultiplier: 1.0,
+    powerMultiplier: 1.0, // Balance Spec: basic 1.0-1.2
     effects: [],
   },
   claw_swipe: {
@@ -536,36 +592,36 @@ const ENEMY_SKILLS: Record<string, Skill> = {
     costMp: 10,
     cooldown: 1,
     target: 'single_enemy',
-    powerMultiplier: 1.4,
+    powerMultiplier: 1.3, // Balance Spec: normal 1.2-1.8
     effects: [],
   },
   poison_fang: {
     id: 'poison_fang',
     name: 'Poison Fang',
     chineseName: '毒牙',
-    description: 'Bite with poisonous fangs',
-    chineseDescription: '以毒牙撕咬',
+    description: 'Bite with poisonous fangs (1.5% max HP per turn, 5 stacks)',
+    chineseDescription: '以毒牙撕咬（每回合1.5%最大生命，可叠5层）',
     type: 'attack',
     element: 'wood',
     costMp: 15,
     cooldown: 2,
     target: 'single_enemy',
-    powerMultiplier: 1.2,
-    effects: [{ type: 'debuff', value: 0.5, buffId: 'poison' }],
+    powerMultiplier: 1.2, // Balance Spec: normal 1.2-1.8
+    effects: [{ type: 'debuff', value: 0.5, buffId: 'poison' }], // Balance Spec: wood 1.5% per stack
   },
   fire_breath: {
     id: 'fire_breath',
     name: 'Fire Breath',
     chineseName: '喷火',
-    description: 'Breathe devastating fire',
-    chineseDescription: '喷射灼热火焰',
+    description: 'Breathe devastating fire (2% max HP per turn, 3 stacks)',
+    chineseDescription: '喷射灼热火焰（每回合2%最大生命，可叠3层）',
     type: 'attack',
     element: 'fire',
     costMp: 20,
     cooldown: 2,
     target: 'single_enemy',
-    powerMultiplier: 1.8,
-    effects: [{ type: 'debuff', value: 0.3, buffId: 'burn' }],
+    powerMultiplier: 1.6, // Balance Spec: normal 1.2-1.8
+    effects: [{ type: 'debuff', value: 0.3, buffId: 'burn' }], // Balance Spec: fire 2% per stack
   },
   howl: {
     id: 'howl',
@@ -590,7 +646,7 @@ const ENEMY_SKILLS: Record<string, Skill> = {
     costMp: 25,
     cooldown: 2,
     target: 'single_enemy',
-    powerMultiplier: 2.0,
+    powerMultiplier: 1.8, // Balance Spec: normal 1.2-1.8 (high end for special attack)
     critBonus: 10,
     effects: [],
   },
@@ -604,7 +660,7 @@ const ENEMY_SKILLS: Record<string, Skill> = {
     costMp: 20,
     cooldown: 3,
     target: 'single_enemy',
-    powerMultiplier: 1.3,
+    powerMultiplier: 1.25, // Balance Spec: normal 1.2-1.8 (lower because it heals)
     effects: [{ type: 'heal', value: 30, isPercentage: true }],
   },
 };

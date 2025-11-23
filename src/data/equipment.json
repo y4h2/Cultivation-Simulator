@@ -1,0 +1,725 @@
+{
+  "templates": [
+    {
+      "id": "wooden_sword",
+      "name": "Wooden Practice Sword",
+      "chineseName": "木剑",
+      "description": "A basic wooden sword for beginners.",
+      "chineseDescription": "初学者使用的基础木剑。",
+      "slot": "weapon",
+      "category": "sword",
+      "rarity": "common",
+      "grade": 1,
+      "baseStats": {
+        "atk": 5
+      },
+      "tags": ["sword"],
+      "maxEnhanceLevel": 5,
+      "maxAffixCount": 1
+    },
+    {
+      "id": "iron_sword",
+      "name": "Iron Spirit Sword",
+      "chineseName": "铁灵剑",
+      "description": "An iron sword infused with trace spiritual energy.",
+      "chineseDescription": "注入微量灵力的铁剑。",
+      "slot": "weapon",
+      "category": "sword",
+      "rarity": "common",
+      "grade": 2,
+      "baseStats": {
+        "atk": 12,
+        "spd": 2
+      },
+      "tags": ["sword"],
+      "maxEnhanceLevel": 10,
+      "maxAffixCount": 2,
+      "possiblePrefixes": ["prefix_sharp", "prefix_sturdy"],
+      "possibleSuffixes": ["suffix_wind"]
+    },
+    {
+      "id": "azure_edge",
+      "name": "Azure Edge",
+      "chineseName": "青锋剑",
+      "description": "A finely crafted sword with azure spiritual glow.",
+      "chineseDescription": "散发青色灵光的精制宝剑。",
+      "slot": "weapon",
+      "category": "sword",
+      "rarity": "uncommon",
+      "grade": 2,
+      "baseStats": {
+        "atk": 25,
+        "spd": 5,
+        "crit": 3
+      },
+      "tags": ["sword", "wind"],
+      "element": "wind",
+      "elementPower": 15,
+      "maxEnhanceLevel": 15,
+      "maxAffixCount": 2,
+      "possiblePrefixes": ["prefix_sharp", "prefix_swift", "prefix_sturdy"],
+      "possibleSuffixes": ["suffix_wind", "suffix_crit"]
+    },
+    {
+      "id": "crimson_flame_blade",
+      "name": "Crimson Flame Blade",
+      "chineseName": "赤焰刀",
+      "description": "A saber forged in volcanic flames, burning with inner fire.",
+      "chineseDescription": "在火山烈焰中锻造的战刀，燃烧着内在的火焰。",
+      "slot": "weapon",
+      "category": "saber",
+      "rarity": "rare",
+      "grade": 3,
+      "baseStats": {
+        "atk": 45,
+        "crit": 5,
+        "critDmg": 15
+      },
+      "tags": ["saber", "fire"],
+      "element": "fire",
+      "elementPower": 30,
+      "maxEnhanceLevel": 20,
+      "maxAffixCount": 3,
+      "possiblePrefixes": ["prefix_sharp", "prefix_blazing", "prefix_bloodthirsty"],
+      "possibleSuffixes": ["suffix_fire", "suffix_crit", "suffix_lifesteal"]
+    },
+    {
+      "id": "jade_spirit_staff",
+      "name": "Jade Spirit Staff",
+      "chineseName": "玉灵杖",
+      "description": "An elegant staff carved from spirit jade, enhancing spiritual power.",
+      "chineseDescription": "用灵玉雕刻的优雅法杖，增强灵力。",
+      "slot": "weapon",
+      "category": "staff",
+      "rarity": "uncommon",
+      "grade": 2,
+      "baseStats": {
+        "atk": 15,
+        "mp": 30,
+        "wis": 5
+      },
+      "tags": ["staff", "spell"],
+      "maxEnhanceLevel": 15,
+      "maxAffixCount": 2,
+      "possiblePrefixes": ["prefix_wise", "prefix_spirit"],
+      "possibleSuffixes": ["suffix_spirit", "suffix_cultivation"]
+    },
+    {
+      "id": "xuanfeng_sword",
+      "name": "Xuanfeng Sword",
+      "chineseName": "玄风剑",
+      "description": "A legendary sword that commands the wind itself.",
+      "chineseDescription": "能驾驭风之力的传奇宝剑。",
+      "slot": "weapon",
+      "category": "sword",
+      "rarity": "epic",
+      "grade": 4,
+      "baseStats": {
+        "atk": 80,
+        "spd": 15,
+        "crit": 8,
+        "critDmg": 25
+      },
+      "tags": ["sword", "wind"],
+      "element": "wind",
+      "elementPower": 50,
+      "setId": "xuanfeng_set",
+      "maxEnhanceLevel": 30,
+      "maxAffixCount": 4,
+      "possiblePrefixes": ["prefix_sharp", "prefix_swift", "prefix_divine"],
+      "possibleSuffixes": ["suffix_wind", "suffix_crit", "suffix_storm"]
+    },
+    {
+      "id": "cloth_robe",
+      "name": "Cloth Robe",
+      "chineseName": "布衣",
+      "description": "Simple cloth robe worn by novice cultivators.",
+      "chineseDescription": "初修者穿着的简单布衣。",
+      "slot": "armor",
+      "category": "robe",
+      "rarity": "common",
+      "grade": 1,
+      "baseStats": {
+        "def": 3,
+        "hp": 20
+      },
+      "tags": ["robe"],
+      "maxEnhanceLevel": 5,
+      "maxAffixCount": 1
+    },
+    {
+      "id": "spirit_silk_robe",
+      "name": "Spirit Silk Robe",
+      "chineseName": "灵丝道袍",
+      "description": "A robe woven from spirit silkworm silk.",
+      "chineseDescription": "用灵蚕丝编织的道袍。",
+      "slot": "armor",
+      "category": "robe",
+      "rarity": "uncommon",
+      "grade": 2,
+      "baseStats": {
+        "def": 15,
+        "hp": 60,
+        "mp": 20
+      },
+      "tags": ["robe", "spell"],
+      "maxEnhanceLevel": 15,
+      "maxAffixCount": 2,
+      "possiblePrefixes": ["prefix_sturdy", "prefix_spirit"],
+      "possibleSuffixes": ["suffix_spirit", "suffix_defense"]
+    },
+    {
+      "id": "azure_cloud_robe",
+      "name": "Azure Cloud Robe",
+      "chineseName": "青云道袍",
+      "description": "A mystical robe that seems to drift like clouds.",
+      "chineseDescription": "如云般飘逸的神秘道袍。",
+      "slot": "armor",
+      "category": "robe",
+      "rarity": "rare",
+      "grade": 3,
+      "baseStats": {
+        "def": 30,
+        "hp": 120,
+        "mp": 40,
+        "eva": 5
+      },
+      "tags": ["robe", "wind"],
+      "element": "wind",
+      "elementPower": 20,
+      "setId": "xuanfeng_set",
+      "maxEnhanceLevel": 20,
+      "maxAffixCount": 3,
+      "possiblePrefixes": ["prefix_sturdy", "prefix_swift", "prefix_spirit"],
+      "possibleSuffixes": ["suffix_wind", "suffix_defense", "suffix_evasion"]
+    },
+    {
+      "id": "leather_boots",
+      "name": "Leather Boots",
+      "chineseName": "皮靴",
+      "description": "Simple leather boots for traveling.",
+      "chineseDescription": "简单的旅行皮靴。",
+      "slot": "boots",
+      "category": "shoes",
+      "rarity": "common",
+      "grade": 1,
+      "baseStats": {
+        "def": 2,
+        "spd": 3
+      },
+      "tags": [],
+      "maxEnhanceLevel": 5,
+      "maxAffixCount": 1
+    },
+    {
+      "id": "swift_wind_boots",
+      "name": "Swift Wind Boots",
+      "chineseName": "疾风靴",
+      "description": "Boots enchanted with wind essence for swift movement.",
+      "chineseDescription": "附有风之精华的靴子，移动迅捷。",
+      "slot": "boots",
+      "category": "cloud_boots",
+      "rarity": "uncommon",
+      "grade": 2,
+      "baseStats": {
+        "def": 8,
+        "spd": 12,
+        "eva": 3
+      },
+      "tags": ["wind"],
+      "element": "wind",
+      "elementPower": 15,
+      "setId": "xuanfeng_set",
+      "maxEnhanceLevel": 15,
+      "maxAffixCount": 2,
+      "possiblePrefixes": ["prefix_swift", "prefix_light"],
+      "possibleSuffixes": ["suffix_wind", "suffix_evasion"]
+    },
+    {
+      "id": "spirit_jade_pendant",
+      "name": "Spirit Jade Pendant",
+      "chineseName": "灵玉佩",
+      "description": "A jade pendant that enhances spiritual sensitivity.",
+      "chineseDescription": "增强灵性感知的玉佩。",
+      "slot": "accessory",
+      "category": "pendant",
+      "rarity": "common",
+      "grade": 1,
+      "baseStats": {
+        "sense": 5,
+        "wis": 3
+      },
+      "tags": [],
+      "maxEnhanceLevel": 5,
+      "maxAffixCount": 1
+    },
+    {
+      "id": "azure_dragon_ring",
+      "name": "Azure Dragon Ring",
+      "chineseName": "青龙戒",
+      "description": "A ring bearing the mark of the Azure Dragon.",
+      "chineseDescription": "带有青龙印记的戒指。",
+      "slot": "accessory",
+      "category": "ring",
+      "rarity": "rare",
+      "grade": 3,
+      "baseStats": {
+        "atk": 15,
+        "crit": 5,
+        "critDmg": 10
+      },
+      "tags": ["dragon", "wind"],
+      "element": "wind",
+      "elementPower": 25,
+      "maxEnhanceLevel": 20,
+      "maxAffixCount": 3,
+      "possiblePrefixes": ["prefix_sharp", "prefix_divine"],
+      "possibleSuffixes": ["suffix_wind", "suffix_crit", "suffix_power"]
+    },
+    {
+      "id": "fortune_merchant_ring",
+      "name": "Fortune Merchant Ring",
+      "chineseName": "招财商戒",
+      "description": "A ring favored by merchant cultivators, brings good fortune in trade.",
+      "chineseDescription": "商修喜爱的戒指，在交易中带来好运。",
+      "slot": "accessory",
+      "category": "ring",
+      "rarity": "uncommon",
+      "grade": 2,
+      "baseStats": {
+        "luck": 10,
+        "sense": 5
+      },
+      "tags": ["merchant", "commerce"],
+      "maxEnhanceLevel": 15,
+      "maxAffixCount": 2,
+      "possiblePrefixes": ["prefix_lucky", "prefix_wise"],
+      "possibleSuffixes": ["suffix_commerce", "suffix_fortune"]
+    },
+    {
+      "id": "novice_crown",
+      "name": "Novice Crown",
+      "chineseName": "新修冠",
+      "description": "A simple headpiece for beginning cultivators.",
+      "chineseDescription": "初修者佩戴的简单头冠。",
+      "slot": "helmet",
+      "category": "crown",
+      "rarity": "common",
+      "grade": 1,
+      "baseStats": {
+        "def": 2,
+        "wis": 3
+      },
+      "tags": [],
+      "maxEnhanceLevel": 5,
+      "maxAffixCount": 1
+    },
+    {
+      "id": "jade_hairpin",
+      "name": "Jade Hairpin",
+      "chineseName": "玉簪",
+      "description": "An elegant jade hairpin that enhances mental clarity.",
+      "chineseDescription": "提升心智清明的优雅玉簪。",
+      "slot": "helmet",
+      "category": "hairpin",
+      "rarity": "uncommon",
+      "grade": 2,
+      "baseStats": {
+        "def": 5,
+        "wis": 8,
+        "sense": 5,
+        "cultivationBonus": 5
+      },
+      "tags": [],
+      "maxEnhanceLevel": 15,
+      "maxAffixCount": 2,
+      "possiblePrefixes": ["prefix_wise", "prefix_spirit"],
+      "possibleSuffixes": ["suffix_cultivation", "suffix_insight"]
+    },
+    {
+      "id": "protection_talisman",
+      "name": "Protection Talisman",
+      "chineseName": "护身符",
+      "description": "A basic talisman that provides minor protection.",
+      "chineseDescription": "提供基础防护的护身符。",
+      "slot": "talisman",
+      "category": "protection_charm",
+      "rarity": "common",
+      "grade": 1,
+      "baseStats": {
+        "def": 5,
+        "hp": 30
+      },
+      "tags": ["protection"],
+      "maxEnhanceLevel": 5,
+      "maxAffixCount": 1
+    },
+    {
+      "id": "five_elements_talisman",
+      "name": "Five Elements Talisman",
+      "chineseName": "五行符",
+      "description": "A powerful talisman balancing all five elements.",
+      "chineseDescription": "平衡五行元素的强力符箓。",
+      "slot": "talisman",
+      "category": "spirit_talisman",
+      "rarity": "rare",
+      "grade": 3,
+      "baseStats": {
+        "def": 15,
+        "hp": 80,
+        "elementResist": {
+          "fire": 10,
+          "water": 10,
+          "wood": 10,
+          "metal": 10,
+          "earth": 10
+        }
+      },
+      "tags": ["elements", "protection"],
+      "maxEnhanceLevel": 20,
+      "maxAffixCount": 3,
+      "possiblePrefixes": ["prefix_sturdy", "prefix_spirit", "prefix_divine"],
+      "possibleSuffixes": ["suffix_elements", "suffix_defense", "suffix_spirit"]
+    }
+  ],
+  "affixes": [
+    {
+      "id": "prefix_sharp",
+      "name": "Sharp",
+      "chineseName": "锋利的",
+      "type": "prefix",
+      "stats": {
+        "atkPercent": 8
+      },
+      "description": "Increases attack power.",
+      "chineseDescription": "提升攻击力。"
+    },
+    {
+      "id": "prefix_sturdy",
+      "name": "Sturdy",
+      "chineseName": "坚固的",
+      "type": "prefix",
+      "stats": {
+        "defPercent": 8,
+        "hpPercent": 5
+      },
+      "description": "Increases defense and health.",
+      "chineseDescription": "提升防御和生命值。"
+    },
+    {
+      "id": "prefix_swift",
+      "name": "Swift",
+      "chineseName": "迅捷的",
+      "type": "prefix",
+      "stats": {
+        "spd": 8,
+        "eva": 3
+      },
+      "description": "Increases speed and evasion.",
+      "chineseDescription": "提升速度和闪避。"
+    },
+    {
+      "id": "prefix_wise",
+      "name": "Wise",
+      "chineseName": "睿智的",
+      "type": "prefix",
+      "stats": {
+        "wis": 10,
+        "sense": 5
+      },
+      "description": "Increases comprehension and divine sense.",
+      "chineseDescription": "提升悟性和神识。"
+    },
+    {
+      "id": "prefix_spirit",
+      "name": "Spiritual",
+      "chineseName": "灵性的",
+      "type": "prefix",
+      "stats": {
+        "mpPercent": 10,
+        "cultivationBonus": 3
+      },
+      "description": "Increases spiritual power and cultivation efficiency.",
+      "chineseDescription": "提升灵力和修炼效率。"
+    },
+    {
+      "id": "prefix_blazing",
+      "name": "Blazing",
+      "chineseName": "炽热的",
+      "type": "prefix",
+      "stats": {
+        "elementDamage": {
+          "fire": 15
+        },
+        "atkPercent": 5
+      },
+      "description": "Increases fire damage.",
+      "chineseDescription": "提升火属性伤害。"
+    },
+    {
+      "id": "prefix_bloodthirsty",
+      "name": "Bloodthirsty",
+      "chineseName": "嗜血的",
+      "type": "prefix",
+      "stats": {
+        "critDmg": 20,
+        "crit": 3
+      },
+      "description": "Increases critical damage.",
+      "chineseDescription": "提升暴击伤害。"
+    },
+    {
+      "id": "prefix_divine",
+      "name": "Divine",
+      "chineseName": "神圣的",
+      "type": "prefix",
+      "stats": {
+        "atkPercent": 12,
+        "defPercent": 8,
+        "hpPercent": 8
+      },
+      "description": "Increases all primary stats.",
+      "chineseDescription": "提升所有主要属性。"
+    },
+    {
+      "id": "prefix_lucky",
+      "name": "Lucky",
+      "chineseName": "幸运的",
+      "type": "prefix",
+      "stats": {
+        "luck": 15,
+        "crit": 3
+      },
+      "description": "Increases luck and critical rate.",
+      "chineseDescription": "提升气运和暴击率。"
+    },
+    {
+      "id": "prefix_light",
+      "name": "Lightweight",
+      "chineseName": "轻盈的",
+      "type": "prefix",
+      "stats": {
+        "spd": 12,
+        "eva": 5
+      },
+      "description": "Greatly increases speed.",
+      "chineseDescription": "大幅提升速度。"
+    },
+    {
+      "id": "suffix_wind",
+      "name": "of Wind",
+      "chineseName": "风之",
+      "type": "suffix",
+      "stats": {
+        "elementDamage": {
+          "wind": 12
+        },
+        "spd": 5
+      },
+      "description": "Adds wind element damage.",
+      "chineseDescription": "附加风属性伤害。"
+    },
+    {
+      "id": "suffix_fire",
+      "name": "of Flame",
+      "chineseName": "焰之",
+      "type": "suffix",
+      "stats": {
+        "elementDamage": {
+          "fire": 12
+        },
+        "atk": 5
+      },
+      "description": "Adds fire element damage.",
+      "chineseDescription": "附加火属性伤害。"
+    },
+    {
+      "id": "suffix_crit",
+      "name": "of Precision",
+      "chineseName": "精准之",
+      "type": "suffix",
+      "stats": {
+        "crit": 8,
+        "acc": 5
+      },
+      "description": "Increases critical rate and accuracy.",
+      "chineseDescription": "提升暴击率和命中。"
+    },
+    {
+      "id": "suffix_defense",
+      "name": "of Protection",
+      "chineseName": "守护之",
+      "type": "suffix",
+      "stats": {
+        "defPercent": 10,
+        "hp": 30
+      },
+      "description": "Increases defense.",
+      "chineseDescription": "提升防御。"
+    },
+    {
+      "id": "suffix_evasion",
+      "name": "of Evasion",
+      "chineseName": "闪避之",
+      "type": "suffix",
+      "stats": {
+        "eva": 10,
+        "spd": 3
+      },
+      "description": "Increases evasion.",
+      "chineseDescription": "提升闪避。"
+    },
+    {
+      "id": "suffix_spirit",
+      "name": "of Spirit",
+      "chineseName": "灵魂之",
+      "type": "suffix",
+      "stats": {
+        "mp": 30,
+        "sense": 8
+      },
+      "description": "Increases spiritual power and divine sense.",
+      "chineseDescription": "提升灵力和神识。"
+    },
+    {
+      "id": "suffix_cultivation",
+      "name": "of Cultivation",
+      "chineseName": "修炼之",
+      "type": "suffix",
+      "stats": {
+        "cultivationBonus": 8,
+        "wis": 5
+      },
+      "description": "Increases cultivation efficiency.",
+      "chineseDescription": "提升修炼效率。"
+    },
+    {
+      "id": "suffix_commerce",
+      "name": "of Commerce",
+      "chineseName": "商道之",
+      "type": "suffix",
+      "stats": {
+        "luck": 8,
+        "sense": 5
+      },
+      "description": "Enhances trading abilities.",
+      "chineseDescription": "提升交易能力。"
+    },
+    {
+      "id": "suffix_fortune",
+      "name": "of Fortune",
+      "chineseName": "财运之",
+      "type": "suffix",
+      "stats": {
+        "luck": 12
+      },
+      "description": "Greatly increases luck.",
+      "chineseDescription": "大幅提升气运。"
+    },
+    {
+      "id": "suffix_power",
+      "name": "of Power",
+      "chineseName": "力量之",
+      "type": "suffix",
+      "stats": {
+        "atk": 15,
+        "atkPercent": 5
+      },
+      "description": "Increases attack power.",
+      "chineseDescription": "提升攻击力。"
+    },
+    {
+      "id": "suffix_lifesteal",
+      "name": "of Vampirism",
+      "chineseName": "吸血之",
+      "type": "suffix",
+      "stats": {
+        "crit": 5
+      },
+      "description": "Attacks heal for a portion of damage dealt.",
+      "chineseDescription": "攻击时吸取部分伤害为生命。"
+    },
+    {
+      "id": "suffix_storm",
+      "name": "of Storm",
+      "chineseName": "风暴之",
+      "type": "suffix",
+      "stats": {
+        "elementDamage": {
+          "wind": 20
+        },
+        "spd": 10,
+        "crit": 5
+      },
+      "description": "Greatly increases wind damage and speed.",
+      "chineseDescription": "大幅提升风属性伤害和速度。"
+    },
+    {
+      "id": "suffix_insight",
+      "name": "of Insight",
+      "chineseName": "洞察之",
+      "type": "suffix",
+      "stats": {
+        "sense": 12,
+        "acc": 8
+      },
+      "description": "Increases divine sense and accuracy.",
+      "chineseDescription": "提升神识和命中。"
+    },
+    {
+      "id": "suffix_elements",
+      "name": "of Elements",
+      "chineseName": "元素之",
+      "type": "suffix",
+      "stats": {
+        "elementResist": {
+          "fire": 5,
+          "water": 5,
+          "wood": 5,
+          "metal": 5,
+          "earth": 5
+        }
+      },
+      "description": "Increases all elemental resistances.",
+      "chineseDescription": "提升所有元素抗性。"
+    }
+  ],
+  "sets": [
+    {
+      "id": "xuanfeng_set",
+      "name": "Xuanfeng Wind Set",
+      "chineseName": "玄风套装",
+      "description": "Equipment blessed by the wind spirits.",
+      "chineseDescription": "受风灵祝福的装备套装。",
+      "pieces": ["xuanfeng_sword", "azure_cloud_robe", "swift_wind_boots"],
+      "bonuses": [
+        {
+          "requiredPieces": 2,
+          "stats": {
+            "spd": 15,
+            "elementDamage": {
+              "wind": 10
+            }
+          }
+        },
+        {
+          "requiredPieces": 3,
+          "stats": {
+            "spd": 25,
+            "elementDamage": {
+              "wind": 25
+            },
+            "crit": 8
+          },
+          "specialEffect": {
+            "id": "xuanfeng_fury",
+            "name": "Xuanfeng Fury",
+            "chineseName": "玄风怒",
+            "description": "Attacks have a chance to unleash a wind burst, dealing additional damage.",
+            "chineseDescription": "攻击时有概率释放风暴，造成额外伤害。"
+          }
+        }
+      ]
+    }
+  ]
+}

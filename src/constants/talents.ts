@@ -482,6 +482,28 @@ export const createInitialTalentState = (): TalentState => ({
   fateChangeCount: 0,
 });
 
+// Create initial talent state with random talents assigned
+export const createRandomInitialTalents = (): TalentState => {
+  const options = generateStartingOptions(1);
+  if (options.length === 0) {
+    return createInitialTalentState();
+  }
+
+  const option = options[0];
+  let state = createInitialTalentState();
+  state = addTalent(state, option.majorTalent, 'start');
+  state = addTalent(state, option.minorTalent, 'start');
+  if (option.flaw) {
+    state = addTalent(state, option.flaw, 'start');
+  }
+  return state;
+};
+
+// Generate new random talents (for refresh functionality)
+export const generateNewRandomTalents = (): TalentState => {
+  return createRandomInitialTalents();
+};
+
 export const hasTalent = (state: TalentState, talentId: string): boolean => {
   return (
     state.majorTalents.some(t => t.talentId === talentId) ||

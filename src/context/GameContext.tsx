@@ -12,6 +12,16 @@ import type {
   SpiritBeast,
   TalentSelectionOption,
 } from '../types/game';
+import type { EquipmentSlot, EquipmentInstance } from '../types/equipment';
+import {
+  equipItem as equipItemUtil,
+  unequipItem as unequipItemUtil,
+  addToInventory,
+  removeFromInventory,
+  getTemplateById,
+  getEquipmentDisplayName,
+  computeInstanceStats,
+} from '../constants/equipment';
 import { createInitialTime, advanceTime, isNewDay } from '../utils/time';
 import { createInitialMarket, updateMarketPrices } from '../utils/market';
 import {
@@ -55,8 +65,8 @@ import {
   addTalent,
   removeTalent,
   getTalentById,
-  generateStartingOptions,
   generateBreakthroughOptions,
+  generateNewRandomTalents,
 } from '../constants/talents';
 import {
   createInitialWorldEventState,
@@ -71,6 +81,26 @@ import {
 } from '../constants/worldEvents';
 import type { IntelSourceType, WorldEventState } from '../types/worldEvent';
 import type { SkillTreeType, ElementTreeType } from '../types/game';
+import type { ClanActivityType, PeakType } from '../types/clan';
+import {
+  createInitialClanState,
+  executeActivity,
+  getActivityById,
+  getEventById as getClanEventById,
+} from '../constants/clan';
+import type { StoryState, StoryEffect } from '../types/storyline';
+import {
+  createInitialStoryState,
+  getNodeById as getStoryNodeById,
+  startNode as storyStartNode,
+  advanceDialogue as storyAdvanceDialogue,
+  makeChoice as storyMakeChoice,
+  completeNode as storyCompleteNode,
+  completeChapter as storyCompleteChapter,
+  checkChapterComplete,
+  getAvailableNodes,
+  computeEffectResults,
+} from '../constants/storyline';
 
 // Helper function to process world event tick (called on new day)
 function processWorldEventTick(
@@ -214,11 +244,32 @@ type GameAction =
   | { type: 'GENERATE_BREAKTHROUGH_OPTIONS'; payload: { realmName: string } }
   | { type: 'CLEAR_TALENT_OPTIONS' }
   | { type: 'SET_SHOW_TALENT_SELECTION'; payload: boolean }
+  | { type: 'REFRESH_TALENTS'; payload: { cost: number } }
   // World Event Actions
   | { type: 'TICK_WORLD_EVENTS' }
   | { type: 'TRIGGER_WORLD_EVENT'; payload: { eventId: string } }
   | { type: 'DISCOVER_EVENT'; payload: { eventId: string; source: IntelSourceType } }
-  | { type: 'MARK_NEWS_READ'; payload: { newsId: string } };
+  | { type: 'MARK_NEWS_READ'; payload: { newsId: string } }
+  // Clan Actions
+  | { type: 'JOIN_CLAN'; payload: { clanName: string; chineseClanName: string } }
+  | { type: 'DO_CLAN_ACTIVITY'; payload: { activityId: string; locationId: string; npcId?: string } }
+  | { type: 'RESOLVE_CLAN_EVENT'; payload: { eventId: string; choiceId?: string } }
+  | { type: 'UPDATE_NPC_RELATIONSHIP'; payload: { npcId: string; affection?: number; trust?: number; respect?: number } }
+  | { type: 'TICK_CLAN_DAY' }
+  // Equipment Actions
+  | { type: 'EQUIP_ITEM'; payload: { instanceId: string } }
+  | { type: 'UNEQUIP_ITEM'; payload: { slot: EquipmentSlot } }
+  | { type: 'ADD_EQUIPMENT'; payload: { equipment: EquipmentInstance } }
+  | { type: 'REMOVE_EQUIPMENT'; payload: { instanceId: string } }
+  | { type: 'ENHANCE_EQUIPMENT'; payload: { instanceId: string } }
+  // Storyline Actions
+  | { type: 'INIT_STORY' }
+  | { type: 'START_STORY_NODE'; payload: { nodeId: string } }
+  | { type: 'ADVANCE_STORY_DIALOGUE'; payload: { nodeId: string } }
+  | { type: 'MAKE_STORY_CHOICE'; payload: { nodeId: string; choiceId: string } }
+  | { type: 'COMPLETE_STORY_NODE'; payload: { nodeId: string } }
+  | { type: 'CHECK_STORY_CONDITIONS' }
+  | { type: 'APPLY_STORY_EFFECTS'; payload: { effects: StoryEffect[] } };
 
 // Initial State
 const createInitialState = (): GameState => ({
@@ -247,14 +298,18 @@ const createInitialState = (): GameState => ({
     soundEnabled: false,
     notificationsEnabled: true,
   },
-  // Talent selection UI state
-  showTalentSelection: true, // Show at game start
-  talentSelectionType: 'starting',
-  startingTalentOptions: generateStartingOptions(3),
+  // Talent selection UI state - no longer show at start, talents are auto-assigned
+  showTalentSelection: false,
+  talentSelectionType: null,
+  startingTalentOptions: [],
   breakthroughTalentOptions: [],
   breakthroughRealmName: '',
   // World Event System
   worldEvents: createInitialWorldEventState(),
+  // Clan/Sect System
+  clanState: undefined, // Will be created when joining a clan
+  // Storyline/Main Quest System
+  storylineState: createInitialStoryState(),
 });
 
 // Reducer
@@ -1554,6 +1609,49 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
       };
     }
 
+    case 'REFRESH_TALENTS': {
+      const { cost } = action.payload;
+
+      // Check if player has enough spirit stones
+      if (state.character.spiritStones < cost) return state;
+
+      // Generate new random talents
+      const newTalents = generateNewRandomTalents();
+
+      // Get talent names for log
+      const majorTalent = newTalents.majorTalents[0];
+      const minorTalent = newTalents.minorTalents[0];
+      const majorDef = majorTalent ? getTalentById(majorTalent.talentId) : null;
+      const minorDef = minorTalent ? getTalentById(minorTalent.talentId) : null;
+
+      let logMessage = `刷新天赋成功！消耗 ${cost} 灵石。`;
+      if (majorDef && minorDef) {
+        logMessage += ` 新天赋：${majorDef.chineseName}、${minorDef.chineseName}`;
+      }
+      if (newTalents.flaws.length > 0) {
+        const flawDef = getTalentById(newTalents.flaws[0].talentId);
+        if (flawDef) {
+          logMessage += `，缺陷：${flawDef.chineseName}`;
+        }
+      }
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: logMessage,
+        type: 'system',
+      };
+
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          talents: newTalents,
+          spiritStones: state.character.spiritStones - cost,
+        },
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
     // ========== World Event Actions ==========
     case 'TICK_WORLD_EVENTS': {
       const worldEvents = { ...state.worldEvents };
@@ -1761,6 +1859,900 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
       };
     }
 
+    // ========== Clan Actions ==========
+    case 'JOIN_CLAN': {
+      const { clanName, chineseClanName } = action.payload;
+      const initialClanState = createInitialClanState();
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: `加入了${chineseClanName}！`,
+        type: 'event',
+      };
+
+      return {
+        ...state,
+        clanState: {
+          ...initialClanState,
+          clanName,
+          chineseClanName,
+          founded: true,
+          joinedAt: { ...state.time },
+        },
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'DO_CLAN_ACTIVITY': {
+      if (!state.clanState) return state;
+
+      const { activityId } = action.payload;
+      const activity = getActivityById(activityId as ClanActivityType);
+      if (!activity) return state;
+
+      const result = executeActivity(activity, state.clanState, state.time);
+
+      // Update clan state
+      let updatedClanState = {
+        ...state.clanState,
+        totalContributions: state.clanState.totalContributions + (result.contributionGained || 0),
+        monthlyContributions: state.clanState.monthlyContributions + (result.contributionGained || 0),
+        dailyActivitiesCompleted: [...state.clanState.dailyActivitiesCompleted, activityId as ClanActivityType],
+      };
+
+      // Update peak reputation if applicable
+      if (result.reputationChanges) {
+        const updatedPeaks = { ...updatedClanState.peaks };
+        for (const [peakId, change] of Object.entries(result.reputationChanges)) {
+          if (updatedPeaks[peakId as PeakType]) {
+            updatedPeaks[peakId as PeakType] = {
+              ...updatedPeaks[peakId as PeakType],
+              reputation: Math.max(0, Math.min(100, updatedPeaks[peakId as PeakType].reputation + change)),
+            };
+          }
+        }
+        updatedClanState = { ...updatedClanState, peaks: updatedPeaks };
+      }
+
+      // Trigger event if any
+      if (result.triggeredEventId) {
+        updatedClanState = {
+          ...updatedClanState,
+          activeEvents: [
+            ...updatedClanState.activeEvents,
+            {
+              eventId: result.triggeredEventId,
+              startTime: { ...state.time },
+              isResolved: false,
+            },
+          ],
+        };
+      }
+
+      // Update wudao points if gained
+      let updatedCharacter = state.character;
+      if (result.wudaoPointsGained) {
+        updatedCharacter = {
+          ...state.character,
+          skillPoints: {
+            ...state.character.skillPoints,
+            wudaoPoints: state.character.skillPoints.wudaoPoints + result.wudaoPointsGained,
+            totalPointsEarned: state.character.skillPoints.totalPointsEarned + result.wudaoPointsGained,
+          },
+        };
+      }
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: result.chineseMessage,
+        type: 'event',
+      };
+
+      return {
+        ...state,
+        character: updatedCharacter,
+        clanState: updatedClanState,
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'RESOLVE_CLAN_EVENT': {
+      if (!state.clanState) return state;
+
+      const { eventId, choiceId } = action.payload;
+      const eventIndex = state.clanState.activeEvents.findIndex(e => e.eventId === eventId);
+      if (eventIndex === -1) return state;
+
+      const activeEvent = state.clanState.activeEvents[eventIndex];
+      const eventDef = getClanEventById(eventId);
+
+      // Apply effects based on choice
+      let updatedClanState = { ...state.clanState };
+      let updatedCharacter = state.character;
+
+      if (eventDef && choiceId) {
+        const choice = eventDef.choices?.find(c => c.id === choiceId);
+        if (choice) {
+          for (const effect of choice.effects) {
+            switch (effect.type) {
+              case 'affection':
+                if (effect.target && effect.value) {
+                  const npcIndex = updatedClanState.npcs.findIndex(n => n.id === effect.target);
+                  if (npcIndex !== -1) {
+                    const updatedNpcs = [...updatedClanState.npcs];
+                    updatedNpcs[npcIndex] = {
+                      ...updatedNpcs[npcIndex],
+                      affection: Math.max(-100, Math.min(100, updatedNpcs[npcIndex].affection + effect.value)),
+                    };
+                    updatedClanState = { ...updatedClanState, npcs: updatedNpcs };
+                  }
+                }
+                break;
+              case 'reputation':
+                if (effect.value) {
+                  updatedClanState = {
+                    ...updatedClanState,
+                    clanAffinity: Math.max(0, Math.min(100, updatedClanState.clanAffinity + effect.value)),
+                  };
+                }
+                break;
+              case 'contribution':
+                if (effect.value) {
+                  updatedClanState = {
+                    ...updatedClanState,
+                    totalContributions: updatedClanState.totalContributions + effect.value,
+                  };
+                }
+                break;
+              case 'wudao_points':
+                if (effect.value) {
+                  updatedCharacter = {
+                    ...updatedCharacter,
+                    skillPoints: {
+                      ...updatedCharacter.skillPoints,
+                      wudaoPoints: updatedCharacter.skillPoints.wudaoPoints + effect.value,
+                      totalPointsEarned: updatedCharacter.skillPoints.totalPointsEarned + effect.value,
+                    },
+                  };
+                }
+                break;
+              case 'atmosphere':
+                if (effect.value) {
+                  updatedClanState = {
+                    ...updatedClanState,
+                    atmosphere: {
+                      ...updatedClanState.atmosphere,
+                      methods: Math.max(-100, Math.min(100, updatedClanState.atmosphere.methods + effect.value)),
+                    },
+                  };
+                }
+                break;
+              case 'flag':
+                if (effect.flagKey !== undefined && effect.flagValue !== undefined) {
+                  updatedClanState = {
+                    ...updatedClanState,
+                    storyFlags: {
+                      ...updatedClanState.storyFlags,
+                      [effect.flagKey]: effect.flagValue,
+                    },
+                  };
+                }
+                break;
+            }
+          }
+        }
+      }
+
+      // Mark event as resolved
+      const updatedActiveEvents = [...updatedClanState.activeEvents];
+      updatedActiveEvents[eventIndex] = {
+        ...activeEvent,
+        isResolved: true,
+        selectedChoiceId: choiceId,
+      };
+
+      // Add to history
+      const eventHistory = [
+        ...updatedClanState.eventHistory,
+        {
+          eventId,
+          resolvedAt: { ...state.time },
+          choiceId,
+        },
+      ];
+
+      updatedClanState = {
+        ...updatedClanState,
+        activeEvents: updatedActiveEvents.filter(e => !e.isResolved),
+        eventHistory,
+      };
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: eventDef ? `处理了事件：${eventDef.chineseName}` : '处理了一个事件',
+        type: 'event',
+      };
+
+      return {
+        ...state,
+        character: updatedCharacter,
+        clanState: updatedClanState,
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'UPDATE_NPC_RELATIONSHIP': {
+      if (!state.clanState) return state;
+
+      const { npcId, affection, trust, respect } = action.payload;
+      const npcIndex = state.clanState.npcs.findIndex(n => n.id === npcId);
+      if (npcIndex === -1) return state;
+
+      const updatedNpcs = [...state.clanState.npcs];
+      updatedNpcs[npcIndex] = {
+        ...updatedNpcs[npcIndex],
+        affection: affection !== undefined
+          ? Math.max(-100, Math.min(100, updatedNpcs[npcIndex].affection + affection))
+          : updatedNpcs[npcIndex].affection,
+        trust: trust !== undefined
+          ? Math.max(0, Math.min(100, updatedNpcs[npcIndex].trust + trust))
+          : updatedNpcs[npcIndex].trust,
+        respect: respect !== undefined
+          ? Math.max(0, Math.min(100, updatedNpcs[npcIndex].respect + respect))
+          : updatedNpcs[npcIndex].respect,
+      };
+
+      return {
+        ...state,
+        clanState: {
+          ...state.clanState,
+          npcs: updatedNpcs,
+        },
+      };
+    }
+
+    case 'TICK_CLAN_DAY': {
+      if (!state.clanState) return state;
+
+      // Reset daily activities on new day
+      return {
+        ...state,
+        clanState: {
+          ...state.clanState,
+          dailyActivitiesCompleted: [],
+          lastDayReset: { ...state.time },
+        },
+      };
+    }
+
+    // ========== Equipment Actions ==========
+    case 'EQUIP_ITEM': {
+      const { instanceId } = action.payload;
+
+      // Find the item in inventory
+      const item = state.character.equipment.inventory.find(
+        (i) => i.instanceId === instanceId
+      );
+      if (!item) return state;
+
+      const template = getTemplateById(item.templateId);
+      if (!template) return state;
+
+      const { equipment, unequipped } = equipItemUtil(state.character.equipment, item);
+
+      const displayName = getEquipmentDisplayName(item, true);
+      const log: GameLog = {
+        timestamp: state.time,
+        message: unequipped
+          ? `装备了${displayName}，替换了原有装备`
+          : `装备了${displayName}`,
+        type: 'system',
+      };
+
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          equipment,
+        },
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'UNEQUIP_ITEM': {
+      const { slot } = action.payload;
+      const currentEquipped = state.character.equipment.equipped[slot];
+
+      if (!currentEquipped) return state;
+
+      const newEquipment = unequipItemUtil(state.character.equipment, slot);
+
+      const displayName = getEquipmentDisplayName(currentEquipped, true);
+      const log: GameLog = {
+        timestamp: state.time,
+        message: `卸下了${displayName}`,
+        type: 'system',
+      };
+
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          equipment: newEquipment,
+        },
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'ADD_EQUIPMENT': {
+      const { equipment: newItem } = action.payload;
+      const updatedEquipment = addToInventory(state.character.equipment, newItem);
+
+      if (!updatedEquipment) {
+        // Inventory full
+        const log: GameLog = {
+          timestamp: state.time,
+          message: '装备背包已满，无法获得新装备',
+          type: 'system',
+        };
+        return {
+          ...state,
+          logs: [...state.logs, log].slice(-100),
+        };
+      }
+
+      const displayName = getEquipmentDisplayName(newItem, true);
+      const log: GameLog = {
+        timestamp: state.time,
+        message: `获得了装备：${displayName}`,
+        type: 'system',
+      };
+
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          equipment: updatedEquipment,
+        },
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'REMOVE_EQUIPMENT': {
+      const { instanceId } = action.payload;
+      const updatedEquipment = removeFromInventory(state.character.equipment, instanceId);
+
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          equipment: updatedEquipment,
+        },
+      };
+    }
+
+    case 'ENHANCE_EQUIPMENT': {
+      // Enhancement logic - simplified version
+      const { instanceId } = action.payload;
+
+      // Find the item (either equipped or in inventory)
+      let item: EquipmentInstance | undefined;
+      let isEquipped = false;
+      let equippedSlot: EquipmentSlot | undefined;
+
+      for (const [slot, equipped] of Object.entries(state.character.equipment.equipped)) {
+        if (equipped?.instanceId === instanceId) {
+          item = equipped;
+          isEquipped = true;
+          equippedSlot = slot as EquipmentSlot;
+          break;
+        }
+      }
+
+      if (!item) {
+        item = state.character.equipment.inventory.find((i) => i.instanceId === instanceId);
+      }
+
+      if (!item) return state;
+
+      const template = getTemplateById(item.templateId);
+      if (!template) return state;
+
+      // Check if max level reached
+      if (item.enhanceLevel >= (template.maxEnhanceLevel || 10)) {
+        return state;
+      }
+
+      // Calculate cost
+      const baseCost = 100 * template.grade;
+      const levelMultiplier = Math.pow(1.5, item.enhanceLevel);
+      const cost = Math.floor(baseCost * levelMultiplier);
+
+      if (state.character.spiritStones < cost) return state;
+
+      // Enhance the item
+      const enhancedItem: EquipmentInstance = {
+        ...item,
+        enhanceLevel: item.enhanceLevel + 1,
+      };
+
+      // Recompute stats
+      enhancedItem.computedStats = computeInstanceStats(enhancedItem);
+
+      // Update equipment state
+      let newEquipment = { ...state.character.equipment };
+
+      if (isEquipped && equippedSlot) {
+        newEquipment = {
+          ...newEquipment,
+          equipped: {
+            ...newEquipment.equipped,
+            [equippedSlot]: enhancedItem,
+          },
+        };
+      } else {
+        newEquipment = {
+          ...newEquipment,
+          inventory: newEquipment.inventory.map((i) =>
+            i.instanceId === instanceId ? enhancedItem : i
+          ),
+        };
+      }
+
+      const displayName = getEquipmentDisplayName(enhancedItem, true);
+      const log: GameLog = {
+        timestamp: state.time,
+        message: `强化成功！${displayName}提升至+${enhancedItem.enhanceLevel}`,
+        type: 'system',
+      };
+
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          spiritStones: state.character.spiritStones - cost,
+          equipment: newEquipment,
+        },
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    // ========== Storyline Actions ==========
+    case 'INIT_STORY': {
+      const initialState = createInitialStoryState();
+
+      // Check for immediately available nodes
+      const context = {
+        character: state.character,
+        storyState: initialState,
+        clanState: state.clanState,
+        worldEvents: state.worldEvents,
+        gameTime: state.time,
+      };
+
+      const availableNodes = getAvailableNodes(initialState, context);
+      const availableNodeIds = availableNodes.map(n => n.id);
+
+      // Auto-start any auto-trigger nodes
+      let updatedState: StoryState = {
+        ...initialState,
+        initialized: true,
+        availableNodeIds,
+      };
+
+      const autoTriggerNodes = availableNodes.filter(n => n.autoTrigger);
+      for (const node of autoTriggerNodes) {
+        updatedState = storyStartNode(updatedState, node.id, state.time);
+      }
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: '踏上修仙之路...',
+        type: 'event',
+      };
+
+      return {
+        ...state,
+        storylineState: updatedState,
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'START_STORY_NODE': {
+      if (!state.storylineState) return state;
+
+      const { nodeId } = action.payload;
+      const node = getStoryNodeById(nodeId);
+      if (!node) return state;
+
+      const updatedStoryState = storyStartNode(state.storylineState, nodeId, state.time);
+
+      // Apply onStartEffects
+      let updatedCharacter = state.character;
+      let updatedClanState = state.clanState;
+
+      if (node.onStartEffects) {
+        const effectResults = computeEffectResults(node.onStartEffects);
+
+        // Apply spirit stones
+        if (effectResults.spiritStonesChange !== 0) {
+          updatedCharacter = {
+            ...updatedCharacter,
+            spiritStones: updatedCharacter.spiritStones + effectResults.spiritStonesChange,
+          };
+        }
+
+        // Apply wudao points
+        if (effectResults.wudaoPointsChange !== 0) {
+          updatedCharacter = {
+            ...updatedCharacter,
+            skillPoints: {
+              ...updatedCharacter.skillPoints,
+              wudaoPoints: updatedCharacter.skillPoints.wudaoPoints + effectResults.wudaoPointsChange,
+              totalPointsEarned: updatedCharacter.skillPoints.totalPointsEarned + effectResults.wudaoPointsChange,
+            },
+          };
+        }
+
+        // Apply cultivation
+        if (effectResults.cultivationChange !== 0) {
+          updatedCharacter = {
+            ...updatedCharacter,
+            cultivationValue: updatedCharacter.cultivationValue + effectResults.cultivationChange,
+          };
+        }
+
+        // Apply contribution and affinity to clan
+        if (updatedClanState && (effectResults.contributionChange !== 0 || effectResults.affinityChange !== 0)) {
+          updatedClanState = {
+            ...updatedClanState,
+            totalContributions: updatedClanState.totalContributions + effectResults.contributionChange,
+            clanAffinity: Math.max(0, Math.min(100, updatedClanState.clanAffinity + effectResults.affinityChange)),
+          };
+        }
+      }
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: `任务开始: ${node.chineseName}`,
+        type: 'event',
+      };
+
+      return {
+        ...state,
+        character: updatedCharacter,
+        clanState: updatedClanState,
+        storylineState: updatedStoryState,
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'ADVANCE_STORY_DIALOGUE': {
+      if (!state.storylineState) return state;
+
+      const { nodeId } = action.payload;
+      const updatedStoryState = storyAdvanceDialogue(state.storylineState, nodeId);
+
+      return {
+        ...state,
+        storylineState: updatedStoryState,
+      };
+    }
+
+    case 'MAKE_STORY_CHOICE': {
+      if (!state.storylineState) return state;
+
+      const { nodeId, choiceId } = action.payload;
+      const { state: updatedStoryState, effects } = storyMakeChoice(state.storylineState, nodeId, choiceId);
+
+      // Apply choice effects
+      let updatedCharacter = state.character;
+      let updatedClanState = state.clanState;
+
+      if (effects.length > 0) {
+        const effectResults = computeEffectResults(effects);
+
+        // Apply spirit stones
+        if (effectResults.spiritStonesChange !== 0) {
+          updatedCharacter = {
+            ...updatedCharacter,
+            spiritStones: updatedCharacter.spiritStones + effectResults.spiritStonesChange,
+          };
+        }
+
+        // Apply wudao points
+        if (effectResults.wudaoPointsChange !== 0) {
+          updatedCharacter = {
+            ...updatedCharacter,
+            skillPoints: {
+              ...updatedCharacter.skillPoints,
+              wudaoPoints: updatedCharacter.skillPoints.wudaoPoints + effectResults.wudaoPointsChange,
+              totalPointsEarned: updatedCharacter.skillPoints.totalPointsEarned + effectResults.wudaoPointsChange,
+            },
+          };
+        }
+
+        // Apply cultivation
+        if (effectResults.cultivationChange !== 0) {
+          updatedCharacter = {
+            ...updatedCharacter,
+            cultivationValue: updatedCharacter.cultivationValue + effectResults.cultivationChange,
+          };
+        }
+
+        // Apply contribution and affinity to clan
+        if (updatedClanState && (effectResults.contributionChange !== 0 || effectResults.affinityChange !== 0)) {
+          updatedClanState = {
+            ...updatedClanState,
+            totalContributions: updatedClanState.totalContributions + effectResults.contributionChange,
+            clanAffinity: Math.max(0, Math.min(100, updatedClanState.clanAffinity + effectResults.affinityChange)),
+          };
+        }
+
+        // Add items to inventory
+        const newInventoryItems = [...updatedCharacter.inventory.items];
+        for (const item of effectResults.items) {
+          const existingItem = newInventoryItems.find(i => i.itemId === item.itemId);
+          if (existingItem) {
+            existingItem.quantity += item.quantity;
+          } else {
+            newInventoryItems.push({ ...item });
+          }
+        }
+        updatedCharacter = {
+          ...updatedCharacter,
+          inventory: { ...updatedCharacter.inventory, items: newInventoryItems },
+        };
+      }
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: '做出了选择',
+        type: 'event',
+      };
+
+      return {
+        ...state,
+        character: updatedCharacter,
+        clanState: updatedClanState,
+        storylineState: updatedStoryState,
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'COMPLETE_STORY_NODE': {
+      if (!state.storylineState) return state;
+
+      const { nodeId } = action.payload;
+      const node = getStoryNodeById(nodeId);
+      if (!node) return state;
+
+      const { state: updatedStoryState, effects } = storyCompleteNode(state.storylineState, nodeId, state.time);
+
+      // Apply completion effects
+      let updatedCharacter = state.character;
+      let updatedClanState = state.clanState;
+
+      if (effects.length > 0) {
+        const effectResults = computeEffectResults(effects);
+
+        // Apply spirit stones
+        if (effectResults.spiritStonesChange !== 0) {
+          updatedCharacter = {
+            ...updatedCharacter,
+            spiritStones: updatedCharacter.spiritStones + effectResults.spiritStonesChange,
+          };
+        }
+
+        // Apply wudao points
+        if (effectResults.wudaoPointsChange !== 0) {
+          updatedCharacter = {
+            ...updatedCharacter,
+            skillPoints: {
+              ...updatedCharacter.skillPoints,
+              wudaoPoints: updatedCharacter.skillPoints.wudaoPoints + effectResults.wudaoPointsChange,
+              totalPointsEarned: updatedCharacter.skillPoints.totalPointsEarned + effectResults.wudaoPointsChange,
+            },
+          };
+        }
+
+        // Apply cultivation
+        if (effectResults.cultivationChange !== 0) {
+          updatedCharacter = {
+            ...updatedCharacter,
+            cultivationValue: updatedCharacter.cultivationValue + effectResults.cultivationChange,
+          };
+        }
+
+        // Apply contribution and affinity to clan
+        if (updatedClanState && (effectResults.contributionChange !== 0 || effectResults.affinityChange !== 0)) {
+          updatedClanState = {
+            ...updatedClanState,
+            totalContributions: updatedClanState.totalContributions + effectResults.contributionChange,
+            clanAffinity: Math.max(0, Math.min(100, updatedClanState.clanAffinity + effectResults.affinityChange)),
+          };
+        }
+
+        // Add items to inventory
+        const newInventoryItems = [...updatedCharacter.inventory.items];
+        for (const item of effectResults.items) {
+          const existingItem = newInventoryItems.find(i => i.itemId === item.itemId);
+          if (existingItem) {
+            existingItem.quantity += item.quantity;
+          } else {
+            newInventoryItems.push({ ...item });
+          }
+        }
+        updatedCharacter = {
+          ...updatedCharacter,
+          inventory: { ...updatedCharacter.inventory, items: newInventoryItems },
+        };
+      }
+
+      // Check for chapter completion
+      let finalStoryState = updatedStoryState;
+      if (checkChapterComplete(finalStoryState)) {
+        const { state: chapterCompleteState, effects: chapterEffects } = storyCompleteChapter(finalStoryState, state.time);
+        finalStoryState = chapterCompleteState;
+
+        if (chapterEffects.length > 0) {
+          const chapterResults = computeEffectResults(chapterEffects);
+
+          if (chapterResults.spiritStonesChange !== 0) {
+            updatedCharacter = {
+              ...updatedCharacter,
+              spiritStones: updatedCharacter.spiritStones + chapterResults.spiritStonesChange,
+            };
+          }
+
+          if (chapterResults.wudaoPointsChange !== 0) {
+            updatedCharacter = {
+              ...updatedCharacter,
+              skillPoints: {
+                ...updatedCharacter.skillPoints,
+                wudaoPoints: updatedCharacter.skillPoints.wudaoPoints + chapterResults.wudaoPointsChange,
+                totalPointsEarned: updatedCharacter.skillPoints.totalPointsEarned + chapterResults.wudaoPointsChange,
+              },
+            };
+          }
+        }
+      }
+
+      // Re-check available nodes after completion
+      const context = {
+        character: updatedCharacter,
+        storyState: finalStoryState,
+        clanState: updatedClanState,
+        worldEvents: state.worldEvents,
+        gameTime: state.time,
+      };
+
+      const availableNodes = getAvailableNodes(finalStoryState, context);
+      finalStoryState = {
+        ...finalStoryState,
+        availableNodeIds: availableNodes.map(n => n.id),
+      };
+
+      const log: GameLog = {
+        timestamp: state.time,
+        message: `任务完成: ${node.chineseName}`,
+        type: 'event',
+      };
+
+      return {
+        ...state,
+        character: updatedCharacter,
+        clanState: updatedClanState,
+        storylineState: finalStoryState,
+        logs: [...state.logs, log].slice(-100),
+      };
+    }
+
+    case 'CHECK_STORY_CONDITIONS': {
+      if (!state.storylineState || !state.storylineState.initialized) return state;
+
+      const context = {
+        character: state.character,
+        storyState: state.storylineState,
+        clanState: state.clanState,
+        worldEvents: state.worldEvents,
+        gameTime: state.time,
+      };
+
+      const availableNodes = getAvailableNodes(state.storylineState, context);
+      const availableNodeIds = availableNodes.map(n => n.id);
+
+      // Check for new available nodes that weren't available before
+      const newAvailable = availableNodeIds.filter(id => !state.storylineState!.availableNodeIds.includes(id));
+
+      // Auto-start any auto-trigger nodes
+      let updatedState: StoryState = {
+        ...state.storylineState,
+        availableNodeIds,
+      };
+
+      const autoTriggerNodes = availableNodes.filter(n =>
+        n.autoTrigger && !state.storylineState!.activeNodes.some(an => an.nodeId === n.id)
+      );
+
+      const logs: GameLog[] = [];
+
+      for (const node of autoTriggerNodes) {
+        updatedState = storyStartNode(updatedState, node.id, state.time);
+        logs.push({
+          timestamp: state.time,
+          message: `新任务: ${node.chineseName}`,
+          type: 'event',
+        });
+      }
+
+      // Notify about new available non-auto nodes
+      for (const nodeId of newAvailable) {
+        const node = getStoryNodeById(nodeId);
+        if (node && !node.autoTrigger) {
+          updatedState = {
+            ...updatedState,
+            pendingNotification: nodeId,
+          };
+          break; // Only one notification at a time
+        }
+      }
+
+      return {
+        ...state,
+        storylineState: updatedState,
+        logs: [...state.logs, ...logs].slice(-100),
+      };
+    }
+
+    case 'APPLY_STORY_EFFECTS': {
+      const { effects } = action.payload;
+      if (effects.length === 0) return state;
+
+      const effectResults = computeEffectResults(effects);
+      let updatedCharacter = state.character;
+      let updatedClanState = state.clanState;
+
+      if (effectResults.spiritStonesChange !== 0) {
+        updatedCharacter = {
+          ...updatedCharacter,
+          spiritStones: updatedCharacter.spiritStones + effectResults.spiritStonesChange,
+        };
+      }
+
+      if (effectResults.wudaoPointsChange !== 0) {
+        updatedCharacter = {
+          ...updatedCharacter,
+          skillPoints: {
+            ...updatedCharacter.skillPoints,
+            wudaoPoints: updatedCharacter.skillPoints.wudaoPoints + effectResults.wudaoPointsChange,
+            totalPointsEarned: updatedCharacter.skillPoints.totalPointsEarned + effectResults.wudaoPointsChange,
+          },
+        };
+      }
+
+      if (effectResults.cultivationChange !== 0) {
+        updatedCharacter = {
+          ...updatedCharacter,
+          cultivationValue: updatedCharacter.cultivationValue + effectResults.cultivationChange,
+        };
+      }
+
+      if (updatedClanState && (effectResults.contributionChange !== 0 || effectResults.affinityChange !== 0)) {
+        updatedClanState = {
+          ...updatedClanState,
+          totalContributions: updatedClanState.totalContributions + effectResults.contributionChange,
+          clanAffinity: Math.max(0, Math.min(100, updatedClanState.clanAffinity + effectResults.affinityChange)),
+        };
+      }
+
+      return {
+        ...state,
+        character: updatedCharacter,
+        clanState: updatedClanState,
+      };
+    }
+
     default:
       return state;
   }
@@ -1809,10 +2801,29 @@ interface GameContextType {
     generateBreakthroughOptions: (realmName: string) => void;
     clearTalentOptions: () => void;
     setShowTalentSelection: (show: boolean) => void;
+    refreshTalents: (cost: number) => void;
     // World Event actions
     triggerWorldEvent: (eventId: string) => void;
     discoverEvent: (eventId: string, source: IntelSourceType) => void;
     markNewsRead: (newsId: string) => void;
+    // Clan actions
+    joinClan: (clanName: string, chineseClanName: string) => void;
+    doClanActivity: (activityId: string, locationId: string, npcId?: string) => void;
+    resolveClanEvent: (eventId: string, choiceId?: string) => void;
+    updateNPCRelationship: (npcId: string, affection?: number, trust?: number, respect?: number) => void;
+    // Equipment actions
+    equipItem: (instanceId: string) => void;
+    unequipItem: (slot: EquipmentSlot) => void;
+    addEquipment: (equipment: EquipmentInstance) => void;
+    removeEquipment: (instanceId: string) => void;
+    enhanceEquipment: (instanceId: string) => void;
+    // Storyline actions
+    initStory: () => void;
+    startStoryNode: (nodeId: string) => void;
+    advanceStoryDialogue: (nodeId: string) => void;
+    makeStoryChoice: (nodeId: string, choiceId: string) => void;
+    completeStoryNode: (nodeId: string) => void;
+    checkStoryConditions: () => void;
   };
 }
 
@@ -1923,6 +2934,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dispatch({ type: 'CLEAR_TALENT_OPTIONS' }), []),
     setShowTalentSelection: useCallback((show: boolean) =>
       dispatch({ type: 'SET_SHOW_TALENT_SELECTION', payload: show }), []),
+    refreshTalents: useCallback((cost: number) =>
+      dispatch({ type: 'REFRESH_TALENTS', payload: { cost } }), []),
     // World Event actions
     triggerWorldEvent: useCallback((eventId: string) =>
       dispatch({ type: 'TRIGGER_WORLD_EVENT', payload: { eventId } }), []),
@@ -1930,6 +2943,39 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dispatch({ type: 'DISCOVER_EVENT', payload: { eventId, source } }), []),
     markNewsRead: useCallback((newsId: string) =>
       dispatch({ type: 'MARK_NEWS_READ', payload: { newsId } }), []),
+    // Clan actions
+    joinClan: useCallback((clanName: string, chineseClanName: string) =>
+      dispatch({ type: 'JOIN_CLAN', payload: { clanName, chineseClanName } }), []),
+    doClanActivity: useCallback((activityId: string, locationId: string, npcId?: string) =>
+      dispatch({ type: 'DO_CLAN_ACTIVITY', payload: { activityId, locationId, npcId } }), []),
+    resolveClanEvent: useCallback((eventId: string, choiceId?: string) =>
+      dispatch({ type: 'RESOLVE_CLAN_EVENT', payload: { eventId, choiceId } }), []),
+    updateNPCRelationship: useCallback((npcId: string, affection?: number, trust?: number, respect?: number) =>
+      dispatch({ type: 'UPDATE_NPC_RELATIONSHIP', payload: { npcId, affection, trust, respect } }), []),
+    // Equipment actions
+    equipItem: useCallback((instanceId: string) =>
+      dispatch({ type: 'EQUIP_ITEM', payload: { instanceId } }), []),
+    unequipItem: useCallback((slot: EquipmentSlot) =>
+      dispatch({ type: 'UNEQUIP_ITEM', payload: { slot } }), []),
+    addEquipment: useCallback((equipment: EquipmentInstance) =>
+      dispatch({ type: 'ADD_EQUIPMENT', payload: { equipment } }), []),
+    removeEquipment: useCallback((instanceId: string) =>
+      dispatch({ type: 'REMOVE_EQUIPMENT', payload: { instanceId } }), []),
+    enhanceEquipment: useCallback((instanceId: string) =>
+      dispatch({ type: 'ENHANCE_EQUIPMENT', payload: { instanceId } }), []),
+    // Storyline actions
+    initStory: useCallback(() =>
+      dispatch({ type: 'INIT_STORY' }), []),
+    startStoryNode: useCallback((nodeId: string) =>
+      dispatch({ type: 'START_STORY_NODE', payload: { nodeId } }), []),
+    advanceStoryDialogue: useCallback((nodeId: string) =>
+      dispatch({ type: 'ADVANCE_STORY_DIALOGUE', payload: { nodeId } }), []),
+    makeStoryChoice: useCallback((nodeId: string, choiceId: string) =>
+      dispatch({ type: 'MAKE_STORY_CHOICE', payload: { nodeId, choiceId } }), []),
+    completeStoryNode: useCallback((nodeId: string) =>
+      dispatch({ type: 'COMPLETE_STORY_NODE', payload: { nodeId } }), []),
+    checkStoryConditions: useCallback(() =>
+      dispatch({ type: 'CHECK_STORY_CONDITIONS' }), []),
   };
 
   return (
@@ -1977,4 +3023,14 @@ export const useLogs = (): GameLog[] => {
 export const useWorldEvents = () => {
   const { state } = useGame();
   return state.worldEvents;
+};
+
+export const useClanState = () => {
+  const { state } = useGame();
+  return state.clanState;
+};
+
+export const useEquipment = () => {
+  const { state } = useGame();
+  return state.character.equipment;
 };

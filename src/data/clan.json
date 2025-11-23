@@ -1,0 +1,581 @@
+{
+  "defaultClan": {
+    "name": "Azure Cloud Sect",
+    "chineseName": "青云宗",
+    "description": "A prestigious sect known for balanced cultivation and harmonious teachings.",
+    "chineseDescription": "一个以均衡修炼和和谐教导闻名的名门正派。"
+  },
+  "peaks": [
+    {
+      "id": "sword_peak",
+      "name": "Sword Peak",
+      "chineseName": "剑锋",
+      "description": "The martial heart of the sect. Disciples here focus on combat techniques and protect the sect.",
+      "chineseDescription": "宗门的武道核心。此峰弟子专注于战斗技法，负责守护宗门。",
+      "focus": "combat",
+      "element": "metal",
+      "activities": ["attend_lecture", "group_training", "seek_guidance"]
+    },
+    {
+      "id": "alchemy_peak",
+      "name": "Alchemy Peak",
+      "chineseName": "丹台",
+      "description": "The medicinal center where pills are refined and healing arts are practiced.",
+      "chineseDescription": "炼丹制药之所，医术治疗之地。",
+      "focus": "alchemy",
+      "element": "fire",
+      "activities": ["attend_lecture", "group_training", "seek_guidance"]
+    },
+    {
+      "id": "beast_garden",
+      "name": "Spirit Beast Garden",
+      "chineseName": "灵兽苑",
+      "description": "Where spirit beasts are raised and trained. Home to the sect's bonded creatures.",
+      "chineseDescription": "豢养灵兽之处，宗门契约灵兽的居所。",
+      "focus": "beasts",
+      "element": "wood",
+      "activities": ["visit_beasts", "beast_training", "seek_guidance"]
+    },
+    {
+      "id": "scripture_cliff",
+      "name": "Scripture Cliff",
+      "chineseName": "藏经崖",
+      "description": "Repository of techniques, formations, and ancient knowledge.",
+      "chineseDescription": "典藏功法、阵法与古老知识之所。",
+      "focus": "knowledge",
+      "activities": ["study_techniques", "read_records", "attend_lecture"]
+    },
+    {
+      "id": "commerce_hall",
+      "name": "Commerce Hall",
+      "chineseName": "商行阁",
+      "description": "Manages the sect's finances, external trade, and resource allocation.",
+      "chineseDescription": "掌管宗门财务、对外贸易与资源调配。",
+      "focus": "trade",
+      "activities": ["help_trade", "review_accounts"]
+    }
+  ],
+  "halls": [
+    {
+      "id": "dining_hall",
+      "name": "Dining Hall",
+      "chineseName": "斋堂",
+      "description": "Where disciples gather for meals. A hub for gossip and casual connections.",
+      "chineseDescription": "弟子用餐之处，也是八卦流言、日常交际的中心。",
+      "isGossipCenter": true,
+      "socialValue": 80,
+      "activities": ["eat_meal", "gossip"]
+    },
+    {
+      "id": "discipline_hall",
+      "name": "Discipline Hall",
+      "chineseName": "刑堂",
+      "description": "Handles punishments, disputes, and maintains order within the sect.",
+      "chineseDescription": "负责惩戒、纠纷处理，维护宗门秩序。",
+      "isGossipCenter": false,
+      "socialValue": 20,
+      "activities": ["report_issue", "seek_justice"]
+    },
+    {
+      "id": "teaching_hall",
+      "name": "Teaching Hall",
+      "chineseName": "传功堂",
+      "description": "Arranges courses, mentorship, and pairs disciples with suitable masters.",
+      "chineseDescription": "安排课程与师承，为弟子寻觅合适的师父。",
+      "isGossipCenter": false,
+      "socialValue": 50,
+      "activities": ["attend_class", "find_mentor"]
+    },
+    {
+      "id": "chores_hall",
+      "name": "Chores Hall",
+      "chineseName": "杂务堂",
+      "description": "Assigns cleaning, deliveries, and errands. Perfect for newcomers to learn the ropes.",
+      "chineseDescription": "分派打扫、送信、采买等杂务，新弟子了解宗门的好去处。",
+      "isGossipCenter": true,
+      "socialValue": 60,
+      "activities": ["do_chores", "deliver_message"]
+    }
+  ],
+  "npcs": [
+    {
+      "id": "npc_peak_master_sword",
+      "name": "Elder Qing Feng",
+      "chineseName": "青锋长老",
+      "role": "peak_master",
+      "personality": "strict",
+      "realm": "nascent_soul",
+      "element": "metal",
+      "peakAffiliation": "sword_peak",
+      "lifeCircle": "cloud_peak",
+      "intention": "genuine",
+      "teachingStyle": "harsh",
+      "flags": {}
+    },
+    {
+      "id": "npc_peak_master_alchemy",
+      "name": "Elder Yao Chen",
+      "chineseName": "药尘长老",
+      "role": "peak_master",
+      "personality": "warm",
+      "realm": "nascent_soul",
+      "element": "fire",
+      "peakAffiliation": "alchemy_peak",
+      "lifeCircle": "cloud_peak",
+      "intention": "genuine",
+      "teachingStyle": "patient",
+      "flags": {}
+    },
+    {
+      "id": "npc_peak_master_beast",
+      "name": "Elder Ling Shou",
+      "chineseName": "灵兽长老",
+      "role": "peak_master",
+      "personality": "carefree",
+      "realm": "core_formation",
+      "element": "wood",
+      "peakAffiliation": "beast_garden",
+      "lifeCircle": "cloud_peak",
+      "intention": "genuine",
+      "teachingStyle": "hands_on",
+      "flags": {}
+    },
+    {
+      "id": "npc_senior_disciple_1",
+      "name": "Senior Brother Li Wei",
+      "chineseName": "李威师兄",
+      "role": "senior_disciple",
+      "personality": "supportive",
+      "realm": "foundation",
+      "element": "metal",
+      "peakAffiliation": "sword_peak",
+      "lifeCircle": "main_gate",
+      "flags": {}
+    },
+    {
+      "id": "npc_senior_disciple_2",
+      "name": "Senior Sister Su Yun",
+      "chineseName": "苏云师姐",
+      "role": "senior_disciple",
+      "personality": "cold",
+      "realm": "foundation",
+      "element": "water",
+      "peakAffiliation": "alchemy_peak",
+      "lifeCircle": "main_gate",
+      "flags": {}
+    },
+    {
+      "id": "npc_junior_disciple_1",
+      "name": "Junior Brother Zhang Ming",
+      "chineseName": "张明师弟",
+      "role": "junior_disciple",
+      "personality": "jealous",
+      "realm": "qi_refining",
+      "peakAffiliation": "sword_peak",
+      "lifeCircle": "main_gate",
+      "flags": {}
+    },
+    {
+      "id": "npc_instructor_1",
+      "name": "Instructor Chen",
+      "chineseName": "陈传功",
+      "role": "instructor",
+      "personality": "pragmatic",
+      "realm": "core_formation",
+      "peakAffiliation": "scripture_cliff",
+      "lifeCircle": "main_gate",
+      "teachingStyle": "distant",
+      "flags": {}
+    },
+    {
+      "id": "npc_logistics_1",
+      "name": "Disciple Wang Er",
+      "chineseName": "王二",
+      "role": "logistics",
+      "personality": "warm",
+      "realm": "qi_refining",
+      "lifeCircle": "main_gate",
+      "flags": {}
+    },
+    {
+      "id": "npc_merchant_1",
+      "name": "Merchant Liu",
+      "chineseName": "刘掌柜",
+      "role": "merchant",
+      "personality": "pragmatic",
+      "realm": "qi_refining",
+      "lifeCircle": "below_mountain",
+      "flags": {}
+    },
+    {
+      "id": "npc_grand_elder",
+      "name": "Grand Elder Xuan Tian",
+      "chineseName": "玄天太上长老",
+      "role": "grand_elder",
+      "personality": "carefree",
+      "realm": "spirit_transformation",
+      "lifeCircle": "cloud_peak",
+      "flags": {}
+    }
+  ],
+  "activities": [
+    {
+      "id": "eat_meal",
+      "name": "Eat Meal",
+      "chineseName": "用餐",
+      "description": "Have a meal at the dining hall. May encounter fellow disciples.",
+      "chineseDescription": "在斋堂用餐，可能遇到同门弟子。",
+      "location": "dining_hall",
+      "timeCost": 2,
+      "contributionGain": 0,
+      "eventChance": 30
+    },
+    {
+      "id": "gossip",
+      "name": "Gossip",
+      "chineseName": "闲聊",
+      "description": "Chat with others to learn the latest sect rumors.",
+      "chineseDescription": "与他人闲聊，了解宗门最新传闻。",
+      "location": "dining_hall",
+      "timeCost": 3,
+      "eventChance": 50
+    },
+    {
+      "id": "attend_lecture",
+      "name": "Attend Lecture",
+      "chineseName": "听道",
+      "description": "Listen to an elder's discourse on cultivation.",
+      "chineseDescription": "聆听长老讲道论法。",
+      "location": "sword_peak",
+      "timeCost": 4,
+      "wudaoPointsGain": 2,
+      "reputationGain": 1,
+      "eventChance": 20
+    },
+    {
+      "id": "group_training",
+      "name": "Group Training",
+      "chineseName": "集体修炼",
+      "description": "Train alongside fellow disciples to improve together.",
+      "chineseDescription": "与同门一起修炼，共同进步。",
+      "location": "sword_peak",
+      "timeCost": 6,
+      "wudaoPointsGain": 3,
+      "affectionGain": 2,
+      "eventChance": 25
+    },
+    {
+      "id": "seek_guidance",
+      "name": "Seek Guidance",
+      "chineseName": "请教",
+      "description": "Seek advice from your master or a senior cultivator.",
+      "chineseDescription": "向师父或前辈请教修炼心得。",
+      "location": "sword_peak",
+      "minStatus": "registered",
+      "timeCost": 3,
+      "wudaoPointsGain": 5,
+      "eventChance": 40
+    },
+    {
+      "id": "do_chores",
+      "name": "Do Chores",
+      "chineseName": "做杂务",
+      "description": "Complete small tasks around the sect. Good for newcomers.",
+      "chineseDescription": "完成宗门杂务，新弟子的好选择。",
+      "location": "chores_hall",
+      "timeCost": 4,
+      "contributionGain": 5,
+      "eventChance": 35
+    },
+    {
+      "id": "deliver_message",
+      "name": "Deliver Message",
+      "chineseName": "送信",
+      "description": "Deliver messages between sect members. May learn secrets.",
+      "chineseDescription": "在宗门成员间传递消息，可能得知秘密。",
+      "location": "chores_hall",
+      "timeCost": 3,
+      "contributionGain": 3,
+      "eventChance": 45
+    },
+    {
+      "id": "help_trade",
+      "name": "Help Trade",
+      "chineseName": "协助贸易",
+      "description": "Assist with the sect's trading operations.",
+      "chineseDescription": "协助宗门贸易事务。",
+      "location": "commerce_hall",
+      "minStatus": "registered",
+      "timeCost": 5,
+      "contributionGain": 8,
+      "reputationGain": 2,
+      "eventChance": 20
+    },
+    {
+      "id": "review_accounts",
+      "name": "Review Accounts",
+      "chineseName": "查账",
+      "description": "Review sect finances. Gain market insights.",
+      "chineseDescription": "审阅宗门账目，获取市场洞察。",
+      "location": "commerce_hall",
+      "minStatus": "direct_disciple",
+      "timeCost": 4,
+      "eventChance": 15
+    },
+    {
+      "id": "visit_beasts",
+      "name": "Visit Spirit Beasts",
+      "chineseName": "看灵兽",
+      "description": "Spend time with the sect's spirit beasts.",
+      "chineseDescription": "与宗门灵兽相处。",
+      "location": "beast_garden",
+      "timeCost": 3,
+      "affectionGain": 3,
+      "eventChance": 30
+    },
+    {
+      "id": "beast_training",
+      "name": "Beast Training",
+      "chineseName": "灵兽训练",
+      "description": "Help train the sect's spirit beasts.",
+      "chineseDescription": "协助训练宗门灵兽。",
+      "location": "beast_garden",
+      "minStatus": "registered",
+      "timeCost": 5,
+      "contributionGain": 6,
+      "wudaoPointsGain": 1,
+      "eventChance": 25
+    },
+    {
+      "id": "attend_class",
+      "name": "Attend Class",
+      "chineseName": "上课",
+      "description": "Attend formal cultivation classes.",
+      "chineseDescription": "参加正式的修炼课程。",
+      "location": "teaching_hall",
+      "timeCost": 4,
+      "wudaoPointsGain": 3,
+      "eventChance": 15
+    },
+    {
+      "id": "find_mentor",
+      "name": "Find Mentor",
+      "chineseName": "寻师",
+      "description": "Seek a master to guide your cultivation path.",
+      "chineseDescription": "寻觅能指引你修炼之路的师父。",
+      "location": "teaching_hall",
+      "minStatus": "registered",
+      "timeCost": 5,
+      "eventChance": 60
+    },
+    {
+      "id": "study_techniques",
+      "name": "Study Techniques",
+      "chineseName": "研习功法",
+      "description": "Study cultivation techniques in the library.",
+      "chineseDescription": "在藏经崖研习功法。",
+      "location": "scripture_cliff",
+      "minStatus": "registered",
+      "timeCost": 6,
+      "wudaoPointsGain": 4,
+      "eventChance": 10
+    },
+    {
+      "id": "read_records",
+      "name": "Read Records",
+      "chineseName": "查阅典籍",
+      "description": "Read historical records and gain knowledge.",
+      "chineseDescription": "阅读历史典籍，增长见闻。",
+      "location": "scripture_cliff",
+      "timeCost": 4,
+      "eventChance": 20
+    },
+    {
+      "id": "meet_master",
+      "name": "Meet Master",
+      "chineseName": "请安",
+      "description": "Pay respects to your master.",
+      "chineseDescription": "向师父请安。",
+      "location": "sword_peak",
+      "minStatus": "direct_disciple",
+      "timeCost": 2,
+      "affectionGain": 1,
+      "eventChance": 50
+    }
+  ],
+  "events": [
+    {
+      "id": "evt_dining_gossip",
+      "type": "gossip_heard",
+      "name": "Overheard Gossip",
+      "chineseName": "听闻闲话",
+      "description": "You overhear some interesting gossip while dining.",
+      "chineseDescription": "用餐时听到了一些有趣的传闻。",
+      "triggerActivity": "eat_meal",
+      "triggerChance": 30,
+      "effects": [
+        { "type": "log", "message": "Learned some sect gossip", "chineseMessage": "听到了一些宗门八卦" }
+      ]
+    },
+    {
+      "id": "evt_senior_help",
+      "type": "fellow_help",
+      "name": "Senior's Guidance",
+      "chineseName": "师兄指点",
+      "description": "A senior disciple offers to help with your training.",
+      "chineseDescription": "一位师兄主动提出指点你的修炼。",
+      "triggerActivity": "group_training",
+      "triggerChance": 20,
+      "effects": [
+        { "type": "wudao_points", "value": 2 },
+        { "type": "affection", "target": "npc_senior_disciple_1", "value": 5 }
+      ]
+    },
+    {
+      "id": "evt_master_mood_good",
+      "type": "master_mood",
+      "name": "Master in Good Mood",
+      "chineseName": "师父心情好",
+      "description": "Your master is in an excellent mood and teaches you extra.",
+      "chineseDescription": "师父心情大好，额外传授了你一些要诀。",
+      "triggerActivity": "seek_guidance",
+      "triggerChance": 25,
+      "requirements": {
+        "minStatus": "direct_disciple"
+      },
+      "effects": [
+        { "type": "wudao_points", "value": 5 },
+        { "type": "affection", "value": 3 }
+      ]
+    },
+    {
+      "id": "evt_chores_secret",
+      "type": "secret_discovered",
+      "name": "Discovered a Secret",
+      "chineseName": "发现秘密",
+      "description": "While doing chores, you stumble upon something interesting.",
+      "chineseDescription": "做杂务时，偶然发现了一些有趣的事。",
+      "triggerActivity": "do_chores",
+      "triggerChance": 15,
+      "choices": [
+        {
+          "id": "report",
+          "text": "Report to the elders",
+          "chineseText": "向长老汇报",
+          "effects": [
+            { "type": "reputation", "value": 10 },
+            { "type": "contribution", "value": 20 },
+            { "type": "flag", "flagKey": "reported_secret_1", "flagValue": true }
+          ]
+        },
+        {
+          "id": "investigate",
+          "text": "Investigate quietly",
+          "chineseText": "暗中调查",
+          "effects": [
+            { "type": "flag", "flagKey": "investigating_secret_1", "flagValue": true }
+          ]
+        },
+        {
+          "id": "ignore",
+          "text": "Pretend you saw nothing",
+          "chineseText": "装作没看见",
+          "effects": []
+        }
+      ]
+    },
+    {
+      "id": "evt_junior_jealousy",
+      "type": "fellow_conflict",
+      "name": "Jealous Junior",
+      "chineseName": "师弟嫉妒",
+      "description": "A junior disciple seems jealous of your progress.",
+      "chineseDescription": "一位师弟似乎嫉妒你的进步。",
+      "triggerActivity": "attend_lecture",
+      "triggerChance": 15,
+      "triggerNPCId": "npc_junior_disciple_1",
+      "choices": [
+        {
+          "id": "confront",
+          "text": "Confront them directly",
+          "chineseText": "直接对质",
+          "effects": [
+            { "type": "affection", "target": "npc_junior_disciple_1", "value": -10 },
+            { "type": "atmosphere", "value": 5 }
+          ]
+        },
+        {
+          "id": "help",
+          "text": "Offer to help them improve",
+          "chineseText": "主动帮助他进步",
+          "effects": [
+            { "type": "affection", "target": "npc_junior_disciple_1", "value": 15 },
+            { "type": "atmosphere", "value": -5 }
+          ]
+        },
+        {
+          "id": "ignore",
+          "text": "Ignore their behavior",
+          "chineseText": "无视他的行为",
+          "effects": [
+            { "type": "affection", "target": "npc_junior_disciple_1", "value": -5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "evt_mentor_offer",
+      "type": "mentor_offer",
+      "name": "Mentor Offer",
+      "chineseName": "收徒意向",
+      "description": "An elder expresses interest in taking you as a disciple.",
+      "chineseDescription": "一位长老表达了收你为徒的意向。",
+      "triggerActivity": "find_mentor",
+      "triggerChance": 40,
+      "requirements": {
+        "minStatus": "registered"
+      },
+      "choices": [
+        {
+          "id": "accept",
+          "text": "Gratefully accept",
+          "chineseText": "感激接受",
+          "effects": [
+            { "type": "status_change", "value": 1 },
+            { "type": "affection", "value": 20 },
+            { "type": "flag", "flagKey": "has_master", "flagValue": true }
+          ]
+        },
+        {
+          "id": "decline",
+          "text": "Politely decline",
+          "chineseText": "婉言谢绝",
+          "effects": [
+            { "type": "affection", "value": -5 }
+          ]
+        },
+        {
+          "id": "ask_time",
+          "text": "Ask for time to consider",
+          "chineseText": "请求考虑时间",
+          "effects": [
+            { "type": "flag", "flagKey": "pending_mentor_offer", "flagValue": true }
+          ]
+        }
+      ]
+    }
+  ],
+  "statusThresholds": {
+    "guest": { "minAffinity": 0, "minContributions": 0 },
+    "registered": { "minAffinity": 20, "minContributions": 50 },
+    "direct_disciple": { "minAffinity": 50, "minContributions": 200, "requiresMaster": true },
+    "successor": { "minAffinity": 80, "minContributions": 1000, "requiresMaster": true, "minRealmIndex": 3 }
+  },
+  "atmosphereEffects": {
+    "very_cold": { "threshold": -60, "npcMoodModifier": -10, "eventChanceModifier": 0.8 },
+    "cold": { "threshold": -30, "npcMoodModifier": -5, "eventChanceModifier": 0.9 },
+    "neutral": { "threshold": 0, "npcMoodModifier": 0, "eventChanceModifier": 1.0 },
+    "warm": { "threshold": 30, "npcMoodModifier": 5, "eventChanceModifier": 1.1 },
+    "very_warm": { "threshold": 60, "npcMoodModifier": 10, "eventChanceModifier": 1.2 }
+  }
+}

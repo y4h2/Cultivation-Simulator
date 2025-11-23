@@ -290,6 +290,8 @@ export interface Character {
   talents: import('./talent').TalentState;
   // Player behavior tracking for talent selection
   behaviorStats: PlayerBehaviorStats;
+  // Equipment System
+  equipment: import('./equipment').CharacterEquipment;
 }
 
 // Player behavior tracking for breakthrough talent selection
@@ -508,6 +510,10 @@ export interface GameState {
   breakthroughRealmName: string;
   // World Event System
   worldEvents: import('./worldEvent').WorldEventState;
+  // Clan/Sect System
+  clanState?: import('./clan').ClanState;
+  // Storyline/Main Quest System
+  storylineState?: import('./storyline').StoryState;
 }
 
 export interface GameSettings {
